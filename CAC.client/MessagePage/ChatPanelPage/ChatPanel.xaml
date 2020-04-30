@@ -1,0 +1,47 @@
+﻿<Page
+    x:Class="CAC.client.MessagePage.ChatPanel"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CAC.client.MessagePage"
+    xmlns:con="using:CAC.client.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <con:NullToVisibility x:Key="NullToVisibility"/>
+    </Page.Resources>
+    <Grid>
+        <Grid x:Name="haveChatGrid" Visibility="{x:Bind VM.ChatListItem, Mode=OneWay, Converter={StaticResource NullToVisibility}}">
+            <Grid.RowDefinitions>
+                <RowDefinition x:Name="windowTitleBarBlankRow" Height="32"/>
+                <RowDefinition x:Name="chatTitleBarRow" Height="40"/>
+                <RowDefinition x:Name="messageViewerRow" Height="*"/>
+                <RowDefinition x:Name="inputBoxRow" Height="180"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="0"/>
+            </Grid.ColumnDefinitions>
+
+            <Grid x:Name="chatTitleBar" Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{x:Bind VM.ChatListItem.ChatName, Mode=OneWay}" VerticalAlignment="Center" FontSize="18" Margin="10 0 0 0"/>
+            </Grid>
+
+            <ContentPresenter x:Name="messageViewerPresenter" Grid.Row="2" Content="{x:Bind VM.CurrentViewer, Mode=OneWay}">
+
+            </ContentPresenter>
+            <local:InputBox Name="inputBox" Grid.Row="3" DidSentContent="inputBox_DidSentContent"/>
+        </Grid>
+
+        <Grid x:Name="noChatGrid">
+            
+        </Grid>
+    </Grid>
+</Page>

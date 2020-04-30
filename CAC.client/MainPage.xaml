@@ -1,0 +1,39 @@
+﻿<Page
+    x:Class="CAC.client.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CAC.client"
+    xmlns:cc="using:CAC.client.CustomControls"
+    xmlns:con="using:CAC.client.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <con:DoubleToGridLength x:Key="DoubleToGridLength"/>
+    </Page.Resources>
+    <Grid>
+        <!--主体是一个splitView，它的pane部分是导航栏，content部分是frame，放置各个子页面。-->
+        <SplitView x:Name="NaviSplitView" IsPaneOpen="True" OpenPaneLength="60" 
+                   DisplayMode="Inline" PaneBackground="{ThemeResource SystemControlAcrylicWindowBrush}">
+            <SplitView.Pane>
+                <cc:Navigator x:Name="Navigator" Width="60"/>
+
+            </SplitView.Pane>
+
+            <SplitView.Content>
+                
+                <cc:HorizontalSplitGrid x:Name="MainGrid">
+                        <cc:HorizontalSplitGrid.MasterContent>
+                            <Frame x:Name="naviFrame"/>
+                        </cc:HorizontalSplitGrid.MasterContent>
+                    
+                        <cc:HorizontalSplitGrid.DetailContent>
+                            <Frame x:Name="codeEditorFrame" Width="0" Background="Azure"/>
+                        </cc:HorizontalSplitGrid.DetailContent>
+                    </cc:HorizontalSplitGrid>
+
+            </SplitView.Content>
+        </SplitView>
+    </Grid>
+</Page>

@@ -1,0 +1,132 @@
+﻿<UserControl
+    x:Class="CAC.client.MessagePage.MessageViewer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CAC.client.MessagePage"
+    xmlns:con="using:CAC.client.Converters"
+    xmlns:mtuc="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="BubbleBgBrush" Color="Red" />
+        <con:BoolToHorizontalAlignment x:Key="BoolToHorizontalAlignment"/>
+        <local:messageDataTemplateSelector x:Key="messageDataTemplateSelector"/>
+    </UserControl.Resources>
+    
+    <Grid>
+
+        <ListView x:Name="MessageViewerList" ItemsSource="{x:Bind Messages, Mode=OneWay}" Loaded="MessageViewerList_Loaded"
+                  ItemTemplateSelector="{StaticResource messageDataTemplateSelector}"
+                  SelectionMode="None" IncrementalLoadingTrigger="Edge">
+            <ListView.Resources>
+                <!--#region 普通消息cell-->
+                <DataTemplate x:Key="MessageViewerTextLeftCell" x:DataType="local:TextMessageVM">
+                    <Grid HorizontalAlignment="Left" MaxWidth="600" MinHeight="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="NicknameRow"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="AvatarColumn"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" VerticalAlignment="Top"
+                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind NickName}" Visibility="Visible"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        <local:TextMessageBubble Grid.Row="1" Grid.Column="1" Text="{x:Bind Text, Mode=OneWay}" Margin="0 4 0 0"
+                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.BubbleBgColor, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate x:Key="MessageViewerTextRightCell" x:DataType="local:TextMessageVM">
+                    <Grid HorizontalAlignment="Right" MaxWidth="600">
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="NicknameRow"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition x:Name="AvatarColumn"/>
+                        </Grid.ColumnDefinitions>
+
+                        <mtuc:ImageEx x:Name="Avatar" Grid.Column="1" Grid.RowSpan="2" Width="34" Height="34" Margin="10 5 0 0" 
+                                      VerticalAlignment="Top" Style="{StaticResource RoundImageEx}"
+                                      Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+
+                        <TextBlock x:Name="NickName" Text="{x:Bind NickName}"
+                                   HorizontalAlignment="Right"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        <local:TextMessageBubble Grid.Row="1" Text="{x:Bind Text, Mode=OneWay}" Margin="0 4 0 0"
+                                               BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.BubbleBgColor, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+                <!--#endregion -->
+
+                <DataTemplate x:Key="MessageViewerImageLeftCell" x:DataType="local:ImageMessageVM">
+                    <Grid HorizontalAlignment="Left" MaxWidth="600" MinHeight="0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="NicknameRow"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="AvatarColumn"/>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+
+                        <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" VerticalAlignment="Top"
+                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind NickName}" Visibility="Visible"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        <local:ImageMessageBubble Grid.Row="1" Grid.Column="1" ImageBase64="{x:Null}" ImageUri="{x:Bind ImageUri}" Margin="0 4 0 0"
+                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.BubbleBgColor, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate x:Key="MessageViewerImageRightCell" x:DataType="local:ImageMessageVM">
+                    <Grid HorizontalAlignment="Right" MaxWidth="600">
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="NicknameRow"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                            <ColumnDefinition x:Name="AvatarColumn"/>
+                        </Grid.ColumnDefinitions>
+
+                        <mtuc:ImageEx x:Name="Avatar" Grid.Column="1" Grid.RowSpan="2" Width="34" Height="34" Margin="10 5 0 0" 
+                                      VerticalAlignment="Top" Style="{StaticResource RoundImageEx}"
+                                      Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+
+                        <TextBlock x:Name="NickName" Text="{x:Bind NickName}"
+                                   HorizontalAlignment="Right"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        <local:ImageMessageBubble Grid.Row="1" ImageBase64="{x:Bind ImageBase64}" ImageUri="{x:Bind ImageUri}" Margin="0 4 0 0"
+                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.BubbleBgColor, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+            </ListView.Resources>
+
+            <ListView.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView" 
+                              VerticalAlignment="Bottom"/>
+                </ItemsPanelTemplate>
+            </ListView.ItemsPanel>
+
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="VerticalAlignment" Value="Center"/>
+                    <Setter Property="Padding" Value="10 0 10 15"/>
+                    <Setter Property="Margin" Value="0"/>
+
+                </Style>
+            </ListView.ItemContainerStyle>
+        </ListView>
+    </Grid>
+</UserControl>

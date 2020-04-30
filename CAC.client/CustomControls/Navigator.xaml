@@ -1,0 +1,77 @@
+﻿<UserControl
+    x:Class="CAC.client.CustomControls.Navigator"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CAC.client"
+    xmlns:con="using:CAC.client.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Aqua"
+    d:DesignHeight="500"
+    d:DesignWidth="60">
+
+    <UserControl.Resources>
+        <con:DoubleToGridLength x:Key="DoubleToGridLength"/>
+    </UserControl.Resources>
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition x:Name="topBlankRow" 
+                                       Height="32"/>
+            <RowDefinition x:Name="avatarRow" 
+                                       Height="{x:Bind Width, Mode=OneTime, Converter={StaticResource DoubleToGridLength}}"/>
+            <RowDefinition x:Name="naviButtonsListRow" 
+                                       Height="*"/>
+            <RowDefinition x:Name="bottomButtonsRow" 
+                                       Height="{x:Bind Width, Mode=OneTime, Converter={StaticResource DoubleToGridLength}}"/>
+        </Grid.RowDefinitions>
+
+        <Grid x:Name="avatar" Grid.Row="1">
+            <Ellipse Margin="10">
+                <Ellipse.Fill>
+                    <ImageBrush ImageSource="/Assets/640.jpeg"/>
+                </Ellipse.Fill>
+            </Ellipse>
+        </Grid>
+        <ListView x:Name="naviItemList" Grid.Row="2" Margin="0 10 0 0"
+                              IsItemClickEnabled="True" ItemClick="naviItemList_ItemClick">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="MinWidth" Value="0"/>
+                    <Setter Property="Padding" Value="0 10 0 10"/>
+                    <Setter Property="Height" Value="60"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <ListViewItem>
+                <!--<FontIcon FontFamily="{StaticResource IcoMoon}"  Glyph="&#xe96d;" FontSize="28" Foreground="Gray"/>-->
+                <FontIcon Tag="chat" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe96d;" FontSize="26" Foreground="Gray"/>
+            </ListViewItem>
+
+            <ListViewItem>
+                <FontIcon Tag="contact" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe944;" FontSize="26" Foreground="Gray"/>
+            </ListViewItem>
+
+        </ListView>
+
+        <ListView x:Name="additionItemList" Grid.Row="3" 
+                              IsItemClickEnabled="True" ItemClick="naviItemList_ItemClick">
+            <ListView.ItemContainerStyle>
+                <Style TargetType="ListViewItem">
+                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <Setter Property="MinWidth" Value="0"/>
+                    <Setter Property="Padding" Value="0 10 0 10"/>
+                    <Setter Property="Height" Value="60"/>
+                </Style>
+            </ListView.ItemContainerStyle>
+
+            <ListViewItem>
+                <FontIcon Tag="setting" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe994;" FontSize="26" Foreground="Gray"/>
+            </ListViewItem>
+        </ListView>
+    </Grid>
+</UserControl>
