@@ -1,6 +1,4 @@
 ﻿
-using System.Diagnostics;
-using Windows.Networking.NetworkOperators;
 using Windows.UI.Input;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -10,7 +8,10 @@ using Windows.UI.Xaml.Input;
 
 namespace CAC.client.CustomControls
 {
-    public sealed partial class HorizontalSplitGrid : UserControl
+    /// <summary>
+    /// 将内容一分为二的网格。用于代码编辑器打开的情形：左边是聊天会话，右边是代码编辑器。
+    /// </summary>
+    sealed partial class HorizontalSplitGrid : UserControl
     {
         private double width;
         private bool dragEnabled = false;

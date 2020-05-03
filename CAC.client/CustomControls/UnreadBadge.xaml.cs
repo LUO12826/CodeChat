@@ -9,6 +9,9 @@ using System.Diagnostics;
 
 namespace CAC.client.CustomControls
 {
+    /// <summary>
+    /// 未读消息角标
+    /// </summary>
     sealed partial class UnreadBadge : UserControl
     {
         #region 依赖属性

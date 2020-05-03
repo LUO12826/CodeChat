@@ -1,5 +1,7 @@
-﻿using System;
+﻿using CAC.client.CustomControls;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -14,14 +16,22 @@ using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 
-namespace CAC.client.ContactsPage
+namespace CAC.client.MessagePage
 {
-
-    public sealed partial class ContactPage : Page
+    sealed partial class ChatPanel : Page
     {
-        public ContactPage()
+        private ChatPanelViewModel VM;
+
+        public ChatPanel()
         {
             this.InitializeComponent();
+            this.NavigationCacheMode = NavigationCacheMode.Required;
+            VM = MessagePageViewModel.ChatPanelViewModel;
+        }
+
+        private void inputBox_DidSentContent(object sender, SentContentEventArgs e)
+        {
+
         }
     }
 }

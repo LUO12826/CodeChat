@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:CAC.client"
     xmlns:con="using:CAC.client.Converters"
+    xmlns:mtuc="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -27,12 +28,10 @@
                                        Height="{x:Bind Width, Mode=OneTime, Converter={StaticResource DoubleToGridLength}}"/>
         </Grid.RowDefinitions>
 
-        <Grid x:Name="avatar" Grid.Row="1">
-            <Ellipse Margin="10">
-                <Ellipse.Fill>
-                    <ImageBrush ImageSource="/Assets/640.jpeg"/>
-                </Ellipse.Fill>
-            </Ellipse>
+        <Grid Grid.Row="1">
+            <mtuc:ImageEx x:Name="avatar" Margin="10" CornerRadius="50" Source="{x:Bind Avatar, Mode=OneWay}" 
+                          Tapped="avatar_Tapped" Tag="avatar"/>
+
         </Grid>
         <ListView x:Name="naviItemList" Grid.Row="2" Margin="0 10 0 0"
                               IsItemClickEnabled="True" ItemClick="naviItemList_ItemClick">
@@ -47,7 +46,6 @@
             </ListView.ItemContainerStyle>
 
             <ListViewItem>
-                <!--<FontIcon FontFamily="{StaticResource IcoMoon}"  Glyph="&#xe96d;" FontSize="28" Foreground="Gray"/>-->
                 <FontIcon Tag="chat" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe96d;" FontSize="26" Foreground="Gray"/>
             </ListViewItem>
 
@@ -70,7 +68,7 @@
             </ListView.ItemContainerStyle>
 
             <ListViewItem>
-                <FontIcon Tag="setting" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe994;" FontSize="26" Foreground="Gray"/>
+                <FontIcon Tag="settings" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe994;" FontSize="26" Foreground="Gray"/>
             </ListViewItem>
         </ListView>
     </Grid>

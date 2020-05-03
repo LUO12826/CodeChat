@@ -20,6 +20,9 @@ namespace CAC.client.Converters
         }
     }
 
+    /// <summary>
+    /// 从Grid的GridLength到double的转换
+    /// </summary>
     class GridLengthToDouble : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)

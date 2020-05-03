@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:CAC.client.MessagePage"
     xmlns:con="using:CAC.client.Converters"
+    xmlns:cc="using:CAC.client.CustomControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -34,10 +35,8 @@
                 <TextBlock Text="{x:Bind VM.ChatListItem.ChatName, Mode=OneWay}" VerticalAlignment="Center" FontSize="18" Margin="10 0 0 0"/>
             </Grid>
 
-            <ContentPresenter x:Name="messageViewerPresenter" Grid.Row="2" Content="{x:Bind VM.CurrentViewer, Mode=OneWay}">
-
-            </ContentPresenter>
-            <local:InputBox Name="inputBox" Grid.Row="3" DidSentContent="inputBox_DidSentContent"/>
+            <ContentPresenter x:Name="messageViewerPresenter" Grid.Row="2" Content="{x:Bind VM.CurrentViewer, Mode=OneWay}"/>
+            <cc:InputBox Name="inputBox" Grid.Row="3" DidSentContent="inputBox_DidSentContent"/>
         </Grid>
 
         <Grid x:Name="noChatGrid">

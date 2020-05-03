@@ -7,7 +7,10 @@ using System;
 
 namespace CAC.client.CustomControls
 {
-    public sealed partial class ResizableMasterDetail : UserControl
+    /// <summary>
+    /// 可以改变master栏宽度的master-detail视图。
+    /// </summary>
+    sealed partial class ResizableMasterDetail : UserControl
     {
         private double width;
         private bool dragEnabled = false;
@@ -89,7 +92,6 @@ namespace CAC.client.CustomControls
         {
             Button btn = sender as Button;
             PointerPoint point = e.GetCurrentPoint(btn);
-            Debug.WriteLine(width);
 
             if (point.Properties.IsLeftButtonPressed && dragEnabled) {
                 width += point.Position.X;

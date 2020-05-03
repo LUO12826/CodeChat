@@ -9,9 +9,9 @@
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
+  
     <Grid>
-
-        <cc:ResizableMasterDetail MasterDefaultWidth="350" MasterMaxWidth="350" MasterThresholdWidth="200" MasterMinWidth="80">
+        <cc:ResizableMasterDetail MasterDefaultWidth="260" MasterMaxWidth="350" MasterThresholdWidth="200" MasterMinWidth="80">
             <cc:ResizableMasterDetail.MasterContent>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -24,7 +24,7 @@
             </cc:ResizableMasterDetail.MasterContent>
 
             <cc:ResizableMasterDetail.DetailContent>
-                <Frame x:Name="chatPanelFrame"/>
+                <Frame x:Name="chatPanelFrame" ContentTransitions="{x:Null}"/>
             </cc:ResizableMasterDetail.DetailContent>
         </cc:ResizableMasterDetail>
     </Grid>

@@ -15,6 +15,7 @@ namespace CAC.client.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            //真为靠右，假为靠左。
             return (bool)value ? HorizontalAlignment.Right : HorizontalAlignment.Left;
         }
 

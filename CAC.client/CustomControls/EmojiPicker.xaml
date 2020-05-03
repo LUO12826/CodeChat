@@ -11,7 +11,7 @@
     d:DesignHeight="400"
     d:DesignWidth="300">
     <UserControl.Resources>
-        <!--girdView的数据源-->
+        <!--girdView的数据源，很重要-->
         <CollectionViewSource x:Name="emojiList" IsSourceGrouped="True" Source="{x:Bind collection.Groups}" ItemsPath="Items"/>
         <!--gridview每一项的样式-->
         <Style x:Key="EmojiGridItemContainerStyle" TargetType="GridViewItem">

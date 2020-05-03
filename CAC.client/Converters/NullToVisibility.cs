@@ -8,6 +8,9 @@ using Windows.UI.Xaml.Data;
 
 namespace CAC.client.Converters
 {
+    /// <summary>
+    /// 将空引用转换为元素不可见。
+    /// </summary>
     class NullToVisibility : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)

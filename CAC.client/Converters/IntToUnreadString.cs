@@ -1,9 +1,11 @@
 ﻿using System;
-
 using Windows.UI.Xaml.Data;
 
 namespace CAC.client.Converters
 {
+    /// <summary>
+    /// 将int转换为未读计数。
+    /// </summary>
     class IntToUnreadString : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)

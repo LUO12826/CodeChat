@@ -14,7 +14,7 @@ namespace CAC.client.Common
 
     /// <summary>
     /// 支持增量加载的可通知变更的集合。
-    /// 需要更多项目时，会通知它的代理。必须为其设置代理。
+    /// 需要更多项目时，会通知它的代理。初始化时必须为其设置代理。
     /// </summary>
     class IncrementalCollection<T> : ObservableCollection<T>, ISupportIncrementalLoading
     {

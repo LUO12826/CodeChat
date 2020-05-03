@@ -17,7 +17,7 @@
         <SplitView x:Name="NaviSplitView" IsPaneOpen="True" OpenPaneLength="60" 
                    DisplayMode="Inline" PaneBackground="{ThemeResource SystemControlAcrylicWindowBrush}">
             <SplitView.Pane>
-                <cc:Navigator x:Name="Navigator" Width="60"/>
+                <cc:Navigator x:Name="Navigator" Width="60" Avatar="{x:Bind avatar}" OnNavigationChanged="Navigator_OnNavigationChanged"/>
 
             </SplitView.Pane>
 

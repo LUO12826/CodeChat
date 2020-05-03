@@ -13,14 +13,16 @@
     <UserControl.Resources>
         <SolidColorBrush x:Key="BubbleBgBrush" Color="Red" />
         <con:BoolToHorizontalAlignment x:Key="BoolToHorizontalAlignment"/>
+        <con:BoolToVisibility x:Key="BoolToVisibility"/>
         <local:messageDataTemplateSelector x:Key="messageDataTemplateSelector"/>
     </UserControl.Resources>
     
     <Grid>
 
-        <ListView x:Name="MessageViewerList" ItemsSource="{x:Bind Messages, Mode=OneWay}" Loaded="MessageViewerList_Loaded"
-                  ItemTemplateSelector="{StaticResource messageDataTemplateSelector}"
+        <ListView x:Name="MessageViewerList" ItemsSource="{x:Bind VM.Messages, Mode=OneWay}" Loaded="MessageViewerList_Loaded"
+                  ItemTemplateSelector="{StaticResource messageDataTemplateSelector}" ShowsScrollingPlaceholders="False"
                   SelectionMode="None" IncrementalLoadingTrigger="Edge">
+            
             <ListView.Resources>
                 <!--#region 普通消息cell-->
                 <DataTemplate x:Key="MessageViewerTextLeftCell" x:DataType="local:TextMessageVM">
@@ -34,15 +36,20 @@
                             <ColumnDefinition/>
                         </Grid.ColumnDefinitions>
 
-                        <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" VerticalAlignment="Top"
+                        <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" 
+                                      VerticalAlignment="Top"
                                       Style="{StaticResource RoundImageEx}" Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
-                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind NickName}" Visibility="Visible"
+                        
+                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind NickName}" 
+                                   Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        
                         <local:TextMessageBubble Grid.Row="1" Grid.Column="1" Text="{x:Bind Text, Mode=OneWay}" Margin="0 4 0 0"
-                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.BubbleBgColor, Mode=OneWay}"/>
+                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.VM.LeftBubbleBgColor, Mode=OneWay}"/>
                     </Grid>
                 </DataTemplate>
 
+                
                 <DataTemplate x:Key="MessageViewerTextRightCell" x:DataType="local:TextMessageVM">
                     <Grid HorizontalAlignment="Right" MaxWidth="600">
                         <Grid.RowDefinitions>
@@ -56,17 +63,18 @@
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.Column="1" Grid.RowSpan="2" Width="34" Height="34" Margin="10 5 0 0" 
                                       VerticalAlignment="Top" Style="{StaticResource RoundImageEx}"
-                                      Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyBase64Avatar, Mode=OneWay}"/>
 
-                        <TextBlock x:Name="NickName" Text="{x:Bind NickName}"
-                                   HorizontalAlignment="Right"
+                        <TextBlock x:Name="NickName" Text="{x:Bind NickName}" HorizontalAlignment="Right"
+                                   Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        
                         <local:TextMessageBubble Grid.Row="1" Text="{x:Bind Text, Mode=OneWay}" Margin="0 4 0 0"
-                                               BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.BubbleBgColor, Mode=OneWay}"/>
+                                               BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.VM.RightBubbleBgColor, Mode=OneWay}"/>
                     </Grid>
                 </DataTemplate>
-                <!--#endregion -->
-
+                <!--#endregion-->
+                <!--图片消息cell-->
                 <DataTemplate x:Key="MessageViewerImageLeftCell" x:DataType="local:ImageMessageVM">
                     <Grid HorizontalAlignment="Left" MaxWidth="600" MinHeight="0">
                         <Grid.RowDefinitions>
@@ -80,10 +88,13 @@
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" VerticalAlignment="Top"
                                       Style="{StaticResource RoundImageEx}" Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
-                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind NickName}" Visibility="Visible"
+                        
+                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind NickName}" 
+                                   Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
-                        <local:ImageMessageBubble Grid.Row="1" Grid.Column="1" ImageBase64="{x:Null}" ImageUri="{x:Bind ImageUri}" Margin="0 4 0 0"
-                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.BubbleBgColor, Mode=OneWay}"/>
+                        
+                        <local:ImageMessageBubble Grid.Row="1" Grid.Column="1" ImageBase64="{x:Bind ImageBase64, Mode=OneWay}" ImageUri="{x:Bind ImageUri, Mode=OneWay}" Margin="0 4 0 0"
+                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.VM.LeftBubbleBgColor, Mode=OneWay}"/>
                     </Grid>
                 </DataTemplate>
 
@@ -100,20 +111,22 @@
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.Column="1" Grid.RowSpan="2" Width="34" Height="34" Margin="10 5 0 0" 
                                       VerticalAlignment="Top" Style="{StaticResource RoundImageEx}"
-                                      Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyBase64Avatar, Mode=OneWay}"/>
 
-                        <TextBlock x:Name="NickName" Text="{x:Bind NickName}"
-                                   HorizontalAlignment="Right"
+                        <TextBlock x:Name="NickName" Text="{x:Bind NickName}" HorizontalAlignment="Right"
+                                   Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
-                        <local:ImageMessageBubble Grid.Row="1" ImageBase64="{x:Bind ImageBase64}" ImageUri="{x:Bind ImageUri}" Margin="0 4 0 0"
-                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.BubbleBgColor, Mode=OneWay}"/>
+                        
+                        <local:ImageMessageBubble Grid.Row="1" ImageBase64="{x:Bind ImageBase64, Mode=OneWay}" ImageUri="{x:Bind ImageUri, Mode=OneWay}" Margin="0 4 0 0"
+                                       BgColor="{Binding ElementName=MessageViewerList, Path=DataContext.VM.RightBubbleBgColor, Mode=OneWay}"/>
                     </Grid>
                 </DataTemplate>
+                <!--#endregion-->
             </ListView.Resources>
 
             <ListView.ItemsPanel>
                 <ItemsPanelTemplate>
-                    <ItemsStackPanel ItemsUpdatingScrollMode="KeepLastItemInView" 
+                    <ItemsStackPanel
                               VerticalAlignment="Bottom"/>
                 </ItemsPanelTemplate>
             </ListView.ItemsPanel>

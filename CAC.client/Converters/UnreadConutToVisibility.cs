@@ -8,6 +8,9 @@ using Windows.UI.Xaml.Data;
 
 namespace CAC.client.Converters
 {
+    /// <summary>
+    /// 当未读计数为0时，隐藏UI元素
+    /// </summary>
     class UnreadConutToVisibility : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, string language)

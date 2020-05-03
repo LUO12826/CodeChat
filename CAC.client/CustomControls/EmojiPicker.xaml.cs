@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using CAC.client;
-using System.ComponentModel;
-using System.Diagnostics;
-using System.Collections.ObjectModel;
 
+/*
+ *将表情正确地分组显示后，滚动流畅度已经没问题，但打开速度仍然很慢。
+ * 使用增量加载的方式可能可以解决问题。
+ *
+ */
 namespace CAC.client.CustomControls
 {
+    /// <summary>
+    /// 表情选择器。
+    /// </summary>
     sealed partial class EmojiPicker : UserControl
     {
         private EmojisCollection collection = Emojis.InternalEmojis;

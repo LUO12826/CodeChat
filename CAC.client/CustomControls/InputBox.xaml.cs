@@ -8,7 +8,7 @@ using Windows.UI.Xaml.Input;
 using Windows.Storage.Pickers;
 using System.IO;
 
-namespace CAC.client.MessagePage
+namespace CAC.client.CustomControls
 {
     sealed partial class InputBox : UserControl
     {

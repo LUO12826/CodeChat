@@ -4,6 +4,9 @@ using System.Drawing;
 
 namespace CAC.client.MessagePage
 {
+    /// <summary>
+    /// 各种类型消息的ViewModel的基类
+    /// </summary>
     class MessageItemBaseVM : BaseViewModel
     {
         private string _UserID;

@@ -24,7 +24,7 @@
                 </DataTemplate>
             </GridView.ItemTemplate>
         </GridView>-->
-        <mg:InputBox Margin="0,170,0,0"/>
+        <cc:InputBox Margin="0,170,0,0"/>
 
         <!--<mg:MessageViewer/>-->
     </Grid>

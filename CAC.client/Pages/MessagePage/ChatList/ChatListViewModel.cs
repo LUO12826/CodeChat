@@ -3,16 +3,17 @@ using CAC.client;
 using System.Collections.ObjectModel;
 using System;
 using System.Diagnostics;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace CAC.client.MessagePage
 {
     class ChatListViewModel : BaseViewModel
     {
-        public event Action<ChatListBaseItemVM> RequireOpenChat;
         public ObservableCollection<ChatListChatItemVM> Items = new ObservableCollection<ChatListChatItemVM>();
 
         public ChatListViewModel()
         {
+
             var temp = new ChatListChatItemVM() {
                 ChatName = "静音聊天",
                 LastActiveTime = DateTime.Now,
@@ -50,7 +51,7 @@ namespace CAC.client.MessagePage
 
         public void DidSelectChat(ChatListBaseItemVM chatItem)
         {
-            RequireOpenChat?.Invoke(chatItem);
+            Messenger.Default.Send(chatItem, "RequireOpenChatToken");
         }
     }
 }

@@ -4,10 +4,14 @@ using CAC.client.Common;
 
 namespace CAC.client.MessagePage
 {
+    /// <summary>
+    /// 考虑到聊天列表中还可能有其它类型的消息（好友通知消息等，虽然不一定做），这里做一个空接口统一起来。
+    /// </summary>
     interface IChatListItem
     {
 
     }
+
     /// <summary>
     /// 聊天列表中，每一个消息项的基础模型。
     /// </summary>

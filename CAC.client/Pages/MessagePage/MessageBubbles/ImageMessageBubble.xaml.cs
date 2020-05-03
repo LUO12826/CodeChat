@@ -55,7 +55,7 @@ namespace CAC.client.MessagePage
             if(d is ImageMessageBubble ib) {
                 if(!(e.NewValue as string).IsNullOrEmpty()) {
                     ib.isLoading = true;
-                    //ib.image.Source = e.NewValue as string;
+                    ib.image.Source = e.NewValue as string;
                 }
             }
         }
@@ -66,7 +66,7 @@ namespace CAC.client.MessagePage
             if (d is ImageMessageBubble ib) {
                 if (!(e.NewValue as string).IsNullOrEmpty() && ib.ImageUri.IsNullOrEmpty()) {
                     ib.isLoading = true;
-                    //ib.image.Source = e.NewValue as string;
+                    ib.image.Source = e.NewValue as string;
                 }
             }
         }

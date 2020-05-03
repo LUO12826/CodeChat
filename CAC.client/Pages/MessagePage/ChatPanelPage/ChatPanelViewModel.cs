@@ -3,8 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace CAC.client.MessagePage
 {
@@ -16,13 +15,10 @@ namespace CAC.client.MessagePage
         private ChatListBaseItemVM _ChatListItem;
         private MessageViewer _CurrentViewer;
 
-        public MessageViewer CurrentViewer {
-            get => _CurrentViewer;
-            set {
-                _CurrentViewer = value;
-                RaisePropertyChanged(nameof(CurrentViewer));
-            }
-        }
+        //对messageViewer的缓存。我们希望切换回某个会话时保留上次的浏览位置，因此设立一个缓存。
+        //其实直接缓存viewModel是更好的方案，但没有找到解决恢复浏览位置的好方法。
+        private Dictionary<ChatListBaseItemVM, MessageViewer> messageViewerCache =
+            new Dictionary<ChatListBaseItemVM, MessageViewer>();
 
         public ChatListBaseItemVM ChatListItem {
             get => _ChatListItem;
@@ -32,13 +28,21 @@ namespace CAC.client.MessagePage
             }
         }
 
-        private Dictionary<ChatListBaseItemVM, MessageViewer> messageViewerCache = new Dictionary<ChatListBaseItemVM, MessageViewer>();
+        public MessageViewer CurrentViewer {
+            get => _CurrentViewer;
+            set {
+                _CurrentViewer = value;
+                RaisePropertyChanged(nameof(CurrentViewer));
+            }
+        }
+
 
         public ChatPanelViewModel()
         {
-
+            Messenger.Default.Register<ChatListBaseItemVM>(this, "RequireOpenChatToken", RequireOpenChat);
         }
 
+        //当缓存中有时，直接从缓存中取，否则新建
         public void RequireOpenChat(ChatListBaseItemVM chatListItem)
         {
             ChatListItem = chatListItem;
@@ -46,12 +50,11 @@ namespace CAC.client.MessagePage
                 CurrentViewer = messageViewerCache[chatListItem];
             }
             else {
-                var viewer = new MessageViewer();
-                CurrentViewer = viewer;
-                messageViewerCache.Add(chatListItem, viewer);
+                var viewerVM = new MessageViewer();
+                CurrentViewer = viewerVM;
+                messageViewerCache.Add(chatListItem, viewerVM);
             }
 
-            Debug.WriteLine("req");
         }
 
         public void RequireCloseChat(ChatListBaseItemVM chatListItem)
