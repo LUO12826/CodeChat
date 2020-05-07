@@ -16,7 +16,6 @@ namespace CAC.client
 
     public sealed partial class testPage : Page
     {
-        private EmojisGroup group = Emojis.testGroup;
         public testPage()
         {
             this.InitializeComponent();

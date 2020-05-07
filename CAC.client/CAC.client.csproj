@@ -327,6 +327,16 @@
   <ItemGroup>
     <Content Include="Assets\fonts\IcoMoon-Free.ttf" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MonacoEditorComponent\MonacoEditorComponent.csproj">
+      <Project>{dd49485c-2d9b-4824-b64e-52193b43e4cb}</Project>
+      <Name>MonacoEditorComponent</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\RichTextControls\RichTextControls.csproj">
+      <Project>{e3bd6f6f-b39e-4180-8182-dfe85c780bf4}</Project>
+      <Name>RichTextControls</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>
   </PropertyGroup>
