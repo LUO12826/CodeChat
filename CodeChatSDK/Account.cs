@@ -22,6 +22,11 @@ namespace CodeChatSDK
         public string Username { get; set; }
 
         /// <summary>
+        /// 显示名称
+        /// </summary>
+        public string FormattedName { get; set; }
+
+        /// <summary>
         /// 密码
         /// </summary>
         public string Password { private get; set; }

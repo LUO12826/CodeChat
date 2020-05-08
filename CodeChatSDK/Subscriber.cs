@@ -38,12 +38,19 @@ namespace CodeChatSDK
         /// <summary>
         /// 是否在线
         /// </summary>
-        public bool Online { get; private set; }
+        public bool Online { get; set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int Status { get; private set; }
 
         /// <summary>
         /// 头像类型
         /// </summary>
         public string PhotoType { get; private set; }
+
+        ///
 
         /// <summary>
         /// 构造函数

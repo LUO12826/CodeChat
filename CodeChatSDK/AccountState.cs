@@ -12,5 +12,6 @@ namespace CodeChatSDK
         Online,
         Busy,
         Offline,
+        Duplicate,
     }
 }
