@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -66,7 +67,9 @@ namespace CodeChatSDK
         /// <summary>
         /// 用户
         /// </summary>
-        public Account Account { get; private set; }
+        public Account CurrentAccount { get; private set; }
+
+        public event ReceiveMessageEventHandler ReceiveMessage;
 
         /// <summary>
         /// 消息Id
@@ -117,11 +120,11 @@ namespace CodeChatSDK
         {
             nextId = new Random().Next(1, 1000);
             Schema = "basic";
-            Account = account;
+            CurrentAccount = account;
             UploadEndpoint = "/v0/file/u";
             DownloadEndpoint = "/v0/file/s";
-            apiKey = "http://localhost:6660";
-            apiBaseUrl = "AQAAAAABAAAoeOI7tA3HsYvdzDhYhZJy";
+            apiKey = "http://127.0.0.1:6060";
+            apiBaseUrl = "AQEAAAABAAD_rAp4DJh05a1HAwFT3A6K";
             cancellationTokenSource = new CancellationTokenSource();
             sendMessageQueue = new Queue<ClientMsg>();
             onCompletion = new Dictionary<string, Callback>();
@@ -157,6 +160,36 @@ namespace CodeChatSDK
             }
         }
 
+        /// <summary>
+        /// 登陆
+        /// </summary>
+        public void LogIn()
+        {
+            ClientPost(Hello());
+            ClientPost(Login(Schema, CurrentAccount.GetSecret()));
+            ClientPost(Subscribe(new Topic("me")));
+        }
+
+        /// <summary>
+        /// 注册
+        /// </summary>
+        public void Register()
+        {
+            ClientPost(Hello());
+            ClientPost(Account(Schema, CurrentAccount.GetSecret(), "new"));
+        }
+
+        /// <summary>
+        /// 忘记密码
+        /// </summary>
+        public void ForgetPassword()
+        {
+            Schema = "reset";
+            string base64Secret = Convert.ToBase64String(Encoding.UTF8.GetBytes("basic:email:" + CurrentAccount.Email));
+            ByteString secret = ByteString.CopyFromUtf8(base64Secret);
+            ClientPost(Hello());
+            ClientPost(Login(Schema, secret));
+        }
 
         /// <summary>
         /// 重置连接
@@ -183,19 +216,34 @@ namespace CodeChatSDK
         /// <param name="topic">当前Topic</param>
         /// <param name="chatMessage">消息内容</param>
         /// <param name="noEcho">是否获取当前信息</param>
-        public void Send(Topic topic,ChatMessage chatMessage,bool noEcho= false)
+        public async void Send(Topic topic,ChatMessage chatMessage,bool noEcho= false)
         {
             ClientPost(Subscribe(topic));
             ClientPost(Publish(topic, noEcho, chatMessage));
+            try
+            {
+                await ClientMessageLoop();
+            }catch(Exception e)
+            {
+
+            }
         }
 
         /// <summary>
         /// 刷新好友列表
         /// </summary>
         /// <returns></returns>
-        public void RefreshSubscriberList()
+        public async void RefreshSubscriberList()
         {
             ClientPost(GetSubs(new Topic("me"), true));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
@@ -218,20 +266,20 @@ namespace CodeChatSDK
         }
 
         /// <summary>
-        /// 上传文件（暂未完成）
+        /// 上传文件
         /// </summary>
-        /// <param name="fileName">文件路径</param>
+        /// <param name="filePath">文件路径</param>
         /// <param name="redirectUrl">重定向URL</param>
         /// <returns></returns>
-        public async Task<UploadedAttachmentInfo> Upload(string fileName, string redirectUrl = "")
+        public async Task<UploadedAttachmentInfo> Upload(string filePath, string redirectUrl = "")
         {
-            if (string.IsNullOrEmpty(fileName) || !File.Exists(fileName))
+            if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
             {
                 return null;
             }
             try
             {
-                var fullFileName = Path.GetFullPath(fileName);
+                var fullFileName = Path.GetFullPath(filePath);
                 var fileInfo = new FileInfo(fullFileName);
 
                 UploadedAttachmentInfo attachmentInfo = new UploadedAttachmentInfo();
@@ -252,7 +300,6 @@ namespace CodeChatSDK
                 }
 
                 request.AddHeader("X-Tinode-APIKey", apiKey);
-                //request.AddHeader("X-Tinode-Auth", $"Token {token}");
                 request.AddXmlBody("id", GetNextId());
 
                 request.AddFile("file", fullFileName);
@@ -281,7 +328,7 @@ namespace CodeChatSDK
                                 break;
                             }
                         }
-                        return await Upload(fileName, redirectUrl);
+                        return await Upload(filePath, redirectUrl);
                     }
                     else
                     {
@@ -300,6 +347,25 @@ namespace CodeChatSDK
             }
         }
 
+        /// <summary>
+        /// 设置头像
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <param name="filePath"></param>
+        public void SetAvator(Topic topic,string filePath)
+        {
+            ClientPost(SetPhoto(topic, filePath));
+        }
+
+        /// <summary>
+        /// 设置私密备注
+        /// </summary>
+        /// <returns></returns>
+        public void SetPrivateComment(Topic topic,string comment)
+        {
+            ClientPost(SetPrivate(topic, comment));
+        }
+
         private AsyncDuplexStreamingCall<ClientMsg,ServerMsg> InitStream()
         {
             var options = new List<ChannelOption>
@@ -311,9 +377,7 @@ namespace CodeChatSDK
             channel = new Channel(ServerHost, ChannelCredentials.Insecure, options);
             var stub = new NodeClient(channel);
             var stream = stub.MessageLoop(cancellationToken: cancellationTokenSource.Token);
-            ClientPost(Hello());
-            ClientPost(Login(Schema, Account.GetSecret()));
-            ClientPost(Subscribe(new Topic("me")));
+
             return stream;
         }
 
@@ -361,18 +425,21 @@ namespace CodeChatSDK
                 }
                 else if (response.Data != null)
                 {
-                    ClientPost(NoteRead(response.Data.Topic, response.Data.SeqId));
+                    Topic currentTopic = CurrentAccount.GetTopicByName(response.Data.Topic);
+                    ClientPost(NoteRead(currentTopic.Name, response.Data.SeqId));
                     Thread.Sleep(50);
                     ChatMessage replyMessage = MessageBuilder.Parse(response.Data.Clone());
+
+                    ReceiveMessage(this, new ReceiveMessageEventArgs() { Message = replyMessage });
                     int newSeqId = response.Data.SeqId;
-                    int oldSeqId = Account.GetTopicByName(response.Data.Topic).MessageList[0].SeqId;
-                    if (oldSeqId >= newSeqId)
+                    int oldSeqId = currentTopic.MessageList.Count==0?0:currentTopic.MessageList[0].SeqId;
+                    if (oldSeqId == 0 || oldSeqId >= newSeqId)
                     {
-                        Account.GetTopicByName(response.Data.Topic).AddFirstMessage(replyMessage);
+                        currentTopic.AddFirstMessage(replyMessage);
                     }
                     else
                     {
-                        Account.GetTopicByName(response.Data.Topic).AddMessage(replyMessage);
+                        currentTopic.AddMessage(replyMessage);
                     }         
                 }
                 else if (response.Pres != null&& response.Pres.Topic == "me")
@@ -421,6 +488,14 @@ namespace CodeChatSDK
             AddCallback(id, new Callback(id, CallbackType.Login,null));
 
             return new ClientMsg() { Login = new ClientLogin() { Id = id, Scheme = scheme, Secret = secret } };
+        }
+
+        private ClientMsg Account(string scheme, ByteString secret,string userId)
+        {
+            var id = GetNextId();
+            AddCallback(id, new Callback(id, CallbackType.Acc, null));
+            ByteString publicField = ByteString.CopyFromUtf8("fn:" + CurrentAccount.FormattedName);
+            return new ClientMsg() { Acc = new ClientAcc() { Id = id, Scheme = scheme, Secret = secret, Login = true, UserId = userId, Desc = new SetDesc() { Public = publicField } } };
         }
 
         private ClientMsg Publish(Topic topic,bool noEcho,ChatMessage message)
@@ -478,6 +553,57 @@ namespace CodeChatSDK
             return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = topic.Name, Query = new GetQuery() { What = "data", Data = new GetOpts() { SinceId = since,BeforeId=before } } } };
         }
 
+
+        private ClientMsg SetTags(Topic topic,RepeatedField<string> tags)
+        {
+            var id = GetNextId();
+            AddCallback(id, new Callback(id, CallbackType.Set, null));
+
+            return new ClientMsg() { Set = new ClientSet() { Id = id, Topic = topic.Name, Query = new SetQuery() {} } };
+        }
+
+        public ClientMsg SetPrivate(Topic topic,string comment)
+        {
+            var id = GetNextId();
+            AddCallback(id, new Callback(id, CallbackType.Set, null));
+            ByteString privateField = ByteString.CopyFromUtf8("{\"comment\":"+comment+"}");
+            return new ClientMsg() { Set = new ClientSet() { Id = id, Topic = topic.Name, Query = new SetQuery() { Desc = new SetDesc() { Private = privateField } } } };
+        }
+
+        private ClientMsg SetPhoto(Topic topic,string filePath)
+        {
+            /*if (string.IsNullOrEmpty(filePath) || !File.Exists(filePath))
+            {
+                return null;
+            }
+            try
+            {
+                string fileExtension = Path.GetExtension(filePath).Trim('.');
+                long fileSize = 0;
+                string base64String = "";
+                using (FileStream readStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
+                {
+                    fileSize = readStream.Length;
+                    byte[] array = new byte[fileSize];
+                    readStream.Position = 0;
+                    readStream.Read(array, 0, (int)fileSize);
+                    base64String = Convert.ToBase64String(array);
+                }*/
+            long fileSize = 65535L;
+            string fileExtension = "png";
+            string base64String = "jajinekdinelainfdkgnsklgn";
+                var id = GetNextId();
+                AddCallback(id, new Callback(id, CallbackType.Set, null));
+                //ByteString publicField = ByteString.CopyFromUtf8("{'photo':{'data':'< 65536,bytes:"+base64String+"','type':'"+fileExtension+"'} }");
+            ByteString publicField = ByteString.CopyFromUtf8("'photo.data': < 65536,bytes:" + base64String);
+            return new ClientMsg() { Set = new ClientSet() {Id = id, Topic = topic.Name, Query = new SetQuery() { Desc=new SetDesc() { Public=publicField}  } } };
+            /*}
+            catch(Exception e)
+            {
+                return null;
+            }*/
+        }
+
         private void AddCallback(string id, Callback bundle)
         {
             onCompletion.Add(id, bundle);
@@ -494,29 +620,36 @@ namespace CodeChatSDK
                 if (code >= 200 && code <= 400)
                 {
                     var arg = bundle.Arg;
-                    bundle.Action(arg, parameters);
                     switch (type)
                     {
                         case CallbackType.Login:
-                            Account.State = AccountState.Online;
+                            CurrentAccount.State = AccountState.Online;
                             break;
                         case CallbackType.Pub:
-                            Account.GetTopicByName(topic);
+                            CurrentAccount.GetTopicByName(topic);
                             break;
                         case CallbackType.Sub:
-                            Account.AddTopic(new Topic(topic));
+                            CurrentAccount.AddTopic(new Topic(topic));
                             break;
                         case CallbackType.Leave:
-                            Account.RemoveTopic(new Topic(topic));
+                            CurrentAccount.RemoveTopic(new Topic(topic));
                             break;
                         default:
                             break;
                     }
                 }else
                 { 
-                    if (type == CallbackType.Login)
+                    switch (type)
                     {
-                        Account.State = AccountState.Offline;
+                        case CallbackType.Login:
+                            CurrentAccount.State = AccountState.Offline;
+                            break;
+                        case CallbackType.Acc:
+                            CurrentAccount.State = AccountState.Duplicate;
+                            break;
+                        default:
+                            break;
+
                     }
                 }
             }
@@ -546,7 +679,7 @@ namespace CodeChatSDK
                             photoType = subObj["photo"]["type"].ToString();
                         }
                     }
-                    Account.AddSubscriber(new Subscriber(userId, topic, userName, type, photoData, photoType, online));
+                    CurrentAccount.AddSubscriber(new Subscriber(userId, topic, userName, type, photoData, photoType, online));
                 }
             }
         }

@@ -8,9 +8,11 @@ namespace CodeChatSDK
     {
         Unknown,
         Hi,
+        Acc,
         Login,
         Sub,
         Get,
+        Set,
         Pub,
         Note,
         Leave,

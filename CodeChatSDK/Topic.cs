@@ -11,9 +11,19 @@ namespace CodeChatSDK
     public class Topic
     {
         /// <summary>
+        /// ID
+        /// </summary>
+        public long Id { get; set; }
+
+        /// <summary>
         /// 话题名
         /// </summary>
         public string Name { get; private set; }
+
+        /// <summary>
+        /// 状态
+        /// </summary>
+        public int Status { get; set; }
 
         /// <summary>
         /// 类型
@@ -21,9 +31,64 @@ namespace CodeChatSDK
         public string Type { get; set; }
 
         /// <summary>
+        /// 是否可见
+        /// </summary>
+        public bool IsVisible { get; set; }
+
+        /// <summary>
+        /// 创建时间戳
+        /// </summary>
+        public long Created { get; set; }
+
+        /// <summary>
+        /// 更新时间戳
+        /// </summary>
+        public long Updated { get; set; }
+
+        /// <summary>
+        /// 已读消息SeqId
+        /// </summary>
+        public long Read { get; set; }
+
+        /// <summary>
+        /// 已接受消息SeqId
+        /// </summary>
+        public long Recieve { get; set; }
+
+        /// <summary>
+        /// 删除事务最新ID
+        /// </summary>
+        public long Clear { get; set; }
+
+        /// <summary>
+        /// 已执行删除事务ID
+        /// </summary>
+        public int MaxDeleteId { get; set; }
+
+        /// <summary>
+        /// 最新消息时间戳
+        /// </summary>
+        public long LastUsed { get; set; }
+
+        /// <summary>
+        /// 本地最小消息SeqId
+        /// </summary>
+        public long MinLocalSeqId { get; set; }
+
+        /// <summary>
+        /// 本地最大消息SeqId
+        /// </summary>
+        public long MaxLocalSeqId { get; set; }
+
+        /// <summary>
+        /// 下个可用SeqId
+        /// </summary>
+        public long NextSeqId { get; set; }
+
+        /// <summary>
         /// 标签
         /// </summary>
-        public string Tag { get; private set; }
+        public string Tags { get; private set; }
 
         /// <summary>
         /// 权重
@@ -34,6 +99,11 @@ namespace CodeChatSDK
         /// 是否归档
         /// </summary>
         public bool IsArchived { get; set; }
+
+        /// <summary>
+        /// 私密备注
+        /// </summary>
+        public string PrivateComment { get; set; }
 
         /// <summary>
         /// 订阅者列表
@@ -61,14 +131,14 @@ namespace CodeChatSDK
         /// </summary>
         /// <param name="name">话题名</param>
         /// <param name="type">类型</param>
-        /// <param name="tag">标签</param>
+        /// <param name="tags">标签</param>
         /// <param name="weight">权重</param>
         /// <param name="isArchived">是否归档</param>
-        public Topic(string name,string type,string tag,int weight,bool isArchived)
+        public Topic(string name,string type,string tags,int weight,bool isArchived)
         {
             Name = name;
             Type = type;
-            Tag = tag;
+            Tags = tags;
             Weight = weight;
             IsArchived = isArchived;
             SubsriberList = new ObservableCollection<Subscriber>();
@@ -80,14 +150,14 @@ namespace CodeChatSDK
         /// </summary>
         /// <param name="name">话题名</param>
         /// <param name="type">类型</param>
-        /// <param name="tag">标签</param>
+        /// <param name="tags">标签</param>
         /// <param name="weight">权重</param>
         /// <param name="isArchived">是否归档</param>
-        public Topic(string name, string type, string tag, int weight, int isArchived)
+        public Topic(string name, string type, string tags, int weight, int isArchived)
         {
             Name = name;
             Type = type;
-            Tag = tag;
+            Tags = tags;
             Weight = weight;
             IsArchived = isArchived == 0 ? false:true ;
             SubsriberList = new ObservableCollection<Subscriber>();
