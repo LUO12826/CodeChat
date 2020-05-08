@@ -123,6 +123,21 @@
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\FluidGridView.cs" />
     <Compile Include="Common\IncrementalCollection.cs" />
+    <Compile Include="Pages\AvatarPage\AvatarPage.xaml.cs">
+      <DependentUpon>AvatarPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\CodeEditorPage\CodeEditorPage.xaml.cs">
+      <DependentUpon>CodeEditorPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ContactPage\ContactDetail\ContactDetailControl.xaml.cs">
+      <DependentUpon>ContactDetailControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ContactPage\ContactList\ContactGroupViewModel.cs" />
+    <Compile Include="Pages\ContactPage\ContactList\ContactList.xaml.cs">
+      <DependentUpon>ContactList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ContactPage\ContactList\ContactListItemTemplateSelector.cs" />
+    <Compile Include="Pages\ContactPage\ContactList\ContactListViewModel.cs" />
     <Compile Include="Pages\ContactPage\ContactPage.xaml.cs">
       <DependentUpon>ContactPage.xaml</DependentUpon>
     </Compile>
@@ -152,6 +167,7 @@
     <Compile Include="Global\Enums.cs" />
     <Compile Include="Global\GlobalConfigs.cs" />
     <Compile Include="Global\GlobalFunctions.cs" />
+    <Compile Include="Pages\ContactPage\ContactList\ContactItemViewModel.cs" />
     <Compile Include="Pages\LoginPage\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
@@ -163,6 +179,7 @@
     </Compile>
     <Compile Include="Pages\MessagePage\ChatList\ChatListItemViewModel.cs" />
     <Compile Include="Pages\MessagePage\ChatList\ChatListViewModel.cs" />
+    <Compile Include="Pages\MessagePage\ChatList\ChatListDataTemplateSelector.cs" />
     <Compile Include="Pages\MessagePage\ChatPanelPage\ChatPanel.xaml.cs">
       <DependentUpon>ChatPanel.xaml</DependentUpon>
     </Compile>
@@ -219,6 +236,22 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="Pages\AvatarPage\AvatarPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\CodeEditorPage\CodeEditorPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ContactPage\ContactDetail\ContactDetailControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ContactPage\ContactList\ContactList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ContactPage\ContactPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -317,7 +350,6 @@
   <ItemGroup>
     <Folder Include="Assets\emojis\" />
     <Folder Include="Docs\" />
-    <Folder Include="Pages\AvatarPage\" />
     <Folder Include="ServiceAdapter\" />
     <Folder Include="Service\" />
   </ItemGroup>

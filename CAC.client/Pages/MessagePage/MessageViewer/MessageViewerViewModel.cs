@@ -11,7 +11,7 @@ namespace CAC.client.MessagePage
     class MessageViewerViewModel : BaseViewModel
     {
         private bool _IsGroupChat = false;
-        private string _MyNickName;
+        private string _MyUserName;
         private string _MyBase64Avatar;
         private Brush _LeftBubbleBgColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 192, 214, 191));
         private Brush _RightBubbleBgColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 244, 148, 118));
@@ -48,11 +48,11 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public string MyNickName {
-            get => _MyNickName;
+        public string MyUserName {
+            get => _MyUserName;
             set {
-                _MyNickName = value;
-                RaisePropertyChanged(nameof(MyNickName));
+                _MyUserName = value;
+                RaisePropertyChanged(nameof(MyUserName));
             }
         }
 
@@ -72,18 +72,18 @@ namespace CAC.client.MessagePage
                 Messages.Add(new TextMessageVM() {
                     Base64Avatar = GlobalConfigs.testB64Avator,
                     Text = "aaaaaaaaaaaaaaaa",
-                    NickName = "aaa",
+                    UserName = "aaa",
                     SendByMe = i % 2 == 0 ? true : false
                 });
             }
             var b = new ImageMessageVM() {
                 Base64Avatar = GlobalConfigs.testB64Avator,
                 ImageBase64 = GlobalConfigs.testB64Avator,
-                NickName = "aaa",
+                UserName = "aaa",
                 SendByMe = false
             };
             Messages.Add(b);
-            MyNickName = "self";
+            MyUserName = "self";
             MyBase64Avatar = GlobalConfigs.testB64Avator;
         }
 
@@ -96,7 +96,7 @@ namespace CAC.client.MessagePage
                 for (int i = 0; i < itemsNum; i++) {
 
                     b.Add(new TextMessageVM() {
-                        NickName = "bbb",
+                        UserName = "bbb",
                         Text = "新加项目",
                         Base64Avatar = GlobalConfigs.testB64Avator
                     });

@@ -15,90 +15,87 @@
     
     <UserControl.Resources>
         <con:DateTimeToShortString x:Key="DateTimeToShortString"/>
-
-        <!--普通状态下的聊天列表项-->
-        <DataTemplate x:Key="ChatListItemNormalTemplate" x:DataType="local:ChatListChatItemVM">
-            
-            <Grid Margin="0 0 12 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                  Background="Transparent"
-                  PointerEntered="cellGrid_PointerEntered" PointerExited="cellGrid_PointerExited">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="38"/>
-                    <RowDefinition Height="38"/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="18" x:Name="deleteButtomCol"/>
-                    <ColumnDefinition Width="65" x:Name="avatarCol"/>
-                    <ColumnDefinition Width="*" x:Name="infoCol"/>
-                </Grid.ColumnDefinitions>
-                
-                <!--移除按钮-->
-                <Button x:Name="removeCellBtn" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" 
-                        Height="14" Width="14" HorizontalAlignment="Center" Style="{StaticResource transparentButtonStyle}"
-                        CornerRadius="14" Tapped="RemoveCellBtn_Tapped" Visibility="Collapsed" Margin="0" Padding="0">
-                    
-                    <FontIcon HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8"
-                          FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;">
-                    </FontIcon>
-                </Button>
-                
-                <!--头像-->
-                <mtuc:ImageEx x:Name="Avatar" Width="50" Height="50" Source="{x:Bind Base64Avatar}"
-                              HorizontalAlignment="Left" Style="{StaticResource RoundImageEx}"
-                              VerticalAlignment="Center"
-                              CornerRadius="25"
-                              Margin="0" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"/>
-
-                <!--聊天名称和上次活跃时间-->
-                <Grid Grid.Row="0" Grid.Column="2" Margin="0 0 0 2" HorizontalAlignment="Stretch">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{x:Bind ChatName}" 
-                           TextTrimming="WordEllipsis"
-                           HorizontalAlignment="Left" VerticalAlignment="Bottom" 
-                           FontSize="15px"
-                           Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind LastActiveTime, Converter={StaticResource DateTimeToShortString}}" 
-                           Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" FontSize="11"
-                           HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
-                </Grid>
-
-                <!--最近一条消息和发送状态、未读计数等图标-->
-                <Grid Grid.Row="1" Grid.Column="3" Margin="0 2 0 0" VerticalAlignment="Top">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <Border Background="Orange" Width="15" Visibility="Collapsed"/>
-                    <TextBlock Grid.Column="1" Text="{x:Bind LatestMessage}" 
-                               Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
-                               FontSize="13px"
-                               TextTrimming="WordEllipsis"
-                               VerticalAlignment="Top"/>
-                    <cc:UnreadBadge Grid.Column="2" UnreadCount="{x:Bind UnreadCount, Mode=OneWay, FallbackValue=0}"
-                                    NotificationType="{x:Bind NotificationType, Mode=OneWay}"/>
-                </Grid>
-            </Grid>
-
-        </DataTemplate>
-
-        <!--紧凑状态下的聊天列表项-->
-        <DataTemplate x:Key="ChatListItemCompactTemplate">
-
-        </DataTemplate>
+        <local:ChatListDataTemplateSelector x:Key="ChatListDataTemplateSelector"/>
     </UserControl.Resources>
 
     <Grid>
         <ListView x:Name="ChatsList" SelectionMode="Single"
                   IsItemClickEnabled="True"
                   ItemClick="ChatsList_ItemClick"
-                  ItemTemplate="{StaticResource ChatListItemNormalTemplate}"
+                  ItemTemplateSelector="{StaticResource ChatListDataTemplateSelector}"
                   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                   ItemsSource="{x:Bind VM.Items, Mode=OneWay}">
 
+            <ListView.Resources>
+                <!--普通状态下的聊天列表项-->
+                <DataTemplate x:Key="ChatListItemNormalTemplate" x:DataType="local:ChatListChatItemVM">
+
+                    <Grid Margin="0 0 12 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                  Background="Transparent"
+                  PointerEntered="cellGrid_PointerEntered" PointerExited="cellGrid_PointerExited">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="38"/>
+                            <RowDefinition Height="38"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="18" x:Name="deleteButtomCol"/>
+                            <ColumnDefinition Width="65" x:Name="avatarCol"/>
+                            <ColumnDefinition Width="*" x:Name="infoCol"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!--移除按钮-->
+                        <Button x:Name="removeCellBtn" Grid.Row="0" Grid.Column="0" Grid.RowSpan="2" 
+                        Height="14" Width="14" HorizontalAlignment="Center" Style="{StaticResource transparentButtonStyle}"
+                        CornerRadius="14" Tapped="RemoveCellBtn_Tapped" Visibility="Collapsed" Margin="0" Padding="0">
+
+                            <FontIcon HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="8"
+                          FontFamily="Segoe MDL2 Assets" Glyph="&#xE711;">
+                            </FontIcon>
+                        </Button>
+
+                        <!--头像-->
+                        <mtuc:ImageEx x:Name="Avatar" Width="50" Height="50" Source="{x:Bind Base64Avatar}"
+                              HorizontalAlignment="Left" Style="{StaticResource RoundImageEx}"
+                              VerticalAlignment="Center"
+                              CornerRadius="25"
+                              Margin="0" Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"/>
+
+                        <!--聊天名称和上次活跃时间-->
+                        <Grid Grid.Row="0" Grid.Column="2" Margin="0 0 0 2" HorizontalAlignment="Stretch">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{x:Bind ChatName}" 
+                           TextTrimming="WordEllipsis"
+                           HorizontalAlignment="Left" VerticalAlignment="Bottom" 
+                           FontSize="15px"
+                           Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}"/>
+                            <TextBlock Grid.Column="1" Text="{x:Bind LastActiveTime, Converter={StaticResource DateTimeToShortString}}" 
+                           Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" FontSize="11"
+                           HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
+                        </Grid>
+
+                        <!--最近一条消息和发送状态、未读计数等图标-->
+                        <Grid Grid.Row="1" Grid.Column="3" Margin="0 2 0 0" VerticalAlignment="Top">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Border Background="Orange" Width="15" Visibility="Collapsed"/>
+                            <TextBlock Grid.Column="1" Text="{x:Bind LatestMessage}" 
+                               Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
+                               FontSize="13px"
+                               TextTrimming="WordEllipsis"
+                               VerticalAlignment="Top"/>
+                            <cc:UnreadBadge Grid.Column="2" UnreadCount="{x:Bind UnreadCount, Mode=OneWay, FallbackValue=0}"
+                                    NotificationType="{x:Bind NotificationType, Mode=OneWay}"/>
+                        </Grid>
+                    </Grid>
+
+                </DataTemplate>
+            </ListView.Resources>
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Stretch"/>

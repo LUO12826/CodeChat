@@ -47,7 +47,7 @@ namespace CAC.client.CustomControls
             else {
 
             }
-            OnNavigationChanged(this, (e.ClickedItem as FontIcon).Tag);
+            OnNavigationChanged(this, (e.ClickedItem as Grid).Tag);
         }
 
         private void avatar_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
@@ -58,4 +58,10 @@ namespace CAC.client.CustomControls
         }
     }
 
+    class NavigatorItem
+    {
+        public string Symbol { get; set; }
+        public int FontSize { get; set; }
+        public string Tag { get; set; }
+    }
 }

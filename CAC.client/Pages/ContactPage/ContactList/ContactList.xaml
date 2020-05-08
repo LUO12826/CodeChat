@@ -1,0 +1,111 @@
+﻿<UserControl
+    x:Class="CAC.client.ContactPage.ContactList"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CAC.client.ContactPage"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mtuc="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400">
+
+    <UserControl.Resources>
+        <CollectionViewSource x:Name="contactListDataSource" IsSourceGrouped="True" Source="{x:Bind VM.Contacts}" ItemsPath="Contacts"/>
+        
+        <!--列表中的联系人项。与之同级别的还有群组项（虽然现在不一定有）-->
+        <DataTemplate x:Key="ContactListContactTemplate" x:DataType="local:ContactItemViewModel">
+            <Grid Margin="0 0 12 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                  Background="Transparent">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="35"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="60" x:Name="avatarCol"/>
+                    <ColumnDefinition Width="*" x:Name="infoCol"/>
+                </Grid.ColumnDefinitions>
+
+                <!--头像-->
+                <mtuc:ImageEx x:Name="Avatar" Width="44" Height="44" Source="{x:Bind Base64Avatar, Mode=OneWay}"
+                              HorizontalAlignment="Left" Style="{StaticResource RoundImageEx}"
+                              VerticalAlignment="Center"
+                              Margin="0" Grid.RowSpan="2"/>
+
+                <!--联系人名称和ID-->
+                <Grid Grid.Row="0" Grid.Column="1" Margin="0 0 0 2" HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="{x:Bind UserName, Mode=OneWay}" 
+                           TextTrimming="WordEllipsis"
+                           HorizontalAlignment="Left" VerticalAlignment="Bottom" 
+                           FontSize="15px"
+                           Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}"/>
+                </Grid>
+                <TextBlock Grid.Column="1" Grid.Row="1" Text="{x:Bind UserID, Mode=OneWay}" 
+                           Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" FontSize="11"
+                           HorizontalAlignment="Left" VerticalAlignment="Top"/>
+
+            </Grid>
+        </DataTemplate>
+        
+        <!--树状图列表中的分组标题,已废弃-->
+        <DataTemplate x:Key="ContactListGroupHeaderTemplate" x:DataType="local:ContactGroupViewModel">
+            <TreeViewItem ItemsSource="{x:Bind Contacts, Mode=OneWay}" IsExpanded="True" Content="{x:Bind GroupName}">
+
+                <!--<TextBlock Text="{x:Bind GroupName, Mode=OneWay}" 
+                           TextTrimming="WordEllipsis"
+                           HorizontalAlignment="Left" VerticalAlignment="Bottom" 
+                           FontSize="16"
+                           Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}"/>-->
+            </TreeViewItem>
+        </DataTemplate>
+
+        <!--列表中的群组项-->
+        <DataTemplate x:Key="ContactListGroupChatTemplate">
+        </DataTemplate>
+
+        <!--模板选择器-->
+        <local:ContactListItemTemplateSelector x:Key="ContactListItemTemplateSelector"
+                                               ContactListContactTemplate="{StaticResource ContactListContactTemplate}"
+                                               ContactListGroupChatTemplate="{StaticResource ContactListGroupChatTemplate}"
+                                               ContactListGroupHeaderTemplate="{StaticResource ContactListGroupHeaderTemplate}"/>
+    </UserControl.Resources>
+
+    <Grid>
+        <SemanticZoom>
+            <SemanticZoom.ZoomedInView>
+                
+                <ListView x:Name="contactListView" ItemsSource="{x:Bind contactListDataSource.View}" ItemTemplateSelector="{StaticResource ContactListItemTemplateSelector}"
+                  SelectionMode="Single" IsItemClickEnabled="True" ItemClick="contactListView_ItemClick">
+                    <ListView.GroupStyle>
+                        <GroupStyle>
+                            <GroupStyle.HeaderTemplate>
+                                <DataTemplate x:DataType="local:ContactGroupViewModel">
+                                    <TextBlock Text="{x:Bind GroupName}" FontSize="16"/>
+                                </DataTemplate>
+                            </GroupStyle.HeaderTemplate>
+                        </GroupStyle>
+
+                    </ListView.GroupStyle>
+                </ListView>
+                
+            </SemanticZoom.ZoomedInView>
+
+            <SemanticZoom.ZoomedOutView>
+                <!--注意这里的组类型和绑定的处理方式-->
+                <ListView ItemsSource="{x:Bind contactListDataSource.View.CollectionGroups}" HorizontalAlignment="Stretch"
+                  SelectionMode="None">
+                    <ListView.ItemTemplate>
+                        <DataTemplate x:DataType="ICollectionViewGroup">
+                            <TextBlock Text="{x:Bind ((local:ContactGroupViewModel)Group).GroupName}" FontSize="16"/>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </SemanticZoom.ZoomedOutView>
+        </SemanticZoom>
+
+    </Grid>
+</UserControl>

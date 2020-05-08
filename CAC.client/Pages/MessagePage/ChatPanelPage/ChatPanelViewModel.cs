@@ -12,7 +12,7 @@ namespace CAC.client.MessagePage
         public event Action<string> SetInputBoxText;
         public event Func<string> GetInputBoxText;
 
-        private ChatListBaseItemVM _ChatListItem;
+        private ChatListChatItemVM _ChatListItem;
         private MessageViewer _CurrentViewer;
 
         //对messageViewer的缓存。我们希望切换回某个会话时保留上次的浏览位置，因此设立一个缓存。
@@ -20,7 +20,7 @@ namespace CAC.client.MessagePage
         private Dictionary<ChatListBaseItemVM, MessageViewer> messageViewerCache =
             new Dictionary<ChatListBaseItemVM, MessageViewer>();
 
-        public ChatListBaseItemVM ChatListItem {
+        public ChatListChatItemVM ChatListItem {
             get => _ChatListItem;
             set {
                 _ChatListItem = value;
@@ -39,11 +39,11 @@ namespace CAC.client.MessagePage
 
         public ChatPanelViewModel()
         {
-            Messenger.Default.Register<ChatListBaseItemVM>(this, "RequireOpenChatToken", RequireOpenChat);
+            Messenger.Default.Register<ChatListChatItemVM>(this, "RequireOpenChatToken", RequireOpenChat);
         }
 
         //当缓存中有时，直接从缓存中取，否则新建
-        public void RequireOpenChat(ChatListBaseItemVM chatListItem)
+        public void RequireOpenChat(ChatListChatItemVM chatListItem)
         {
             ChatListItem = chatListItem;
             if (messageViewerCache.Keys.Contains(chatListItem)) {
@@ -57,7 +57,7 @@ namespace CAC.client.MessagePage
 
         }
 
-        public void RequireCloseChat(ChatListBaseItemVM chatListItem)
+        public void RequireCloseChat(ChatListChatItemVM chatListItem)
         {
 
         }

@@ -10,7 +10,7 @@ namespace CAC.client.MessagePage
     class MessageItemBaseVM : BaseViewModel
     {
         private string _UserID;
-        private string _NickName;
+        private string _UserName;
         private bool _SendByMe;
         private DateTime _TimeStamp;
         private string _Base64Avatar;
@@ -24,10 +24,10 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public string NickName {
-            get => _NickName;
+        public string UserName {
+            get => _UserName;
             set {
-                _NickName = value;
+                _UserName = value;
                 RaisePropertyChanged(nameof(UserID));
             }
         }
