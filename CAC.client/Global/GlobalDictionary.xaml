@@ -4,6 +4,10 @@
     xmlns:mtuc="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:local="using:CAC.client">
     
+    <FontFamily x:Key="IcoMoon">/Assets/fonts/IcoMoon-Free.ttf#IcoMoon-Free</FontFamily>
+    <FontFamily x:Key="CAC-1">/Assets/fonts/CAC-1.ttf#CAC-1</FontFamily>
+
+    <FontIcon x:Key="CodeSymbol" FontFamily="{StaticResource CAC-1}" Glyph="E"/>
     <!--全局滚动条样式-->
     <Style TargetType="ScrollBar">
         <Setter Property="MinWidth" Value="12" />

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
+using CAC.client.CustomControls;
 
 namespace CAC.client.MessagePage
 {
@@ -39,11 +40,11 @@ namespace CAC.client.MessagePage
 
         public ChatPanelViewModel()
         {
-            Messenger.Default.Register<ChatListChatItemVM>(this, "RequireOpenChatToken", RequireOpenChat);
+            Messenger.Default.Register<ChatListChatItemVM>(this, "RequireOpenChatToken", RequestOpenChat);
         }
 
         //当缓存中有时，直接从缓存中取，否则新建
-        public void RequireOpenChat(ChatListChatItemVM chatListItem)
+        public void RequestOpenChat(ChatListChatItemVM chatListItem)
         {
             ChatListItem = chatListItem;
             if (messageViewerCache.Keys.Contains(chatListItem)) {
@@ -57,9 +58,20 @@ namespace CAC.client.MessagePage
 
         }
 
-        public void RequireCloseChat(ChatListChatItemVM chatListItem)
+        public void RequestCloseChat(ChatListChatItemVM chatListItem)
         {
 
+        }
+
+        public void DidSendContent(SentContentEventArgs e)
+        {
+            if(e.Type == MessageType.image) {
+                CurrentViewer.VM.Messages.Add(new ImageMessageVM() {
+                    UserName = "aaa",
+                    SendByMe = true,
+                    ImageUri = e.Content
+                });
+            }
         }
     }
 }

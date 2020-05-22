@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.Storage;
 
 namespace CAC.client
 {
@@ -7,7 +8,11 @@ namespace CAC.client
         /// <summary>
         /// 调试时设置起始页用的变量
         /// </summary>
-        public static Type startPage = typeof(MainPage);
+        public static Type startPage = typeof(CodeEditorPage.CodeEditorPage);
+
+        public static string[] HighlightLanguageList = new string[] {
+            "PlainText","CSharp","JavaScript","Python","XML","JSON","SQL","PHP","Ruby","CPlusPlus","CSS","Java"
+        };
 
         /// <summary>
         /// 调试时方便起见设置的一个Base64图像串

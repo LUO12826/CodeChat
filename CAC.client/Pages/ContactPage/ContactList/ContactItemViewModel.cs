@@ -35,6 +35,7 @@ namespace CAC.client.ContactPage
             set {
                 _UserName = value;
                 RaisePropertyChanged(nameof(UserName));
+                RaisePropertyChanged(nameof(DisplayName));
             }
         }
 
@@ -43,9 +44,16 @@ namespace CAC.client.ContactPage
             set {
                 _Note = value;
                 RaisePropertyChanged(nameof(Note));
+                RaisePropertyChanged(nameof(DisplayName));
             }
         }
 
+        public string DisplayName {
+            get {
+                string user = UserName.IsNullOrEmpty() ? UserID : UserName;
+                return Note.IsNullOrEmpty() ? user : Note;
+            }
+        }
 
         public string Base64Avatar {
             get => _Base64Avatar;

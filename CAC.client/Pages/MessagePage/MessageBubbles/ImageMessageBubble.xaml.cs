@@ -12,7 +12,7 @@ using Windows.UI.Xaml.Navigation;
 
 namespace CAC.client.MessagePage
 {
-    public sealed partial class ImageMessageBubble : UserControl, INotifyPropertyChanged
+    sealed partial class ImageMessageBubble : UserControl, INotifyPropertyChanged
     {
 
         private bool _isLoading = false;

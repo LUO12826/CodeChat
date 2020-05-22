@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:CAC.client.CustomControls"
     xmlns:cc="using:CAC.client.CustomControls"
+    xmlns:editor="using:Monaco"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -194,12 +195,22 @@
             
             <Button x:Name="selectImageButton" Style="{StaticResource transparentButtonStyle}" 
                     VerticalAlignment="Stretch" Width="40" Click="selectImageButton_Tapped">
-                <SymbolIcon Symbol="Pictures"/>
+                <FontIcon FontFamily="{StaticResource CAC-1}" Glyph="B"/>
             </Button>
 
             <Button x:Name="selectFileButton" Style="{StaticResource transparentButtonStyle}" 
                     VerticalAlignment="Stretch" Width="40" Tapped="selectFileButton_Tapped">
                 <SymbolIcon Symbol="OpenFile"/>
+            </Button>
+
+            <Button x:Name="sendCodeButton" Style="{StaticResource transparentButtonStyle}" 
+                    VerticalAlignment="Stretch" Width="40">
+                <Button.Flyout>
+                    <Flyout>
+                        <cc:SendCodePanel MinHeight="300" MinWidth="300" Width="400"/>
+                    </Flyout>
+                </Button.Flyout>
+                <FontIcon FontFamily="{StaticResource CAC-1}" Glyph="E"/>
             </Button>
         </StackPanel>
 
@@ -208,7 +219,7 @@
 
         <Button x:Name="sendButton" Style="{StaticResource transparentButtonStyle}" Grid.Row="2" 
                 HorizontalAlignment="Right" Height="40" Width="40" Tapped="sendButton_Tapped">
-            <SymbolIcon Symbol="Send"/>
+            <FontIcon FontFamily="{StaticResource CAC-1}" Glyph="A"/>
         </Button>
                 
     </Grid>

@@ -270,6 +270,11 @@ namespace Monaco
             return default(T);
         }
 
+        internal IAsyncOperation<string> InvokeScriptAsync(string scriptName, string[] args)
+        {
+            return this._view.InvokeScriptAsync(scriptName, args);
+        }
+
         private void NotifyPropertyChanged([CallerMemberName] String propertyName = "")
         {
             if (PropertyChanged != null)

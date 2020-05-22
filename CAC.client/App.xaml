@@ -6,6 +6,7 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
                 <ResourceDictionary Source="MainPageDictionary.xaml"/>
                 <ResourceDictionary Source="Global/GlobalDictionary.xaml"/>
             </ResourceDictionary.MergedDictionaries>

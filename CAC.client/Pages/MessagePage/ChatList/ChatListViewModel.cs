@@ -58,7 +58,7 @@ namespace CAC.client.MessagePage
             
         }
 
-        public void RequireRemoveChat(IChatListItem chatItem)
+        public void RequestRemoveChat(IChatListItem chatItem)
         {
 
         }

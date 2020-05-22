@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Data.Json;
 using Windows.Foundation;
 
@@ -154,6 +155,18 @@ namespace Monaco
             return SendScriptAsync("editor.setPosition(" + JsonConvert.SerializeObject(position) + ");").AsAsyncAction();
         }
 
+        /// <summary>
+        /// 在编辑会话中切换，为了实现多tab功能而设计。
+        /// </summary>
+        public IAsyncOperation<string> SwitchToSession(string userToken, string language, string code)
+        {
+            return InvokeScriptAsync("SwitchToSession", new string[] { userToken, language, code});
+        }
+
+        public IAsyncOperation<string> CloseSession(string userToken)
+        {
+            return InvokeScriptAsync("CloseSession", new string[] { userToken });
+        }
         /// <summary>
         /// https://microsoft.github.io/monaco-editor/api/interfaces/monaco.editor.icommoncodeeditor.html#deltadecorations
         /// 

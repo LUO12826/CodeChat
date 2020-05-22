@@ -36,7 +36,7 @@ namespace CAC.client.MessagePage
         //点击了移除cell的按钮时
         private void RemoveCellBtn_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
-            VM.RequireRemoveChat((sender as Button).DataContext as IChatListItem);
+            VM.RequestRemoveChat((sender as Button).DataContext as IChatListItem);
         }
 
         //点击了某个cell时

@@ -2,8 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Storage;
 using Windows.UI.Xaml.Media;
 
 namespace CAC.client.MessagePage
@@ -82,7 +85,16 @@ namespace CAC.client.MessagePage
                 UserName = "aaa",
                 SendByMe = false
             };
+            var c = new CodeMessageVM() {
+                Code = "using System;",
+                Language = "csharp",
+                UserName = "aaa",
+                SendByMe = false,
+                Base64Avatar = GlobalConfigs.testB64Avator,
+            };
+
             Messages.Add(b);
+            Messages.Add(c);
             MyUserName = "self";
             MyBase64Avatar = GlobalConfigs.testB64Avator;
         }
@@ -90,7 +102,7 @@ namespace CAC.client.MessagePage
 
         private async Task<Tuple<List<MessageItemBaseVM>, bool>> loadMoreItems(uint itemsNum)
         {
-            var a = await Task.Run(() => {
+            var a = await Task.Run(async () => {
                 Thread.Sleep(2000);
                 var b = new List<MessageItemBaseVM>();
                 for (int i = 0; i < itemsNum; i++) {
@@ -101,6 +113,24 @@ namespace CAC.client.MessagePage
                         Base64Avatar = GlobalConfigs.testB64Avator
                     });
                 }
+
+                //var exampleFile = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(@"Assets\Code\example.js");
+                var exampleFile = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
+                var bb = await exampleFile.GetFolderAsync("Code");
+                var cc = await bb.GetFileAsync("example.java");
+                foreach(var file in await bb.GetFilesAsync()) {
+                    Debug.WriteLine(file.Name);
+                }
+                var text = await FileIO.ReadTextAsync(cc);
+
+                var c = new CodeMessageVM() {
+                    Code = text,
+                    Language = "php",
+                    UserName = "aaa",
+                    SendByMe = false,
+                    Base64Avatar = GlobalConfigs.testB64Avator,
+                };
+                b.Add(c);
                 return b;
             });
 
