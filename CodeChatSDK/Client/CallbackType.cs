@@ -16,5 +16,6 @@ namespace CodeChatSDK
         Pub,
         Note,
         Leave,
+        Del,
     }
 }
