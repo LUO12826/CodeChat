@@ -5,16 +5,16 @@ using System.Text;
 namespace CodeChatSDK
 {
     /// <summary>
-    /// 接受消息
+    /// 登陆成功
     /// </summary>
     /// <param name="sender">发送者</param>
-    /// <param name="args">接受消息参数</param>
-    public delegate void ReceiveMessageEventHandler(Object sender, ReceiveMessageEventArgs args);
+    /// <param name="args">登陆成功参数</param>
+    public delegate void LoginSuccessEventHandler(Object sender, LoginSuccessEventArgs args);
 
     /// <summary>
-    /// 接受消息参数
+    /// 登陆成功参数
     /// </summary>
-    public class ReceiveMessageEventArgs
+    public class LoginSuccessEventArgs
     {
         /// <summary>
         /// 聊天消息

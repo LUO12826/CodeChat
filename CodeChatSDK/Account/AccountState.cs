@@ -10,7 +10,6 @@ namespace CodeChatSDK
     public enum AccountState
     {
         Online,
-        Busy,
         Offline,
         Duplicate,
     }
