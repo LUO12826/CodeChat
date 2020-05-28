@@ -1,6 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using CodeChatSDK.Message;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace CodeChatSDK.Models
+namespace CodeChatSDK
 {
     /// <summary>
     /// 实体消息

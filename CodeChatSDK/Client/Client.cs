@@ -1,6 +1,4 @@
 ﻿using CodeChatSDK.EventHandler;
-using CodeChatSDK.Models;
-using CodeChatSDK.Utils;
 using Google.Protobuf;
 using Google.Protobuf.Collections;
 using Grpc.Core;
@@ -10,14 +8,17 @@ using Pbx;
 using RestSharp;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage;
+using Windows.Storage.Streams;
 using static Pbx.Node;
 
 namespace CodeChatSDK
@@ -89,14 +90,9 @@ namespace CodeChatSDK
         public string Schema { get; set; }
 
         /// <summary>
-        /// Key
+        /// 登陆密钥
         /// </summary>
-        public string ApiKey { get; private set; }
-
-        /// <summary>
-        /// BaseURL
-        /// </summary>
-        public string ApiBaseUrl { get; private set; }
+        public ByteString Secret { private get; set; }
 
         /// <summary>
         /// 登陆成功事件
@@ -167,7 +163,17 @@ namespace CodeChatSDK
         /// 流
         /// </summary>
         private AsyncDuplexStreamingCall<ClientMsg, ServerMsg> stream;
-        
+
+        /// <summary>
+        /// Key
+        /// </summary>
+        private string apiKey;
+
+        /// <summary>
+        /// BaseURL
+        /// </summary>
+        private string apiBaseUrl;
+
         /// <summary>
         /// 上传文件令牌
         /// </summary>
@@ -203,8 +209,8 @@ namespace CodeChatSDK
             ServerHost = "127.0.0.1:6061";
             UploadEndpoint = "/v0/file/u";
             DownloadEndpoint = "/v0/file/s";
-            ApiBaseUrl = "http://127.0.0.1:6060";
-            ApiKey = "AQEAAAABAAD_rAp4DJh05a1HAwFT3A6K";
+            apiBaseUrl = "http://127.0.0.1:6060";
+            apiKey = "AQEAAAABAAD_rAp4DJh05a1HAwFT3A6K";
             cancellationTokenSource = new CancellationTokenSource();
             sendMessageQueue = new Queue<ClientMsg>();
             onCompletion = new Dictionary<string, Callback>();
@@ -217,24 +223,25 @@ namespace CodeChatSDK
         /// <param name="apikey">Key</param>
         public void SetHttpApi(string apiBaseUrl, string apikey)
         {
-            ApiBaseUrl = apiBaseUrl;
-            ApiKey = apikey;
+            this.apiBaseUrl = apiBaseUrl;
+            this.apiKey = apikey;
         }
 
         /// <summary>
         /// 开始连接
         /// </summary>
         /// <returns></returns>
-        public void Start()
+        public async Task Start()
         {
             stream = InitStream();
             SendMessageLoop();
             try
             {
-                ClientMessageLoop();
+                await ClientMessageLoop();
             }
             catch (Exception e)
             {
+
                 Thread.Sleep(2000);
                 Reset();
             }
@@ -243,22 +250,22 @@ namespace CodeChatSDK
         /// <summary>
         /// 登陆
         /// </summary>
-        public void LogIn(ByteString secret)
+        public void LogIn()
         {
-            Topic me = new Topic("me");
             ClientPost(Hello());
-            ClientPost(Login(Schema, secret));
-            ClientPost(Subscribe(me));
+            ClientPost(Login(Schema, Secret));
+            ClientPost(Subscribe(new Topic("me")));
+            ClientPost(GetTags(new Topic("me")));
         }
 
         /// <summary>
         /// 注册
         /// </summary>
         /// <param name="formattedName">显示名称</param>
-        public void Register(ByteString secret, string formattedName,string email)
+        public void Register(string formattedName,string email)
         {
             ClientPost(Hello());
-            ClientPost(Account(Schema, secret, "new", formattedName,email));
+            ClientPost(Account(Schema, Secret, "new", formattedName,email));
         }
 
         /// <summary>
@@ -294,15 +301,19 @@ namespace CodeChatSDK
             }
         }
 
-        /// <summary>
-        /// 发送验证码
-        /// </summary>
-        /// <param name="secret">密钥</param>
-        /// <param name="response">验证码</param>
-        public void SendVerificationCode(ByteString secret, string response)
+        public async Task SendVerificationCode(string response)
         {
-            ClientPost(Login(Schema, secret,response));
+            ClientPost(Login(Schema, Secret,response));
             ClientPost(Subscribe(new Topic("me")));
+            ClientPost(GetTags(new Topic("me")));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
@@ -311,9 +322,18 @@ namespace CodeChatSDK
         /// <param name="topic">当前Topic</param>
         /// <param name="chatMessage">消息内容</param>
         /// <param name="noEcho">是否获取当前信息</param>
-        public void Send(Topic topic, ChatMessage chatMessage, bool noEcho = false)
+        public async Task Send(Topic topic, ChatMessage chatMessage, bool noEcho = false)
         {
+            ClientPost(Subscribe(topic));
             ClientPost(Publish(topic, noEcho, chatMessage));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
@@ -322,14 +342,18 @@ namespace CodeChatSDK
         /// <param name="topic">消息所属话题</param>
         /// <param name="message">消息</param>
         /// <returns></returns>
-        public void RemoveMessage(Topic topic, ChatMessage message)
+        public async Task RemoveMessage(Topic topic, ChatMessage message)
         {
             ClientPost(DeleteMessage(topic, message.SeqId));
-        }
+            ClientPost(Leave(topic, true));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
 
-        public void NoteMessage(Topic topic,ChatMessage message)
-        {
-            ClientPost(NoteRead(topic.Name, message.SeqId));
+            }
         }
 
         /// <summary>
@@ -337,29 +361,45 @@ namespace CodeChatSDK
         /// </summary>
         /// <param name="topic">话题</param>
         /// <returns></returns>
-        public void RemoveTopic(Topic topic)
+        public async Task RemoveTopic(Topic topic)
         {
             ClientPost(DeleteTopic(topic));
             ClientPost(Leave(topic, true));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
-        /// 订阅话题
+        /// 添加话题
         /// </summary>
         /// <param name="topic">话题</param>
         /// <returns></returns>
-        public void SubscribeTopic(Topic topic)
+        public async Task AddTopic(Topic topic)
         {
-            ClientPost(Subscribe(topic));
+
         }
 
         /// <summary>
         /// 刷新话题列表
         /// </summary>
         /// <returns></returns>
-        public void RefreshTopicList()
+        public async Task RefreshTopicList()
         {
-            ClientPost(GetMeSubs());
+            ClientPost(GetSubs(new Topic("me"), true));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
@@ -369,41 +409,17 @@ namespace CodeChatSDK
         /// <param name="since">起始消息SeqID</param>
         /// <param name="before">结束消息SeqID</param>
         /// <returns></returns>
-        public void Load(Topic topic, int since, int before)
+        public async Task Load(Topic topic, int since, int before)
         {
             ClientPost(GetData(topic, since, before));
-        }
-
-        /// <summary>
-        /// 获取历史消息
-        /// </summary>
-        /// <param name="topic">当前话题</param>
-        /// <param name="limit">消息条数限制</param>
-        public void Load(Topic topic, int limit)
-        {
-            ClientPost(GetData(topic,limit));
-        }
-
-        /// <summary>
-        /// 搜索订阅者
-        /// </summary>
-        /// <param name="condition">搜索条件</param>
-        public void FindSubscriber(string condition)
-        {
-            ClientPost(Subscribe(new Topic("fnd")));
-            if (string.IsNullOrEmpty(condition) == false)
+            try
             {
-                ClientPost(SetDesc(condition));
+                await ClientMessageLoop();
             }
-        }
+            catch (Exception e)
+            {
 
-        /// <summary>
-        /// 搜索订阅者
-        /// </summary>
-        public void FindSubscriber()
-        {
-            ClientPost(Subscribe(new Topic("fnd")));
-            ClientPost(GetFindSubs());
+            }
         }
 
         /// <summary>
@@ -435,7 +451,7 @@ namespace CodeChatSDK
                 attachmentInfo.Mime = $"file/{fileInfo.Extension}";
 
                 //新建PUT请求
-                var restClient = new RestClient(ApiBaseUrl);
+                var restClient = new RestClient(apiBaseUrl);
                 RestRequest request;
                 if (string.IsNullOrEmpty(redirectUrl))
                 {
@@ -447,7 +463,7 @@ namespace CodeChatSDK
                 }
 
                 //填充头部与主体
-                request.AddHeader("X-Tinode-APIKey", ApiKey);
+                request.AddHeader("X-Tinode-APIKey", apiKey);
                 request.AddHeader("X-Tinode-Auth", $"Token {token}");
                 request.AddXmlBody("id", GetNextId());
                 request.AddFile("file", fullFileName);
@@ -528,7 +544,7 @@ namespace CodeChatSDK
                 attachmentInfo.Mime = $"file/{file.FileType}";
 
                 //新建PUT请求
-                var restClient = new RestClient(ApiBaseUrl);
+                var restClient = new RestClient(apiBaseUrl);
                 RestRequest request;
                 if (string.IsNullOrEmpty(redirectUrl))
                 {
@@ -540,7 +556,7 @@ namespace CodeChatSDK
                 }
 
                 //填充头部与主体
-                request.AddHeader("X-Tinode-APIKey", ApiKey);
+                request.AddHeader("X-Tinode-APIKey", apiKey);
                 request.AddHeader("X-Tinode-Auth", $"Token {token}");
                 request.AddXmlBody("id", GetNextId());
                 request.AddFile("file", bytes, fullFileName);
@@ -598,7 +614,7 @@ namespace CodeChatSDK
         /// </summary>
         /// <param name="topic"></param>
         /// <param name="filePath"></param>
-        public void SetAvator(Topic topic, StorageFile file, ulong size, byte[] bytes)
+        public async Task SetAvator(Topic topic, StorageFile file, ulong size, byte[] bytes)
         {
             //判断文件是否为空
             if (file == null)
@@ -609,18 +625,32 @@ namespace CodeChatSDK
 
             //填充文件信息
             string data = Convert.ToBase64String(bytes);
-            ClientPost(Subscribe(topic));
             ClientPost(SetPhoto(topic, file.FileType, size, data));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
         /// 设置私密备注
         /// </summary>
         /// <returns></returns>
-        public void SetPrivateComment(Topic topic, string comment)
+        public async Task SetPrivateComment(Topic topic, string comment)
         {
-            ClientPost(Subscribe(topic));
             ClientPost(SetPrivate(topic, comment));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
@@ -629,10 +659,18 @@ namespace CodeChatSDK
         /// <param name="topic">话题</param>
         /// <param name="tags">标签</param>
         /// <returns></returns>
-        public void SetTags(Topic topic,List<string> tags)
+        public async Task SetTags(Topic topic,List<string> tags)
         {
             ClientPost(Subscribe(topic));
             ClientPost(SetTag(topic, tags));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
@@ -641,19 +679,35 @@ namespace CodeChatSDK
         /// <param name="topic"></param>
         /// <param name="formattedName"></param>
         /// <returns></returns>
-        public void SetDescription(Topic topic, string formattedName)
+        public async Task SetDescription(Topic topic, string formattedName)
         {
             ClientPost(Subscribe(topic));
             ClientPost(SetDesc(topic, formattedName));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         /// <summary>
         /// 修改密码
         /// </summary>
         /// <returns></returns>
-        public void ChangePassword(ByteString secret)
+        public async Task ChangePassword()
         {
-            ClientPost(Account(Schema, secret));
+            ClientPost(Account(Schema, Secret));
+            try
+            {
+                await ClientMessageLoop();
+            }
+            catch (Exception e)
+            {
+
+            }
         }
 
         private AsyncDuplexStreamingCall<ClientMsg, ServerMsg> InitStream()
@@ -692,61 +746,55 @@ namespace CodeChatSDK
                      }
                      else
                      {
-                         Thread.Sleep(100);
+                         Thread.Sleep(10);
                      }
                  }
              }, cancellationTokenSource.Token);
             sendBackendTask.Start();
         }
 
-        private void ClientMessageLoop()
+        private async Task ClientMessageLoop()
         {
-            Task receiveTask = new Task(async () =>
-              {
-                  while (!cancellationTokenSource.IsCancellationRequested)
-                  {
-                      if (!await stream.ResponseStream.MoveNext())
-                      {
-                          Thread.Sleep(100);
-                      }
-                      else
-                      {
-                          ServerMsg response = stream.ResponseStream.Current;
-                          if (response.Ctrl != null)
-                          {
-                              ExecuteCallback(response.Ctrl.Id, response.Ctrl.Code, response.Ctrl.Text, response.Ctrl.Topic, response.Ctrl.Params);
-                          }
-                          else if (response.Data != null)
-                          {
-                              Thread.Sleep(50);
-                              ChatMessage replyMessage = ChatMessageParser.Parse(response.Data.Clone());
-                              AddMessageEvent(this, new AddMessageEventArgs() { TopicName = response.Data.Topic, Message = replyMessage });
-                          }
-                          else if (response.Pres != null && response.Pres.Topic == "me")
-                          {
-                              if ((response.Pres.What == ServerPres.Types.What.On || response.Pres.What == ServerPres.Types.What.Msg))
-                              {
+            while (!cancellationTokenSource.IsCancellationRequested)
+            {
+                if (!await stream.ResponseStream.MoveNext())
+                {
+                    break;
+                }
 
-                                  ClientPost(Subscribe(new Topic(response.Pres.Topic)));
-                              }
-                              else if (response.Pres.What == ServerPres.Types.What.Off)
-                              {
-                                  ClientPost(Leave(new Topic(response.Pres.Topic)));
-                              }
-                          }
-                          else if (response.Meta != null && response.Meta.Topic == "me")
-                          {
-                              OnGetMeMeta(response.Meta);
-                          }
-                          else if (response.Meta != null && response.Meta.Topic == "fnd")
-                          {
-                              OnGetFindMeta(response.Meta);
-                          }
-                      }
-                  }
-              }, cancellationTokenSource.Token);
-            receiveTask.Start();
-            
+                ServerMsg response = stream.ResponseStream.Current;
+                if (response.Ctrl != null)
+                {
+                    ExecuteCallback(response.Ctrl.Id, response.Ctrl.Code, response.Ctrl.Text, response.Ctrl.Topic, response.Ctrl.Params);
+                }
+                else if (response.Data != null)
+                {
+                    ClientPost(NoteRead(response.Data.Topic, response.Data.SeqId));
+                    Thread.Sleep(50);
+                    ChatMessage replyMessage = MessageBuilder.Parse(response.Data.Clone());
+                    AddMessageEvent(this, new AddMessageEventArgs() { TopicName = response.Data.Topic, Message = replyMessage });
+                }
+                else if (response.Pres != null && response.Pres.Topic == "me")
+                {
+                    if ((response.Pres.What == ServerPres.Types.What.On || response.Pres.What == ServerPres.Types.What.Msg))
+                    {
+
+                        ClientPost(Subscribe(new Topic(response.Pres.Topic)));
+                    }
+                    else if (response.Pres.What == ServerPres.Types.What.Off)
+                    {
+                        ClientPost(Leave(new Topic(response.Pres.Topic)));
+                    }
+                }
+                else if (response.Meta != null)
+                {
+                    OnGetMeta(response.Meta);
+                }
+                else
+                {
+
+                }
+            }
         }
 
         private string GetNextId()
@@ -842,7 +890,7 @@ namespace CodeChatSDK
             return new ClientMsg() { Leave = new ClientLeave() { Id = id, Topic = topic.Name, Unsub = unsubscribe } };
         }
 
-        private ClientMsg DeleteTopic(Topic topic, bool hard = false)
+        private ClientMsg DeleteTopic(Topic topic, bool hard = true)
         {
             var id = GetNextId();
             AddCallback(id, new Callback(id, CallbackType.Del, null, topic.Name));
@@ -850,7 +898,7 @@ namespace CodeChatSDK
             return new ClientMsg() { Del = new ClientDel() { Id = id, Topic = topic.Name, What = ClientDel.Types.What.Topic, Hard = hard } };
         }
 
-        private ClientMsg DeleteMessage(Topic topic, int deleteSeqId, bool hard = false)
+        private ClientMsg DeleteMessage(Topic topic, int deleteSeqId, bool hard = true)
         {
             var id = GetNextId();
             AddCallback(id, new Callback(id, CallbackType.Del, null, topic.Name));
@@ -860,28 +908,23 @@ namespace CodeChatSDK
             return new ClientMsg() { Del = del };
         }
 
-        private ClientMsg GetSubs(Topic topic)
+        private ClientMsg GetSubs(Topic topic, bool getAll = false)
         {
             var id = GetNextId();
             AddCallback(id, new Callback(id, CallbackType.Get, null, topic.Name));
 
-            return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = topic.Name, Query = new GetQuery() { What = "sub" } } };
-        }
-
-        private ClientMsg GetMeSubs()
-        {
-            var id = GetNextId();
-            AddCallback(id, new Callback(id, CallbackType.Get, null, "me"));
-
-            return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = "me", Query = new GetQuery() { What = "sub" } } };
-        }
-
-        private ClientMsg GetFindSubs()
-        {
-            var id = GetNextId();
-            AddCallback(id, new Callback(id, CallbackType.Get, null, "fnd"));
-
-            return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = "fnd", Query = new GetQuery() { What = "sub" } } };
+            if (getAll == true && topic.Name == "me")
+            {
+                return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = topic.Name, Query = new GetQuery() { What = "sub" } } };
+            }
+            else if (getAll == false && topic.Name != "me")
+            {
+                return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = topic.Name, Query = new GetQuery() { What = "desc" } } };
+            }
+            else
+            {
+                return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = topic.Name } };
+            }
         }
 
         private ClientMsg GetData(Topic topic, int since, int before)
@@ -890,14 +933,6 @@ namespace CodeChatSDK
             AddCallback(id, new Callback(id, CallbackType.Get, null));
 
             return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = topic.Name, Query = new GetQuery() { What = "data", Data = new GetOpts() { SinceId = since, BeforeId = before } } } };
-        }
-
-        private ClientMsg GetData(Topic topic, int limit)
-        {
-            var id = GetNextId();
-            AddCallback(id, new Callback(id, CallbackType.Get, null));
-
-            return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = topic.Name, Query = new GetQuery() { What = "data", Data = new GetOpts() { Limit = limit } } } };
         }
 
         private ClientMsg GetTags(Topic topic)
@@ -963,16 +998,6 @@ namespace CodeChatSDK
             return new ClientMsg() { Set = set };
         }
 
-        private ClientMsg SetDesc(string condition)
-        {
-            var id = GetNextId();
-            AddCallback(id, new Callback(id, CallbackType.Set, null));
-
-            ByteString publicField = ByteString.CopyFromUtf8(condition);
-            ClientSet set = new ClientSet() { Id = id, Topic = "fnd", Query = new SetQuery() { Desc = new Pbx.SetDesc() { Public = publicField } } };
-            return new ClientMsg() { Set = set };
-        }
-
         private void AddCallback(string id, Callback bundle)
         {
             onCompletion.Add(id, bundle);
@@ -996,7 +1021,7 @@ namespace CodeChatSDK
                             LoginSuccessEvent(this, new LoginSuccessEventArgs());
                             break;
                         case CallbackType.Del:
-                            Topic deletedTopic = new Topic(topic);
+                            //Topic deletedTopic = new Topic(topic);
                             //RemoveTopicEvent(this, new RemoveTopicEventArgs() { Topic = deletedTopic });
                             break;
                         case CallbackType.Sub:
@@ -1038,7 +1063,7 @@ namespace CodeChatSDK
             }
         }
 
-        private void OnLogin(MapField<string, ByteString> paramaters)
+        public void OnLogin(MapField<string, ByteString> paramaters)
         {
             if (paramaters == null)
             {
@@ -1050,17 +1075,12 @@ namespace CodeChatSDK
                 SetAccountEvent?.Invoke(this, new SetAccountEventArgs() { UserId = userId });
             }
 
-            Topic me = new Topic("me");
-
-            ClientPost(GetTags(me));
-            ClientPost(GetSubs(me));
-
             //保存令牌供上传使用
             token = JsonConvert.DeserializeObject<string>(paramaters["token"].ToString(Encoding.UTF8));
 
         }
 
-        private void OnGetMeMeta(ServerMeta meta)
+        private void OnGetMeta(ServerMeta meta)
         {
             if (meta.Sub != null && meta.Sub.Count != 0)
             {
@@ -1082,6 +1102,7 @@ namespace CodeChatSDK
                     topic.LastUsed = sub.TouchedAt;
                     topic.MinLocalSeqId = sub.RecvId;
                     topic.MaxLocalSeqId = sub.RecvId;
+                    topic.Type = "user";
                     topic.IsArchived = false;
                     topic.IsVisible = false;
                     topic.PrivateComment = sub.UserId;
@@ -1107,13 +1128,14 @@ namespace CodeChatSDK
                     subscriber.Online = sub.Online;
                     subscriber.TopicName = sub.Topic;
                     subscriber.Username = sub.UserId;
-                    subscriber.Type = publicObject == null ? "group" : "user";
+                    subscriber.Type = "user";
                     subscriber.PhotoData = string.Empty;
                     subscriber.PhotoType = string.Empty;
                     subscriber.Status = 1;
                     if (publicObject != null)
                     {
                         subscriber.Username = publicObject["fn"].ToString();
+                        subscriber.Type = publicObject == null ? "group" : "user";
                         if (publicObject.ContainsKey("photo"))
                         {
                             subscriber.PhotoData = publicObject["photo"]["data"].ToString();
@@ -1121,7 +1143,7 @@ namespace CodeChatSDK
                         }
                     }
 
-                    AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber,isTemporary=false });
+                    AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber });
 
                 }
             }
@@ -1130,39 +1152,6 @@ namespace CodeChatSDK
             {
                 List<string> tags = meta.Tags.ToList();
                 SetAccountEvent(this, new SetAccountEventArgs() { Tags = tags });
-            }
-        }
-
-        private void OnGetFindMeta(ServerMeta meta)
-        {
-            if (meta.Sub != null && meta.Sub.Count != 0)
-            {
-                foreach (var sub in meta.Sub)
-                {
-                    Subscriber subscriber = new Subscriber();
-
-                    var publicInfo = sub.Public.ToStringUtf8();
-                    var publicObject = JsonConvert.DeserializeObject<JObject>(publicInfo);
-
-                    subscriber.UserId = sub.UserId;
-                    subscriber.TopicName = sub.UserId;
-                    subscriber.Username = sub.UserId;
-                    subscriber.Type = publicObject == null ? "group" : "user";
-                    subscriber.PhotoData = string.Empty;
-                    subscriber.PhotoType = string.Empty;
-                    subscriber.Status = 1;
-                    if (publicObject != null)
-                    {
-                        subscriber.Username = publicObject["fn"].ToString();
-                        if (publicObject.ContainsKey("photo"))
-                        {
-                            subscriber.PhotoData = publicObject["photo"]["data"].ToString();
-                            subscriber.PhotoType = publicObject["photo"]["type"].ToString();
-                        }
-                    }
-
-                    AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber,isTemporary=true });
-                }
             }
         }
 

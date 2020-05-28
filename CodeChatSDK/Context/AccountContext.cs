@@ -1,5 +1,4 @@
-﻿using CodeChatSDK.Models;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using SQLite.CodeFirst;
 using System;
 using System.Collections.Generic;
@@ -7,7 +6,7 @@ using System.ComponentModel;
 using System.Data.Common;
 using System.Text;
 
-namespace CodeChatSDK.Repository.Sqlite
+namespace CodeChatSDK
 {
     /// <summary>
     /// 用户数据库上下文
@@ -17,15 +16,25 @@ namespace CodeChatSDK.Repository.Sqlite
         /// <summary>
         /// 数据库存储路径
         /// </summary>
-        private string path;
+        public static string Path { get; set; }
+
+        /// <summary>
+        /// 实例
+        /// </summary>
+        public static AccountContext Instance
+        {
+            get
+            {
+                return new AccountContext();
+            }
+        }
 
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="path">数据库存储路径</param>
-        public AccountContext(string path) : base()
+        public AccountContext() : base()
         {
-            this.path = path;
+            this.Database.EnsureCreated();
         }
 
         /// <summary>
@@ -34,27 +43,11 @@ namespace CodeChatSDK.Repository.Sqlite
         /// <param name="optionsBuilder"></param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(path);
+            optionsBuilder.UseSqlite(Path);
         }
 
-        /// <summary>
-        /// 话题表
-        /// </summary>
         public DbSet<Topic> Topics { get; set; }
-
-        /// <summary>
-        /// 订阅者表
-        /// </summary>
         public DbSet<Subscriber> Subscribers { get; set; }
-
-        /// <summary>
-        /// 消息表
-        /// </summary>
         public DbSet<ChatMessage> Messages { get; set; }
-
-        public AccountContext GetContext()
-        {
-            return new AccountContext(path);
-        }
     }
 }

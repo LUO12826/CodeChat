@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeChatSDK.Models
+namespace CodeChatSDK
 {
     /// <summary>
     /// 用户状态

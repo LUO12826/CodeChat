@@ -1,16 +1,21 @@
-﻿using CodeChatSDK.Models;
+﻿using CodeChatSDK.Message;
 using Newtonsoft.Json;
 using Pbx;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
+using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace CodeChatSDK.Utils
+namespace CodeChatSDK
 {
     /// <summary>
-    /// 消息解析器
+    /// 消息构造器
     /// </summary>
-    public class ChatMessageParser
+    public class MessageBuilder
     {
         /// <summary>
         /// 解析服务器信息
@@ -108,121 +113,125 @@ namespace CodeChatSDK.Utils
             }
         }
 
-        public static List<string> ParseUrl(ChatMessage message, string baseurl)
-        {
-            List<string> urls = new List<string>();
-            List<EntData> attachments = ParseGenericAttachment(message);
-            foreach (EntData attachment in attachments)
-            {
-                string url = baseurl + attachment.Ref;
-                urls.Add(url);
-            }
-            return urls;
-        }
-
-        public static List<string> ParseImageBase64(ChatMessage message)
-        {
-            List<string> base64s = new List<string>();
-            List<EntData> images = ParseImages(message);
-            foreach (EntData image in images)
-            {
-                string base64 = image.Val;
-                base64s.Add(base64);
-            }
-            return base64s;
-        }
-
         /// <summary>
-        /// 获取富文本内容
+        /// 构建附件消息
         /// </summary>
-        /// <returns>富文本内容</returns>
-        public static string ParseFormattedText(ChatMessage message)
+        /// <param name="attachmentInfo">附件信息</param>
+        /// <param name="text">消息</param>
+        /// <returns>聊天消息</returns>
+        public static ChatMessage BuildAttachmentMessage(UploadedAttachmentInfo attachmentInfo, string text = " ")
         {
-            if (message.Text == null)
+            var message = new ChatMessage();
+            message.Text = text;
+            message.Ent = new List<EntMessage>();
+            message.Fmt = new List<FmtMessage>();
+            message.Ent.Add(new EntMessage()
             {
-                return null;
-            }
-            var textArray = message.Text.ToCharArray();
-            if (message.Fmt != null)
-            {
-                foreach (var fmt in message.Fmt)
+                Tp = "EX",
+                Data = new EntData()
                 {
-                    if (!string.IsNullOrEmpty(fmt.Tp))
+                    Mime = attachmentInfo.Mime,
+                    Name = attachmentInfo.FileName,
+                    Ref = attachmentInfo.RelativeUrl,
+                    Size = int.Parse(attachmentInfo.Size.ToString()),
+
+                }
+            });
+            message.Fmt.Add(new FmtMessage()
+            {
+                At = text.Length,
+                Len = 1,
+                Key = 0,
+            });
+
+            if (text.Contains("\n"))
+            {
+                for (int i = 0; i < text.Length; i++)
+                {
+                    if (text[i] == '\n')
                     {
-                        if (fmt.Tp == "BR")
-                        {
-                            textArray[fmt.At.Value] = '\n';
-                        }
+                        FmtMessage fmt = new FmtMessage() { At = i, Tp = "BR", Len = 1 };
+                        message.Fmt.Add(fmt);
                     }
                 }
             }
-            return new String(textArray);
+            return message;
         }
 
         /// <summary>
-        /// 获取实体数据
+        /// 构建代码消息
         /// </summary>
-        /// <param name="tp">类型</param>
-        /// <returns>实体数据列表</returns>
-        public static List<EntData> ParseEntDatas(ChatMessage message, string tp)
+        /// <param name="type"></param>
+        /// <param name="text"></param>
+        /// <returns></returns>
+        public static ChatMessage BuildCodeMessage(CodeType type, string text = "")
         {
-            var ret = new List<EntData>();
-            if (message.Ent != null)
+            var message = new ChatMessage();
+            int baseLen = 0;
+            message.Text = text;
+            message.Ent = new List<EntMessage>();
+            message.Fmt = new List<FmtMessage>();
+            if (text.Contains("\r"))
             {
-                foreach (var ent in message.Ent)
+                for (int i = 0; i < text.Length - 1; i++)
                 {
-                    if (ent.Tp == tp)
+                    if (text[i] == '\r')
                     {
-                        ret.Add(ent.Data);
+                        FmtMessage fmtMessage = new FmtMessage() { At = baseLen + i, Tp = "BR", Len = 1 };
+                        message.Fmt.Add(fmtMessage);
                     }
                 }
             }
-            return ret;
+
+            var leftLen = baseLen + (text.Length - text.TrimStart().Length);
+            var subLen = text.Length - text.TrimEnd().Length;
+            var validLen = message.Text.Length - leftLen - subLen;
+
+            FmtMessage fmt = new FmtMessage() { Tp = "CO", At = leftLen, Len = validLen };
+            message.Fmt.Add(fmt);
+
+            message.Text += type.ToString();
+
+            return message;
         }
 
-        /// <summary>
-        /// 获取实体数据列表
-        /// </summary>
-        /// <returns>实体数据列表</returns>
-        public static List<EntData> ParseMentions(ChatMessage message)
-        {
-            return ParseEntDatas(message, "MN");
-        }
+
 
         /// <summary>
-        /// 获取图像
+        /// 将Base64转为图像
         /// </summary>
-        /// <returns>实体数据列表</returns>
-        public static List<EntData> ParseImages(ChatMessage message)
+        /// <param name="base64String"></param>
+        /// <returns>Bitmap</returns>
+        static public Bitmap ConvertBase64ToImage(string base64String)
         {
-            return ParseEntDatas(message, "IM");
+            byte[] imageArray = Convert.FromBase64String(base64String);
+            Bitmap image = null;
+            using (MemoryStream stream = new MemoryStream(imageArray))
+            {
+                image = new Bitmap(stream);
+            }
+            return image;
         }
 
-        /// <summary>
-        /// 获取哈希标签
-        /// </summary>
-        /// <returns>实体数据列表</returns>
-        public static List<EntData> ParseHashTags(ChatMessage message)
-        {
-            return ParseEntDatas(message, "HT");
-        }
 
         /// <summary>
-        /// 获取超链接
+        /// 将图像转换为Base64
         /// </summary>
-        /// <returns>实体数据列表</returns>
-        public static List<EntData> ParseLinks(ChatMessage message)
+        /// <param name="image">转化图像</param>
+        /// <param name="format">图像格式</param>
+        /// <returns>Base64字符串</returns>
+        static public async Task<string> ConvertImageToBase64(Bitmap image, ImageFormat format)
         {
-            return ParseEntDatas(message, "LN");
-        }
-
-        /// <summary>
-        /// 获取附件
-        /// </summary>
-        /// <returns>实体数据列表</returns>
-        public static List<EntData> ParseGenericAttachment(ChatMessage message)
-        {
-            return ParseEntDatas(message, "EX");
+            string base64String = "";
+            using (MemoryStream stream = new MemoryStream())
+            {
+                image.Save(stream, format);
+                byte[] array = new byte[stream.Length];
+                stream.Position = 0;
+                await stream.ReadAsync(array, 0, (int)stream.Length);
+                base64String = Convert.ToBase64String(array);
+            }
+            return base64String;
         }
     }
 }

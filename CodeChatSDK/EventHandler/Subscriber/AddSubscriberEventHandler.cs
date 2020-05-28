@@ -1,5 +1,4 @@
-﻿using CodeChatSDK.Models;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -21,10 +20,5 @@ namespace CodeChatSDK.EventHandler
         /// 订阅者
         /// </summary>
         public Subscriber Subscriber { get; set; }
-
-        /// <summary>
-        /// 是否临时查看
-        /// </summary>
-        public bool isTemporary { get; set; }
     }
 }

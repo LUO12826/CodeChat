@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Text;
 
-namespace CodeChatSDK.Models
+namespace CodeChatSDK
 {
     /// <summary>
     /// 消息基类

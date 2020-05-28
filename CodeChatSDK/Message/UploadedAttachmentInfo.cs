@@ -1,4 +1,8 @@
-﻿namespace CodeChatSDK.Models
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace CodeChatSDK
 {
     /// <summary>
     /// 上传附件信息
