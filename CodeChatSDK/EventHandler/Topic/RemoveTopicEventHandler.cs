@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeChatSDK.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
