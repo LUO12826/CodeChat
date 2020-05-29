@@ -25,6 +25,15 @@ namespace CodeChatSDK.Repository
         Task<IEnumerable<ChatMessage>> GetAsync(string condition);
 
         /// <summary>
+        /// 获取符合条件的消息
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <param name="skip">条件</param>
+        /// <param name="take">条件</param>
+        /// <returns></returns>
+        Task<IEnumerable<ChatMessage>> GetAsync(string condition,int skip,int take);
+
+        /// <summary>
         /// 获取对应话题的消息
         /// </summary>
         /// <param name="topic">话题</param>
@@ -40,6 +49,9 @@ namespace CodeChatSDK.Repository
         /// <returns></returns>
         Task<IEnumerable<ChatMessage>> GetAsync(Topic topic, int since, int before);
 
+        Task<IEnumerable<ChatMessage>> GetAsync(Topic topic, int limit);
+
+
         /// <summary>
         /// 获取对应话题的符合条件的消息
         /// </summary>
@@ -47,6 +59,8 @@ namespace CodeChatSDK.Repository
         /// <param name="condition">条件</param>
         /// <returns></returns>
         Task<IEnumerable<ChatMessage>> GetAsync(Topic topic, string condition);
+
+        Task<IEnumerable<ChatMessage>> GetAsync(Topic topic, string condition,int skip,int take);
 
         /// <summary>
         /// 新增或更新消息

@@ -58,6 +58,7 @@ namespace CodeChatSDK
             client.LoginFailedEvent += LoginFailed;
             client.RegisterFailedEvent += RegisterFailed;
             client.SetAccountEvent += SetAccountInformation;
+            client.SubscriberStateChangedEvent += SubscriberStateChanged;
         }
 
         /// <summary>
@@ -265,6 +266,7 @@ namespace CodeChatSDK
             Topic topic = instance.TopicList[position];
             topic.IsArchived = true;
             await db.Topics.UpsertTopic(topic);
+            instance.TopicList.Remove(topic);
             client.RemoveTopic(topic);
             return true;
         }
@@ -284,6 +286,7 @@ namespace CodeChatSDK
             instance.TopicList.Remove(topic);
             topic.IsArchived = true;
             await db.Topics.UpsertTopic(topic);
+            instance.TopicList.Remove(topic);
             client.RemoveTopic(topic);
             return true;
         }
@@ -351,7 +354,17 @@ namespace CodeChatSDK
             return await topicController.SearchTopic(condition);
         }
 
+        public SubscriberController GetSubscriberController(Subscriber subscriber)
+        {
+            if (subscriber == null)
+            {
+                return null;
+            }
 
+            SubscriberController subscriberController = new SubscriberController(db.Subscribers);
+            subscriberController.SetSubscriber(subscriber);
+            return subscriberController;
+        }
 
         /// <summary>
         /// 新增订阅者
@@ -359,9 +372,9 @@ namespace CodeChatSDK
         /// <param name="subscriber">订阅者对象</param>
         /// <param name="isTemporary">是否临时保存</param>
         /// <returns></returns>
-        public async Task<bool> AddSubscriber(Subscriber subscriber,bool isTemporary)
+        public async Task<bool> AddSubscriber(Subscriber subscriber,bool isTemporary=false)
         {
-            if (instance.SubscriberList.Contains(subscriber))
+            if (instance.SubscriberList.Contains(subscriber) || subscriber.TopicName == "fnd")
             {
                 return false;
             }
@@ -369,7 +382,7 @@ namespace CodeChatSDK
             {
                 instance.FormattedName = subscriber.Username;
                 instance.Avatar = subscriber.PhotoData;
-
+                return true;
             }
             if (isTemporary == true)
             {
@@ -380,8 +393,14 @@ namespace CodeChatSDK
                 searchSubscriberResult.Add(subscriber);
                 return true;
             }
+
+            Topic newTopic = new Topic(subscriber.TopicName);
+            instance.TopicList.Add(newTopic);
+            await db.Topics.UpsertTopic(newTopic);
             instance.SubscriberList.Add(subscriber);
             await db.Subscribers.UpsertSubscriber(subscriber);
+
+            client.SubscribeTopic(newTopic);
             return true;
         }
 
@@ -396,8 +415,13 @@ namespace CodeChatSDK
             {
                 return false;
             }
+
+            Topic removedTopic = GetTopicByName(subscriber.TopicName);
             instance.SubscriberList.Remove(subscriber);
             await db.Subscribers.DeleteSubscriber(subscriber);
+            instance.TopicList.Remove(removedTopic);
+            await db.Topics.DeleteTopic(removedTopic);
+
             return true;
         }
 
@@ -548,5 +572,10 @@ namespace CodeChatSDK
             await topicController.AddMessage(args.Message);
         }
 
+        private void SubscriberStateChanged(object sender,SubscriberStateChangedEventArgs args)
+        {
+            SubscriberController subscriberController = GetSubscriberController(args.Subscriber);
+            subscriberController.ChangeSubscriberState(args.IsOnline);
+        }
     }
 }

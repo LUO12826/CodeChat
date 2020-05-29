@@ -25,6 +25,15 @@ namespace CodeChatSDK.Repository
         Task<IEnumerable<Subscriber>> GetAsync(string condition);
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="skip"></param>
+        /// <param name="take"></param>
+        /// <returns></returns>
+        Task<IEnumerable<Subscriber>> GetAsync(string condition,int skip,int take);
+
+        /// <summary>
         /// 获取对应话题的订阅者
         /// </summary>
         /// <param name="topic">话题</param>

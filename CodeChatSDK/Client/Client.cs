@@ -158,6 +158,8 @@ namespace CodeChatSDK
         /// </summary>
         public event RemoveSubscriberEventHandler RemoveSubscriberEvent;
 
+        public event SubscriberStateChangedEventHandler SubscriberStateChangedEvent;
+
         /// <summary>
         /// 消息Id
         /// </summary>
@@ -339,7 +341,7 @@ namespace CodeChatSDK
         /// <returns></returns>
         public void RemoveTopic(Topic topic)
         {
-            ClientPost(DeleteTopic(topic));
+            ClientPost(SetArchived(topic,true));
             ClientPost(Leave(topic, true));
         }
 
@@ -404,6 +406,13 @@ namespace CodeChatSDK
         {
             ClientPost(Subscribe(new Topic("fnd")));
             ClientPost(GetFindSubs());
+        }
+
+        public void RemoveSubscriber(Subscriber subscriber)
+        {
+            Topic removedTopic = new Topic(subscriber.TopicName);
+            ClientPost(DeleteTopic(removedTopic, true));
+            ClientPost(Leave(removedTopic, true));
         }
 
         /// <summary>
@@ -705,43 +714,59 @@ namespace CodeChatSDK
               {
                   while (!cancellationTokenSource.IsCancellationRequested)
                   {
-                      if (!await stream.ResponseStream.MoveNext())
+                      try
                       {
-                          Thread.Sleep(100);
-                      }
-                      else
-                      {
-                          ServerMsg response = stream.ResponseStream.Current;
-                          if (response.Ctrl != null)
+                          if (!await stream.ResponseStream.MoveNext())
                           {
-                              ExecuteCallback(response.Ctrl.Id, response.Ctrl.Code, response.Ctrl.Text, response.Ctrl.Topic, response.Ctrl.Params);
+                              Thread.Sleep(100);
                           }
-                          else if (response.Data != null)
+                          else
                           {
-                              Thread.Sleep(50);
-                              ChatMessage replyMessage = ChatMessageParser.Parse(response.Data.Clone());
-                              AddMessageEvent(this, new AddMessageEventArgs() { TopicName = response.Data.Topic, Message = replyMessage });
-                          }
-                          else if (response.Pres != null && response.Pres.Topic == "me")
-                          {
-                              if ((response.Pres.What == ServerPres.Types.What.On || response.Pres.What == ServerPres.Types.What.Msg))
+                              ServerMsg response = stream.ResponseStream.Current;
+                              if (response.Ctrl != null)
                               {
+                                  ExecuteCallback(response.Ctrl.Id, response.Ctrl.Code, response.Ctrl.Text, response.Ctrl.Topic, response.Ctrl.Params);
+                              }
+                              else if (response.Data != null)
+                              {
+                                  Thread.Sleep(100);
+                                  ChatMessage replyMessage = ChatMessageParser.Parse(response.Data.Clone());
+                                  AddMessageEvent(this, new AddMessageEventArgs() { TopicName = response.Data.Topic, Message = replyMessage });
+                              }
+                              else if (response.Pres != null)
+                              {
+                                  ClientPost(Subscribe(new Topic(response.Pres.Src)));
 
-                                  ClientPost(Subscribe(new Topic(response.Pres.Topic)));
+                                  if ((response.Pres.What == ServerPres.Types.What.On))
+                                  {
+                                      
+                                      SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = true });
+                                      ClientPost(Subscribe(new Topic(response.Pres.Topic)));
+                                  }
+                                  else if (response.Pres.What == ServerPres.Types.What.Off)
+                                  {
+
+                                      SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = false });
+                                      ClientPost(Leave(new Topic(response.Pres.Topic)));
+                                  }
+                                  else
+                                  {
+                                      
+                                  }
                               }
-                              else if (response.Pres.What == ServerPres.Types.What.Off)
+                              else if (response.Meta != null && response.Meta.Topic == "me")
                               {
-                                  ClientPost(Leave(new Topic(response.Pres.Topic)));
+                                  OnGetMeMeta(response.Meta);
+                              }
+                              else if (response.Meta != null && response.Meta.Topic == "fnd")
+                              {
+                                  OnGetFindMeta(response.Meta);
                               }
                           }
-                          else if (response.Meta != null && response.Meta.Topic == "me")
-                          {
-                              OnGetMeMeta(response.Meta);
-                          }
-                          else if (response.Meta != null && response.Meta.Topic == "fnd")
-                          {
-                              OnGetFindMeta(response.Meta);
-                          }
+                      }
+                      catch(Exception e)
+                      {
+
                       }
                   }
               }, cancellationTokenSource.Token);
@@ -826,12 +851,17 @@ namespace CodeChatSDK
             return new ClientMsg() { Pub = pub };
         }
 
-        private ClientMsg Subscribe(Topic topic)
+        private ClientMsg Subscribe(Topic topic,int limit=24)
         {
             var id = GetNextId();
             AddCallback(id, new Callback(id, CallbackType.Sub, null, topic.Name));
 
-            return new ClientMsg() { Sub = new ClientSub() { Id = id, Topic = topic.Name } };
+            ClientSub sub = new ClientSub() { Id = id, Topic = topic.Name };
+            if (topic.Name != "me" && topic.Name != "fnd")
+            {
+                sub.GetQuery = new GetQuery() { Data = new GetOpts() { Limit = limit } };
+            }
+            return new ClientMsg() { Sub = sub  };
         }
 
         private ClientMsg Leave(Topic topic, bool unsubscribe = false)
@@ -845,7 +875,7 @@ namespace CodeChatSDK
         private ClientMsg DeleteTopic(Topic topic, bool hard = false)
         {
             var id = GetNextId();
-            AddCallback(id, new Callback(id, CallbackType.Del, null, topic.Name));
+            AddCallback(id, new Callback(id, CallbackType.DelTopic, null, topic.Name));
 
             return new ClientMsg() { Del = new ClientDel() { Id = id, Topic = topic.Name, What = ClientDel.Types.What.Topic, Hard = hard } };
         }
@@ -853,7 +883,7 @@ namespace CodeChatSDK
         private ClientMsg DeleteMessage(Topic topic, int deleteSeqId, bool hard = false)
         {
             var id = GetNextId();
-            AddCallback(id, new Callback(id, CallbackType.Del, null, topic.Name));
+            AddCallback(id, new Callback(id, CallbackType.DelMsg, null, deleteSeqId.ToString()));
 
             ClientDel del = new ClientDel() { Id = id, Topic = topic.Name, What = ClientDel.Types.What.Msg, Hard = hard };
             del.DelSeq.Add(new SeqRange() { Low = deleteSeqId });
@@ -926,6 +956,18 @@ namespace CodeChatSDK
             return new ClientMsg() { Set =set  };
         }
 
+        private ClientMsg SetArchived(Topic topic,bool isArchived)
+        {
+            var id = GetNextId();
+            AddCallback(id, new Callback(id, CallbackType.Set, null));
+
+            JObject privateObject = new JObject { { "arch", isArchived } };
+            string privateInfo = privateObject.ToString();
+            ByteString privateField = ByteString.CopyFromUtf8(privateInfo);
+            return new ClientMsg() { Set = new ClientSet() { Id = id, Topic = topic.Name, Query = new SetQuery() { Desc = new SetDesc() { Private = privateField } } } };
+
+        }
+
         private ClientMsg SetPrivate(Topic topic, string comment)
         {
             var id = GetNextId();
@@ -992,22 +1034,42 @@ namespace CodeChatSDK
                     bundle.Action?.Invoke(arg, parameters);
                     switch (type)
                     {
-                        case CallbackType.Login:
-                            LoginSuccessEvent(this, new LoginSuccessEventArgs());
+                        case CallbackType.Acc:
+                            RegisterSuccessEvent(this, new RegisterSuccessEventArgs() { Exception = new Exception("Please enter the verification code.") });
+
                             break;
-                        case CallbackType.Del:
-                            Topic deletedTopic = new Topic(topic);
-                            //RemoveTopicEvent(this, new RemoveTopicEventArgs() { Topic = deletedTopic });
+                        case CallbackType.Login:
+                            if(code == 300)
+                            {
+                                RegisterFailedEvent(this, new RegisterFailedEventArgs() { Exception = new Exception(text) });
+                            }
+                            else
+                            {
+                                LoginSuccessEvent(this, new LoginSuccessEventArgs());
+                            }
+
+                            break;
+                        case CallbackType.DelMsg:
+                            ChatMessage removedMessage = new ChatMessage();
+                            removedMessage.TopicName = topic;
+                            removedMessage.SeqId = int.Parse(arg);
+
+                            RemoveMessageEvent?.Invoke(this, new RemoveMessageEventArgs() { Message = removedMessage });
+                            break;
+                        case CallbackType.DelTopic:
+                            Subscriber removedSubscriber = new Subscriber();
+                            removedSubscriber.TopicName = topic;
+                            removedSubscriber.UserId=topic;
+
+                            RemoveSubscriberEvent?.Invoke(this, new RemoveSubscriberEventArgs() { Subscriber = removedSubscriber });
                             break;
                         case CallbackType.Sub:
-                            Topic newTopic = new Topic(topic);
                             Subscriber newSubscriber = new Subscriber();
                             newSubscriber.TopicName = topic;
                             newSubscriber.UserId = topic;
                             newSubscriber.Username = topic;
 
-                            //AddTopicEvent?.Invoke(this, new AddTopicEventArgs() { Topic = newTopic });
-                            //AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs { Subscriber = newSubscriber });
+                            AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs { Subscriber = newSubscriber });
                             break;
                         case CallbackType.Leave:
                             Topic removedTopic = new Topic(topic);
@@ -1024,11 +1086,11 @@ namespace CodeChatSDK
                     {
                         case CallbackType.Login:
 
-                            LoginFailedEvent(this, new LoginFailedEventArgs() { exception = new Exception(text) });
+                            LoginFailedEvent(this, new LoginFailedEventArgs() { Exception = new Exception(text) });
                             break;
                         case CallbackType.Acc:
 
-                            RegisterFailedEvent(this, new RegisterFailedEventArgs() { exception = new Exception(text) });
+                            RegisterFailedEvent(this, new RegisterFailedEventArgs() { Exception = new Exception(text) });
                             break;
                         default:
                             break;
@@ -1053,7 +1115,7 @@ namespace CodeChatSDK
             Topic me = new Topic("me");
 
             ClientPost(GetTags(me));
-            ClientPost(GetSubs(me));
+            ClientPost(GetMeSubs());
 
             //保存令牌供上传使用
             token = JsonConvert.DeserializeObject<string>(paramaters["token"].ToString(Encoding.UTF8));
@@ -1074,7 +1136,6 @@ namespace CodeChatSDK
                     var privateInfo = sub.Private.ToStringUtf8();
                     var privateObject = JsonConvert.DeserializeObject<JObject>(privateInfo);
 
-                    topic.Status = 0;
                     topic.Updated = sub.UpdatedAt;
                     topic.Read = sub.ReadId;
                     topic.Recieve = sub.RecvId;
@@ -1083,7 +1144,6 @@ namespace CodeChatSDK
                     topic.MinLocalSeqId = sub.RecvId;
                     topic.MaxLocalSeqId = sub.RecvId;
                     topic.IsArchived = false;
-                    topic.IsVisible = false;
                     topic.PrivateComment = sub.UserId;
                     topic.Weight = 0;
                     topic.Type = publicObject == null ? "group" : "user";
@@ -1100,8 +1160,6 @@ namespace CodeChatSDK
                         }
                         
                     }
-
-                    AddTopicEvent?.Invoke(this, new AddTopicEventArgs() { Topic = topic });
 
                     subscriber.UserId = sub.Topic;
                     subscriber.Online = sub.Online;
@@ -1120,6 +1178,10 @@ namespace CodeChatSDK
                             subscriber.PhotoType = publicObject["photo"]["type"].ToString();
                         }
                     }
+
+                    topic.SubsriberList.Add(subscriber);
+
+                    AddTopicEvent?.Invoke(this, new AddTopicEventArgs() { Topic = topic });
 
                     AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber,isTemporary=false });
 
@@ -1150,7 +1212,7 @@ namespace CodeChatSDK
                     subscriber.Type = publicObject == null ? "group" : "user";
                     subscriber.PhotoData = string.Empty;
                     subscriber.PhotoType = string.Empty;
-                    subscriber.Status = 1;
+
                     if (publicObject != null)
                     {
                         subscriber.Username = publicObject["fn"].ToString();

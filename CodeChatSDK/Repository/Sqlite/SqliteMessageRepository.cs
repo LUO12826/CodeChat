@@ -31,13 +31,29 @@ namespace CodeChatSDK.Repository.Sqlite
 
         public async Task<IEnumerable<ChatMessage>> GetAsync()
         {
-            return await db.Messages.ToListAsync();
+            return await db.Messages.
+                            OrderBy(m => m.TopicName).
+                            OrderByDescending(m=>m.SeqId).
+                            ToListAsync();
         }
 
         public async Task<IEnumerable<ChatMessage>> GetAsync(string condition)
         {
             return await db.Messages.
+                            OrderBy(m => m.TopicName).
+                            OrderByDescending(m => m.SeqId).
                             Where(m => m.Content.Contains(condition)).
+                            ToListAsync();
+        }
+
+        public async Task<IEnumerable<ChatMessage>> GetAsync(string condition,int skip,int take)
+        {
+            return await db.Messages.
+                            OrderBy(m => m.TopicName).
+                            OrderByDescending(m => m.SeqId).
+                            Where(m => m.Content.Contains(condition)).
+                            Skip(skip).
+                            Take(take).
                             ToListAsync();
         }
 
@@ -45,6 +61,7 @@ namespace CodeChatSDK.Repository.Sqlite
         {
             return await db.Messages.
                             Where(m => m.TopicName == topic.Name).
+                            OrderBy(m => m.SeqId).
                             ToListAsync();
         }
 
@@ -54,6 +71,16 @@ namespace CodeChatSDK.Repository.Sqlite
                             Where(m => m.TopicName == topic.Name &&
                             m.SeqId >= since &&
                             m.SeqId < before).
+                            OrderBy(m => m.SeqId).
+                            ToListAsync();
+        }
+
+        public async Task<IEnumerable<ChatMessage>> GetAsync(Topic topic, int limit)
+        {
+            return await db.Messages.
+                            Where(m => m.TopicName == topic.Name).
+                            OrderBy(m => m.SeqId).
+                            Take(limit).
                             ToListAsync();
         }
 
@@ -62,6 +89,18 @@ namespace CodeChatSDK.Repository.Sqlite
             return await db.Messages.
                             Where(m => m.TopicName == topic.Name &&
                             m.Content.Contains(condition)).
+                            OrderBy(m => m.SeqId).
+                            ToListAsync();
+        }
+
+        public async Task<IEnumerable<ChatMessage>> GetAsync(Topic topic, string condition, int skip, int take)
+        {
+            return await db.Messages.
+                            Where(m => m.TopicName == topic.Name &&
+                            m.Content.Contains(condition)).
+                            OrderBy(m => m.SeqId).
+                            Skip(skip).
+                            Take(take).
                             ToListAsync();
         }
 
@@ -72,7 +111,7 @@ namespace CodeChatSDK.Repository.Sqlite
 
         public async Task<ChatMessage> UpsertMessage(ChatMessage message)
         {
-            var currentMessage = await db.Messages.FirstOrDefaultAsync(s => s.Id == message.Id);
+            var currentMessage = await db.Messages.FirstOrDefaultAsync(s => s.TopicName== message.TopicName && s.SeqId == message.SeqId);
 
             if (currentMessage == null)
             {
@@ -80,7 +119,10 @@ namespace CodeChatSDK.Repository.Sqlite
             }
             else
             {
-                db.Entry(currentMessage).CurrentValues.SetValues(message);
+                //long id = currentMessage.Id;
+                //db.Entry(currentMessage).CurrentValues.SetValues(message);
+                //currentMessage.Id = id;
+                //message.Id = id;
             }
 
             await db.SaveChangesAsync();

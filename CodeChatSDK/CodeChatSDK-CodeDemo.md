@@ -130,7 +130,7 @@ await account.RemoveTag(tag);
 
 ```c#
 //获取话题列表
-ObservableCollection<Topic> TopicList = account.TopicList;
+ObservableCollection<Topic> TopicObservableCollection = account.TopicObservableCollection;
 ```
 
 
@@ -139,7 +139,7 @@ ObservableCollection<Topic> TopicList = account.TopicList;
 
 ```c#
 //刷新话题列表
-await account.RefreshTopicList();
+await account.RefreshTopicObservableCollection();
 ```
 
 
@@ -148,7 +148,7 @@ await account.RefreshTopicList();
 
 ```c#
 //获取当前话题
-//来源于ListView的点击项
+//来源于ObservableCollectionView的点击项
 Topic currentTopic = itemClickEventArgs.ClickedItem as Topic;
 
 //由话题名寻找话题
@@ -203,7 +203,7 @@ await currentTopic.SetPrivateComment("Dream it possible");
 
 ```c#
 //获取消息列表
-ObservableCollection<ChatMessage> ChatMessageList = currentTopic.MessageList;
+ObservableCollection<ChatMessage> ChatMessageObservableCollection = currentTopic.MessageObservableCollection;
 ```
 
 

@@ -17,9 +17,6 @@ namespace CodeChatSDK
     /// </summary>
     public class LoginSuccessEventArgs
     {
-        /// <summary>
-        /// 聊天消息
-        /// </summary>
-        public ChatMessage Message { get; set; }
+        public Exception Exception { get; set; }
     }
 }

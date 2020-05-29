@@ -19,6 +19,6 @@ namespace CodeChatSDK
         /// <summary>
         /// 登陆失败异常
         /// </summary>
-        public Exception exception { get; set; }
+        public Exception Exception { get; set; }
     }
 }

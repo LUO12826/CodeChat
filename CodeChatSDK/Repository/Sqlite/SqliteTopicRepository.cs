@@ -31,7 +31,7 @@ namespace CodeChatSDK.Repository.Sqlite
         public async Task<IEnumerable<Topic>> GetAsync()
         {
             return await db.Topics.
-                            Where(t=>t.IsArchived==false).
+                            Where(t => t.IsArchived == false).
                             OrderByDescending(t => t.Weight).
                             ThenByDescending(t => t.LastUsed).
                             ToListAsync();
@@ -44,6 +44,18 @@ namespace CodeChatSDK.Repository.Sqlite
                             (t.Name.Contains(condition) ||
                             t.PrivateComment.Contains(condition))).
                             OrderByDescending(t => t.LastUsed).
+                            ToListAsync();
+        }
+
+        public async Task<IEnumerable<Topic>> GetAsync(string condition, int skip, int take)
+        {
+            return await db.Topics.
+                            Where(t => t.IsArchived == false &&
+                            (t.Name.Contains(condition) ||
+                            t.PrivateComment.Contains(condition))).
+                            OrderByDescending(t => t.LastUsed).
+                            Skip(skip).
+                            Take(take).
                             ToListAsync();
         }
 

@@ -71,6 +71,8 @@ namespace CodeChatSDK.Models
             Email = "";
             Avatar = "";
             State = AccountState.Offline;
+            SubscriberList = new List<Subscriber>();
+            TopicList = new List<Topic>();
             Tags = new List<string>();
         }
     }

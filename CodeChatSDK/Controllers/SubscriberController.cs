@@ -23,6 +23,12 @@ namespace CodeChatSDK.Controllers
             instance = subscriber;
         }
 
+        public async void ChangeSubscriberState(bool isOnline)
+        {
+            instance.Online = isOnline;
+            await db.UpsertSubscriber(instance);
+        }
+
         public async void UpsertSubscriber()
         {
             await db.UpsertSubscriber(instance);
@@ -46,6 +52,11 @@ namespace CodeChatSDK.Controllers
         public async Task<List<Subscriber>> SearchSubscriber(string condition)
         {
             return await db.GetAsync(condition) as List<Subscriber>;
+        }
+
+        public async Task<List<Subscriber>> SearchSubscriber(string condition,int skip,int take)
+        {
+            return await db.GetAsync(condition,skip,take) as List<Subscriber>;
         }
     }
 }

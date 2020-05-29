@@ -17,8 +17,8 @@ namespace CodeChatSDK
     public class RegisterSuccessEventArgs
     {
         /// <summary>
-        /// 注册失败异常
+        /// 注册成功异常
         /// </summary>
-        public Exception exception { get; set; }
+        public Exception Exception { get; set; }
     }
 }

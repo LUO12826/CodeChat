@@ -26,11 +26,6 @@ namespace CodeChatSDK.Models
         public string Username { get; set; }
 
         /// <summary>
-        /// 头像数据
-        /// </summary>
-        public string PhotoData { get; set; }
-
-        /// <summary>
         /// 类型
         /// </summary>
         public string Type { get; set; }
@@ -46,9 +41,19 @@ namespace CodeChatSDK.Models
         public int Status { get; set; }
 
         /// <summary>
+        /// 头像数据
+        /// </summary>
+        public string PhotoData { get; set; }
+
+        /// <summary>
         /// 头像类型
         /// </summary>
         public string PhotoType { get; set; }
+
+        public Subscriber()
+        {
+            Status = 1;
+        }
 
         public override int GetHashCode()
         {
@@ -63,7 +68,7 @@ namespace CodeChatSDK.Models
 
         public override string ToString()
         {
-            return $"{Username},{UserId},{TopicName}";
+            return $"{Username},{UserId},{TopicName},{Online}";
         }
     }
 }

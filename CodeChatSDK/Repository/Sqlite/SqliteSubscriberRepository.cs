@@ -52,6 +52,16 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
+        public async Task<IEnumerable<Subscriber>> GetAsync(string condition, int skip, int take)
+        {
+            return await db.Subscribers.
+                            Where(s => s.UserId.Contains(condition) ||
+                            s.Username.Contains(condition)).
+                            Skip(skip).
+                            Take(take).
+                            ToListAsync();
+        }
+
         public ISubscriberRepository GetRepository()
         {
             return new SqliteSubscriberRepository(db.GetContext());

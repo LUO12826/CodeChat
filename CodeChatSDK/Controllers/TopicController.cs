@@ -31,10 +31,9 @@ namespace CodeChatSDK.Controllers
         {
             instance = topic;
             MessageController messageController = new MessageController(db.Messages);
-            instance.MessageList = await messageController.GetMessages(instance);
-            client.Load(instance, instance.Limit);
+            instance.MessageList = await messageController.GetMessages(instance,instance.Limit);
         }
-
+        
         /// <summary>
         /// 增加订阅者
         /// </summary>
@@ -104,17 +103,22 @@ namespace CodeChatSDK.Controllers
         {
 
             int newSeqId = message.SeqId;
-            int oldSeqId = instance.MessageList.Count == 0 ? 1 : instance.MessageList[0].SeqId;
+            int oldSeqId = instance.MessageList.Count == 0 ? instance.MinLocalSeqId : instance.MessageList[0].SeqId;
             message.TopicName = instance.Name;
-            if (oldSeqId == 1 || oldSeqId >= newSeqId)
+            if (oldSeqId == 0)
+            {
+                instance.MessageList.Add(message);
+                instance.MinLocalSeqId = newSeqId;
+                instance.MaxLocalSeqId = newSeqId;
+            }else if (oldSeqId >= newSeqId)
             {
                 instance.MessageList.Insert(0, message);
-                --instance.MinLocalSeqId;
+                instance.MinLocalSeqId = newSeqId;
             }
             else
             {
                 instance.MessageList.Add(message);
-                ++instance.MaxLocalSeqId;
+                instance.MaxLocalSeqId = newSeqId;
             }
 
             MessageController messageController = new MessageController(db.Messages);
@@ -141,13 +145,30 @@ namespace CodeChatSDK.Controllers
             }
             if (message.SeqId == instance.MaxLocalSeqId)
             {
-                --instance.MaxLocalSeqId;
+                int size = instance.MessageList.Count;
+                if(size <= 1)
+                {
+                    instance.MaxLocalSeqId = 0;
+                }
+                else
+                {
+                    instance.MaxLocalSeqId = instance.MessageList[size - 2].SeqId;
+                }
+                
             }
             if (message.SeqId == instance.MinLocalSeqId)
             {
-                ++instance.MinLocalSeqId;
+                int size = instance.MessageList.Count;
+                if (size <= 1)
+                {
+                    instance.MinLocalSeqId = 0;
+                }
+                else
+                {
+                    instance.MinLocalSeqId = instance.MessageList[1].SeqId;
+                }
+                
             }
-
             MessageController messageController = new MessageController(db.Messages);
             messageController.SetMessage(message);
             messageController.DeleteMessage();
@@ -158,6 +179,7 @@ namespace CodeChatSDK.Controllers
             var dbContext = db.Topics.GetRepository();
             await dbContext.UpsertTopic(instance);
 
+            client.RemoveMessage(instance,message);
             return true;
         }
 
@@ -187,26 +209,25 @@ namespace CodeChatSDK.Controllers
         public async void LoadMessage()
         {
             
-            int since = instance.MessageList.Count == 0 ? instance.MaxLocalSeqId : instance.MessageList[0].SeqId - 1;
-            int before = (since - instance.Limit) >= 0 ? since - instance.Limit : 0;
-            if (since < instance.MinLocalSeqId)
-            {
-                client.Load(instance, since, before);
-                instance.MinLocalSeqId = before + 1;
-            }
-            else if (before < instance.MinLocalSeqId)
+            int before = instance.MessageList.Count == 0 ? instance.MinLocalSeqId : instance.MessageList[0].SeqId;
+            int since = (before - instance.Limit) > 0 ? before - instance.Limit : 0;
+            if (since >= instance.MinLocalSeqId)
             {
                 MessageController messageController = new MessageController(db.Messages);
                 List<ChatMessage> messages = await messageController.GetMessages(instance, since, before) as List<ChatMessage>;
                 messages.ForEach(async m => await AddMessage(m));
-                since = instance.MinLocalSeqId;
+            }
+            else if (before > instance.MinLocalSeqId)
+            {
+                MessageController messageController = new MessageController(db.Messages);
+                List<ChatMessage> messages = await messageController.GetMessages(instance, since, before) as List<ChatMessage>;
+                messages.ForEach(async m => await AddMessage(m));
+                before = instance.MinLocalSeqId;
                 client.Load(instance, since, before);
             }
             else
             {
-                MessageController messageController = new MessageController(db.Messages);
-                List<ChatMessage> messages = await messageController.GetMessages(instance, since, before) as List<ChatMessage>;
-                messages.ForEach(async m => await AddMessage(m));
+                client.Load(instance, since, before);
             }
 
             //话题更新时间戳
@@ -237,6 +258,12 @@ namespace CodeChatSDK.Controllers
             return await messageController.SearchMessage(instance, condition);
         }
 
+        public async Task<List<ChatMessage>> SearchMessage(string condition,int skip,int take)
+        {
+            MessageController messageController = new MessageController(db.Messages);
+            return await messageController.SearchMessage(instance, condition,skip,take);
+        }
+
         public async void UpsertTopic()
         {
             var dbContext = db.Topics.GetRepository();
@@ -259,6 +286,12 @@ namespace CodeChatSDK.Controllers
         {
             var dbContext = db.Topics.GetRepository();
             return await dbContext.GetAsync(condition) as List<Topic>;
+        }
+
+        public async Task<List<Topic>> SearchTopic(string condition,int skip,int take)
+        {
+            var dbContext = db.Topics.GetRepository();
+            return await dbContext.GetAsync(condition,skip,take) as List<Topic>;
         }
     }
 }

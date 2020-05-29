@@ -108,7 +108,9 @@ namespace CodeChatSDK.Models
         public Topic(string name)
         {
             Name = name;
-            Limit = 32;
+            Limit = 24;
+            Status = 0;
+            IsVisible = true;
             LastUsed = ChatMessageBuilder.GetTimeStamp();
             SubsriberList = new List<Subscriber>();
             MessageList = new List<ChatMessage>();
