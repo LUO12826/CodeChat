@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Storage;
 using Windows.UI.Text.Core;
 
 namespace CodeChatSDK
@@ -154,6 +155,11 @@ namespace CodeChatSDK
             client.SetDescription(new Topic("me"), newFormattedName);
         }
 
+        public void SetAvator(StorageFile file,ulong size,byte[] bytes)
+        {
+            client.SetAvator(new Topic("me"), file, size, bytes);
+        }
+
         /// <summary>
         /// 添加标签
         /// </summary>
@@ -191,7 +197,6 @@ namespace CodeChatSDK
         /// <returns></returns>
         public Topic GetTopicAt(int position)
         {
-            client.SubscribeTopic(instance.TopicList[position]);
             return position < 0 ? null : instance.TopicList[position];
         }
 
@@ -354,6 +359,12 @@ namespace CodeChatSDK
             return await topicController.SearchTopic(condition);
         }
 
+        public List<Topic> SearchTopic(string condition,int pageIndex,int pageSize,ref int pageCount)
+        {
+            TopicController topicController = new TopicController(db);
+            return topicController.SearchTopic(condition,pageIndex,pageSize,ref pageCount);
+        }
+
         public SubscriberController GetSubscriberController(Subscriber subscriber)
         {
             if (subscriber == null)
@@ -459,6 +470,18 @@ namespace CodeChatSDK
             return searchSubscriberResult.Where(s=>s.Username.Contains(condition)||s.UserId.Contains(condition)).ToList();
         }
 
+        public List<Subscriber> SearchSubscriberOnline(string condition,int pageIndex, int pageSize, ref int pageCount)
+        {
+            client.FindSubscriber();
+            var query = searchSubscriberResult.
+                                Where(s => s.Username.Contains(condition) ||
+                                s.UserId.Contains(condition));
+
+            pageCount = query.Count() % pageSize == 0 ? (query.Count() / pageSize) : (query.Count() / pageSize) + 1;
+
+            return query.Skip(pageIndex - 1).Take(pageSize).ToList();
+        }
+
         /// <summary>
         /// 搜索消息
         /// </summary>
@@ -468,6 +491,17 @@ namespace CodeChatSDK
         {
             MessageController messageController = new MessageController(db.Messages);
             return await messageController.SearchMessage(condition);
+        }
+
+        /// <summary>
+        /// 搜索消息
+        /// </summary>
+        /// <param name="condition">搜索条件</param>
+        /// <returns></returns>
+        public List<ChatMessage> SearchMessage(string condition, int pageIndex, int pageSize, ref int pageCount)
+        {
+            MessageController messageController = new MessageController(db.Messages);
+            return messageController.SearchMessage(condition, pageIndex, pageSize, ref pageCount);
         }
 
         /// <summary>

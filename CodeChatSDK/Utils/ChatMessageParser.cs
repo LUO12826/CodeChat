@@ -30,7 +30,14 @@ namespace CodeChatSDK.Utils
                 chatMsg.Content = message.Content.ToStringUtf8();
                 chatMsg.SeqId = message.SeqId;
                 chatMsg.TopicName = message.Topic;
-                chatMsg.IsPlainText = false;
+                if(ParseGenericAttachment(chatMsg).Count != 0)
+                {
+                    chatMsg.IsPlainText = false;
+                }
+                else
+                {
+                    chatMsg.IsPlainText = true;
+                }
                 ParseCode(chatMsg);
             }
             else

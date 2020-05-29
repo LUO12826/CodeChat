@@ -258,10 +258,10 @@ namespace CodeChatSDK.Controllers
             return await messageController.SearchMessage(instance, condition);
         }
 
-        public async Task<List<ChatMessage>> SearchMessage(string condition,int skip,int take)
+        public List<ChatMessage> SearchMessage(string condition,int pageIndex,int pageSize, ref int pageCount)
         {
             MessageController messageController = new MessageController(db.Messages);
-            return await messageController.SearchMessage(instance, condition,skip,take);
+            return messageController.SearchMessage(instance, condition,pageIndex, pageSize, ref pageCount);
         }
 
         public async void UpsertTopic()
@@ -288,10 +288,10 @@ namespace CodeChatSDK.Controllers
             return await dbContext.GetAsync(condition) as List<Topic>;
         }
 
-        public async Task<List<Topic>> SearchTopic(string condition,int skip,int take)
+        public List<Topic> SearchTopic(string condition,int pageIndex,int pageSize,ref int pageCount)
         {
             var dbContext = db.Topics.GetRepository();
-            return await dbContext.GetAsync(condition,skip,take) as List<Topic>;
+            return dbContext.GetSync(condition,pageIndex,pageSize,ref pageCount) as List<Topic>;
         }
     }
 }

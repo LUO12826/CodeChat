@@ -52,14 +52,16 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
-        public async Task<IEnumerable<Subscriber>> GetAsync(string condition, int skip, int take)
+        public IEnumerable<Subscriber> GetSync(string condition, int pageIndex, int pageSize, ref int pageCount)
         {
-            return await db.Subscribers.
+            var query = db.Subscribers.
                             Where(s => s.UserId.Contains(condition) ||
-                            s.Username.Contains(condition)).
-                            Skip(skip).
-                            Take(take).
-                            ToListAsync();
+                            s.Username.Contains(condition));
+
+            pageCount = query.Count() % pageSize == 0 ? (query.Count() / pageSize) : (query.Count() / pageSize) + 1;
+            ;
+            return query.Skip(pageIndex - 1).Take(pageSize).ToList();
+
         }
 
         public ISubscriberRepository GetRepository()

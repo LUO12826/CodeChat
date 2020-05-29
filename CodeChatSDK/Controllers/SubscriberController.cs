@@ -54,9 +54,9 @@ namespace CodeChatSDK.Controllers
             return await db.GetAsync(condition) as List<Subscriber>;
         }
 
-        public async Task<List<Subscriber>> SearchSubscriber(string condition,int skip,int take)
+        public List<Subscriber> SearchSubscriber(string condition,int pageIndex,int pageSize,ref int pageCount)
         {
-            return await db.GetAsync(condition,skip,take) as List<Subscriber>;
+            return db.GetSync(condition,pageIndex,pageSize,ref pageCount) as List<Subscriber>;
         }
     }
 }

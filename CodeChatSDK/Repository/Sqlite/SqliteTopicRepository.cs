@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.UI.Xaml.Controls;
 
 namespace CodeChatSDK.Repository.Sqlite
 {
@@ -47,16 +48,18 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
-        public async Task<IEnumerable<Topic>> GetAsync(string condition, int skip, int take)
+        public IEnumerable<Topic> GetSync(string condition, int pageIndex, int pageSize, ref int pageCount)
         {
-            return await db.Topics.
+            var query = db.Topics.
                             Where(t => t.IsArchived == false &&
                             (t.Name.Contains(condition) ||
                             t.PrivateComment.Contains(condition))).
-                            OrderByDescending(t => t.LastUsed).
-                            Skip(skip).
-                            Take(take).
-                            ToListAsync();
+                            OrderByDescending(t => t.LastUsed);
+
+            pageCount = query.Count() % pageSize == 0 ? (query.Count() / pageSize) : (query.Count() / pageSize) + 1;
+                            ;
+            return query.Skip(pageIndex-1).Take(pageSize).ToList();
+
         }
 
         public ITopicRepository GetRepository()

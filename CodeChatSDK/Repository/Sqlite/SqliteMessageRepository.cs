@@ -46,15 +46,17 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
-        public async Task<IEnumerable<ChatMessage>> GetAsync(string condition,int skip,int take)
+        public IEnumerable<ChatMessage> GetSync(string condition, int pageIndex, int pageSize, ref int pageCount)
         {
-            return await db.Messages.
+            var query = db.Messages.
                             OrderBy(m => m.TopicName).
                             OrderByDescending(m => m.SeqId).
-                            Where(m => m.Content.Contains(condition)).
-                            Skip(skip).
-                            Take(take).
-                            ToListAsync();
+                            Where(m => m.Content.Contains(condition));
+
+            pageCount = query.Count() % pageSize == 0 ? (query.Count() / pageSize) : (query.Count() / pageSize) + 1;
+
+            return query.Skip(pageIndex - 1).Take(pageSize).ToList();
+
         }
 
         public async Task<IEnumerable<ChatMessage>> GetAsync(Topic topic)
@@ -104,6 +106,18 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
+        public IEnumerable<ChatMessage> GetSync(Topic topic, string condition, int pageIndex, int pageSize, ref int pageCount)
+        {
+            var query = db.Messages.
+                            Where(m => m.TopicName == topic.Name &&
+                            m.Content.Contains(condition)).
+                            OrderBy(m => m.SeqId);
+
+            pageCount = query.Count() % pageSize == 0 ? (query.Count() / pageSize) : (query.Count() / pageSize) + 1;
+
+            return query.Skip(pageIndex - 1).Take(pageSize).ToList();
+
+        }
         public IMessageRepository GetRepository()
         {
             return new SqliteMessageRepository(db.GetContext());

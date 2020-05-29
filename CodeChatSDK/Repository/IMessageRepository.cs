@@ -24,14 +24,6 @@ namespace CodeChatSDK.Repository
         /// <returns></returns>
         Task<IEnumerable<ChatMessage>> GetAsync(string condition);
 
-        /// <summary>
-        /// 获取符合条件的消息
-        /// </summary>
-        /// <param name="condition">条件</param>
-        /// <param name="skip">条件</param>
-        /// <param name="take">条件</param>
-        /// <returns></returns>
-        Task<IEnumerable<ChatMessage>> GetAsync(string condition,int skip,int take);
 
         /// <summary>
         /// 获取对应话题的消息
@@ -60,7 +52,26 @@ namespace CodeChatSDK.Repository
         /// <returns></returns>
         Task<IEnumerable<ChatMessage>> GetAsync(Topic topic, string condition);
 
-        Task<IEnumerable<ChatMessage>> GetAsync(Topic topic, string condition,int skip,int take);
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <param name="condition"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageCount"></param>
+        /// <returns></returns>
+        IEnumerable<ChatMessage> GetSync(Topic topic, string condition, int pageIndex, int pageSize, ref int pageCount);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="condition"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageCount"></param>
+        /// <returns></returns>
+        IEnumerable<ChatMessage> GetSync(string condition, int pageIndex, int pageSize, ref int pageCount);
 
         /// <summary>
         /// 新增或更新消息

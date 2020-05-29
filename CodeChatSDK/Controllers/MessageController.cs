@@ -1,6 +1,7 @@
 ﻿using CodeChatSDK.Models;
 using CodeChatSDK.Repository;
 using CodeChatSDK.Utils;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -85,9 +86,9 @@ namespace CodeChatSDK.Controllers
             return messages;
         }
 
-        public async Task<List<ChatMessage>> SearchMessage(string condition,int skip,int take)
+        public List<ChatMessage> SearchMessage(string condition, int pageIndex, int pageSize, ref int pageCount)
         {
-            List<ChatMessage> messages = await db.GetAsync(condition,skip,take) as List<ChatMessage>;
+            List<ChatMessage> messages = db.GetSync(condition,pageIndex,pageSize,ref pageCount) as List<ChatMessage>;
             messages.ForEach(m =>
             {
                 ChatMessageParser.ParseContent(m);
@@ -107,9 +108,9 @@ namespace CodeChatSDK.Controllers
             return messages;
         }
 
-        public async Task<List<ChatMessage>> SearchMessage(Topic topic, string condition,int skip,int take)
+        public List<ChatMessage> SearchMessage(Topic topic, string condition, int pageIndex, int pageSize, ref int pageCount)
         {
-            List<ChatMessage> messages = await db.GetAsync(topic, condition,skip,take) as List<ChatMessage>;
+            List<ChatMessage> messages = db.GetSync(topic, condition, pageIndex, pageSize, ref pageCount) as List<ChatMessage>;
             messages.ForEach(m =>
             {
                 ChatMessageParser.ParseContent(m);

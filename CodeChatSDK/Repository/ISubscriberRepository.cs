@@ -28,10 +28,11 @@ namespace CodeChatSDK.Repository
         /// 
         /// </summary>
         /// <param name="condition"></param>
-        /// <param name="skip"></param>
-        /// <param name="take"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="pageCount"></param>
         /// <returns></returns>
-        Task<IEnumerable<Subscriber>> GetAsync(string condition,int skip,int take);
+        IEnumerable<Subscriber> GetSync(string condition, int pageIndex, int pageSize, ref int pageCount);
 
         /// <summary>
         /// 获取对应话题的订阅者
