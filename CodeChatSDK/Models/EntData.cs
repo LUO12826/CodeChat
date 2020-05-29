@@ -1,9 +1,6 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace CodeChatSDK.Message
+namespace CodeChatSDK.Models
 {
     /// <summary>
     /// 实体数据
@@ -20,7 +17,7 @@ namespace CodeChatSDK.Message
         /// Data值
         /// </summary>
         [JsonProperty("val")]
-        public dynamic Val { get; set; }
+        public string Val { get; set; }
 
         /// <summary>
         /// URL

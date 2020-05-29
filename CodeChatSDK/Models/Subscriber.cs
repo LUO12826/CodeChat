@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Text;
-using static CodeChatSDK.MessageBuilder;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.Models
 {
     /// <summary>
     /// 订阅者
@@ -63,6 +59,11 @@ namespace CodeChatSDK
         {
             Subscriber subscriber = obj as Subscriber;
             return subscriber != null && this.UserId.Equals(subscriber.UserId);
+        }
+
+        public override string ToString()
+        {
+            return $"{Username},{UserId},{TopicName}";
         }
     }
 }
