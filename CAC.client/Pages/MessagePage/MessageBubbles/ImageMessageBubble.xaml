@@ -11,18 +11,16 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     <UserControl.Resources>
-        
+
     </UserControl.Resources>
-    
-    <Grid>
-        <Grid Background="{x:Bind BgColor, Mode=OneWay}" Padding="10" CornerRadius="4">
-            <Border x:Name="ProgressRingBorder" MaxHeight="120" MaxWidth="140" Padding="30"
+
+    <Grid Background="{x:Bind BgColor, Mode=OneWay}" Padding="10" CornerRadius="4">
+        <Border x:Name="ProgressRingBorder" MaxHeight="120" MaxWidth="140" Padding="30"
                     Visibility="Visible" Background="Transparent" HorizontalAlignment="Stretch">
-                <ProgressRing x:Name="progressRing" IsActive="True" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
-            </Border>
+            <ProgressRing x:Name="progressRing" IsActive="True" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+        </Border>
 
-            <mtuc:ImageEx x:Name="image" Visibility="Collapsed" MaxWidth="400" MaxHeight="400"/>
-
-        </Grid>
+        <mtuc:ImageEx x:Name="image" Visibility="Collapsed" MaxWidth="400" MaxHeight="400"/>
     </Grid>
+
 </UserControl>

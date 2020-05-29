@@ -2,8 +2,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Windows.Storage;
 using Windows.UI.Xaml.Media;
 
 namespace CAC.client.MessagePage
@@ -11,7 +14,7 @@ namespace CAC.client.MessagePage
     class MessageViewerViewModel : BaseViewModel
     {
         private bool _IsGroupChat = false;
-        private string _MyNickName;
+        private string _MyUserName;
         private string _MyBase64Avatar;
         private Brush _LeftBubbleBgColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 192, 214, 191));
         private Brush _RightBubbleBgColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 244, 148, 118));
@@ -48,11 +51,11 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public string MyNickName {
-            get => _MyNickName;
+        public string MyUserName {
+            get => _MyUserName;
             set {
-                _MyNickName = value;
-                RaisePropertyChanged(nameof(MyNickName));
+                _MyUserName = value;
+                RaisePropertyChanged(nameof(MyUserName));
             }
         }
 
@@ -72,35 +75,62 @@ namespace CAC.client.MessagePage
                 Messages.Add(new TextMessageVM() {
                     Base64Avatar = GlobalConfigs.testB64Avator,
                     Text = "aaaaaaaaaaaaaaaa",
-                    NickName = "aaa",
+                    UserName = "aaa",
                     SendByMe = i % 2 == 0 ? true : false
                 });
             }
             var b = new ImageMessageVM() {
                 Base64Avatar = GlobalConfigs.testB64Avator,
                 ImageBase64 = GlobalConfigs.testB64Avator,
-                NickName = "aaa",
+                UserName = "aaa",
                 SendByMe = false
             };
+            var c = new CodeMessageVM() {
+                Code = "using System;",
+                Language = "csharp",
+                UserName = "aaa",
+                SendByMe = false,
+                Base64Avatar = GlobalConfigs.testB64Avator,
+            };
+
             Messages.Add(b);
-            MyNickName = "self";
+            Messages.Add(c);
+            MyUserName = "self";
             MyBase64Avatar = GlobalConfigs.testB64Avator;
         }
 
 
         private async Task<Tuple<List<MessageItemBaseVM>, bool>> loadMoreItems(uint itemsNum)
         {
-            var a = await Task.Run(() => {
+            var a = await Task.Run(async () => {
                 Thread.Sleep(2000);
                 var b = new List<MessageItemBaseVM>();
                 for (int i = 0; i < itemsNum; i++) {
 
                     b.Add(new TextMessageVM() {
-                        NickName = "bbb",
+                        UserName = "bbb",
                         Text = "新加项目",
                         Base64Avatar = GlobalConfigs.testB64Avator
                     });
                 }
+
+                //var exampleFile = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFileAsync(@"Assets\Code\example.js");
+                var exampleFile = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
+                var bb = await exampleFile.GetFolderAsync("Code");
+                var cc = await bb.GetFileAsync("example.java");
+                foreach(var file in await bb.GetFilesAsync()) {
+                    Debug.WriteLine(file.Name);
+                }
+                var text = await FileIO.ReadTextAsync(cc);
+
+                var c = new CodeMessageVM() {
+                    Code = text,
+                    Language = "php",
+                    UserName = "aaa",
+                    SendByMe = false,
+                    Base64Avatar = GlobalConfigs.testB64Avator,
+                };
+                b.Add(c);
                 return b;
             });
 

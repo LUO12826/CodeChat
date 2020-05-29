@@ -4,12 +4,13 @@ using System.Collections.ObjectModel;
 using System;
 using System.Diagnostics;
 using GalaSoft.MvvmLight.Messaging;
+using Windows.ApplicationModel.VoiceCommands;
 
 namespace CAC.client.MessagePage
 {
     class ChatListViewModel : BaseViewModel
     {
-        public ObservableCollection<ChatListChatItemVM> Items = new ObservableCollection<ChatListChatItemVM>();
+        public ObservableCollection<IChatListItem> Items = new ObservableCollection<IChatListItem>();
 
         public ChatListViewModel()
         {
@@ -49,9 +50,17 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public void DidSelectChat(ChatListBaseItemVM chatItem)
+        public void DidSelectChat(IChatListItem chatListItem)
         {
-            Messenger.Default.Send(chatItem, "RequireOpenChatToken");
+            if(chatListItem is ChatListChatItemVM chatItem) {
+                Messenger.Default.Send(chatItem, "RequireOpenChatToken");
+            }
+            
+        }
+
+        public void RequestRemoveChat(IChatListItem chatItem)
+        {
+
         }
     }
 }

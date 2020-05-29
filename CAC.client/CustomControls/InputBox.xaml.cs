@@ -7,6 +7,9 @@ using Windows.System;
 using Windows.UI.Xaml.Input;
 using Windows.Storage.Pickers;
 using System.IO;
+using Windows.UI.Xaml.Documents;
+using Windows.UI.Text;
+using Windows.UI.Xaml.Media;
 
 namespace CAC.client.CustomControls
 {
@@ -19,6 +22,10 @@ namespace CAC.client.CustomControls
         {
             this.InitializeComponent();
             TextInputBox.AddHandler(RichEditBox.KeyDownEvent, new KeyEventHandler(TextInputBox_KeyDown), true);
+            var a = new RichEditBox();
+            var b = new Paragraph();
+            var c = new RichTextBlock();
+
         }
 
         //将表情插入字串中。注意，一个表情占字符串中的两个字符。
@@ -98,6 +105,7 @@ namespace CAC.client.CustomControls
                 };
                 DidSentContent?.Invoke(this, arg);
             }
+            
         }
 
         private async void selectFileButton_Tapped(object sender, TappedRoutedEventArgs e)

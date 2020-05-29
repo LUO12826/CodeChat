@@ -119,10 +119,34 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Assets\Code\example.cs" />
     <Compile Include="Common\BaseViewModel.cs" />
     <Compile Include="Common\Extensions.cs" />
     <Compile Include="Common\FluidGridView.cs" />
     <Compile Include="Common\IncrementalCollection.cs" />
+    <Compile Include="Converters\StringToHightlightLanguage.cs" />
+    <Compile Include="CustomControls\SendCodePanel.xaml.cs">
+      <DependentUpon>SendCodePanel.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\AvatarPage\AvatarPage.xaml.cs">
+      <DependentUpon>AvatarPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\CodeEditorPage\CodeEditorPage.xaml.cs">
+      <DependentUpon>CodeEditorPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\CodeEditorPage\CodeEditSessionInfo.cs" />
+    <Compile Include="Pages\CodeEditorPage\WrappedMonacoEditor.xaml.cs">
+      <DependentUpon>WrappedMonacoEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ContactPage\ContactDetail\ContactDetailControl.xaml.cs">
+      <DependentUpon>ContactDetailControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ContactPage\ContactList\ContactGroupViewModel.cs" />
+    <Compile Include="Pages\ContactPage\ContactList\ContactList.xaml.cs">
+      <DependentUpon>ContactList.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\ContactPage\ContactList\ContactListItemTemplateSelector.cs" />
+    <Compile Include="Pages\ContactPage\ContactList\ContactListViewModel.cs" />
     <Compile Include="Pages\ContactPage\ContactPage.xaml.cs">
       <DependentUpon>ContactPage.xaml</DependentUpon>
     </Compile>
@@ -152,6 +176,10 @@
     <Compile Include="Global\Enums.cs" />
     <Compile Include="Global\GlobalConfigs.cs" />
     <Compile Include="Global\GlobalFunctions.cs" />
+    <Compile Include="Pages\ContactPage\ContactList\ContactItemViewModel.cs" />
+    <Compile Include="Pages\FunctionPage\FunctionPage.xaml.cs">
+      <DependentUpon>FunctionPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\LoginPage\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
@@ -163,12 +191,16 @@
     </Compile>
     <Compile Include="Pages\MessagePage\ChatList\ChatListItemViewModel.cs" />
     <Compile Include="Pages\MessagePage\ChatList\ChatListViewModel.cs" />
+    <Compile Include="Pages\MessagePage\ChatList\ChatListDataTemplateSelector.cs" />
     <Compile Include="Pages\MessagePage\ChatPanelPage\ChatPanel.xaml.cs">
       <DependentUpon>ChatPanel.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\MessagePage\ChatPanelPage\ChatPanelViewModel.cs" />
     <Compile Include="CustomControls\InputBox.xaml.cs">
       <DependentUpon>InputBox.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\MessagePage\MessageBubbles\CodeMessageBubble.xaml.cs">
+      <DependentUpon>CodeMessageBubble.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\MessagePage\MessagePageViewModel.cs" />
     <Compile Include="Pages\MessagePage\MessagePage.xaml.cs">
@@ -204,6 +236,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\640.jpeg" />
+    <Content Include="Assets\Code\example.cpp" />
+    <Content Include="Assets\Code\example.css" />
+    <Content Include="Assets\Code\example.html" />
+    <Content Include="Assets\Code\example.java" />
+    <Content Include="Assets\Code\example.js" />
+    <Content Include="Assets\Code\example.sql" />
     <Content Include="NOTE.txt" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
@@ -219,6 +257,30 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="CustomControls\SendCodePanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\AvatarPage\AvatarPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\CodeEditorPage\CodeEditorPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\CodeEditorPage\WrappedMonacoEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ContactPage\ContactDetail\ContactDetailControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\ContactPage\ContactList\ContactList.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\ContactPage\ContactPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -247,6 +309,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Pages\FunctionPage\FunctionPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Pages\LoginPage\LoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -268,6 +334,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="CustomControls\InputBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\MessagePage\MessageBubbles\CodeMessageBubble.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -310,6 +380,9 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls">
       <Version>6.0.0</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.UI.Xaml">
+      <Version>2.4.0</Version>
+    </PackageReference>
     <PackageReference Include="MvvmLight">
       <Version>5.4.1.1</Version>
     </PackageReference>
@@ -317,7 +390,6 @@
   <ItemGroup>
     <Folder Include="Assets\emojis\" />
     <Folder Include="Docs\" />
-    <Folder Include="Pages\AvatarPage\" />
     <Folder Include="ServiceAdapter\" />
     <Folder Include="Service\" />
   </ItemGroup>
@@ -336,6 +408,15 @@
       <Project>{e3bd6f6f-b39e-4180-8182-dfe85c780bf4}</Project>
       <Name>RichTextControls</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Assets\fonts\CAC-1.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Assets\Code\example.json" />
+    <None Include="Assets\Code\example.php" />
+    <None Include="Assets\Code\example.py" />
+    <None Include="Assets\Code\example.rb" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

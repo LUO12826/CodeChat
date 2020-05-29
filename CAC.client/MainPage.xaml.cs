@@ -38,6 +38,7 @@ namespace CAC.client
             Type type = typeof(MessagePage.MessagePage);
             switch (destination) {
                 case "avatar":
+                    type = typeof(AvatarPage.AvatarPage);
                     break;
                 case "chat":
                     type = typeof(MessagePage.MessagePage);

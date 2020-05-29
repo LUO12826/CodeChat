@@ -1,0 +1,22 @@
+﻿<Page
+    x:Class="CAC.client.CodeEditorPage.CodeEditorPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:CAC.client.CodeEditorPage"
+    xmlns:mtuc="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:controls="using:Microsoft.UI.Xaml.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+
+
+        <controls:TabView x:Name="editorTabView" Margin="0 32 0 0" Height="39"
+                          IsAddTabButtonVisible="True" SelectionChanged="editorTabView_SelectionChanged"
+                          AddTabButtonClick="editorTabView_AddTabButtonClick"
+                          TabCloseRequested="editorTabView_TabCloseRequested"/>
+        <ContentPresenter x:Name="editorPresenter" Margin="0 71 0 0" VerticalAlignment="Stretch"/>
+    </Grid>
+</Page>
