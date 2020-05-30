@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.Models
 {
     /// <summary>
     /// 用户状态
@@ -10,7 +10,6 @@ namespace CodeChatSDK
     public enum AccountState
     {
         Online,
-        Busy,
         Offline,
         Duplicate,
     }

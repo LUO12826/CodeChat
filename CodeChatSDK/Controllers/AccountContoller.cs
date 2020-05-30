@@ -1,0 +1,656 @@
+﻿using CodeChatSDK.EventHandler;
+using CodeChatSDK.Models;
+using CodeChatSDK.Repository;
+using Google.Protobuf;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Windows.Storage;
+
+namespace CodeChatSDK.Controllers
+{
+    /// <summary>
+    /// 用户控制器
+    /// </summary>
+    public class AccountController
+    {
+        /// <summary>
+        /// 用户单例
+        /// </summary>
+        private static Account instance;
+
+        /// <summary>
+        /// 用户单例
+        /// </summary>
+        public static Account Instance
+        {
+            get
+            {
+                if (instance == null)
+                {
+                    instance = new Account();
+                }
+                return instance;
+            }
+        }
+
+        /// <summary>
+        /// 订阅者搜索结果列表
+        /// </summary>
+        private List<Subscriber> searchSubscriberResult;
+
+        /// <summary>
+        /// 用户数据库
+        /// </summary>
+        private IAccountRepository db;
+
+        /// <summary>
+        /// 客户端
+        /// </summary>
+        private Client client;
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        public AccountController()
+        {
+            client = Client.Instance;
+            searchSubscriberResult = new List<Subscriber>();
+            client.DisconnectedEvent += Disconnected;
+            client.AddMessageEvent += AddMessage;
+            client.AddSubscriberEvent += AddSubscriber;
+            client.AddTopicEvent += AddTopic;
+            client.LoginSuccessEvent += LoginSuccess;
+            client.LoginFailedEvent += LoginFailed;
+            client.RegisterFailedEvent += RegisterFailed;
+            client.SetAccountEvent += SetAccountInformation;
+            client.SubscriberStateChangedEvent += SubscriberStateChanged;
+        }
+
+        /// <summary>
+        /// 设置密钥
+        /// </summary>
+        /// <param name="username">用户名</param>
+        /// <param name="password">密码</param>
+        public void SetSecret(string username, string password)
+        {
+            instance.Username = username;
+            instance.Password = password;
+        }
+
+        /// <summary>
+        /// 获取密钥
+        /// </summary>
+        /// <returns>密钥</returns>
+        public ByteString GetSecret()
+        {
+            return ByteString.CopyFromUtf8(instance.Username + ":" + instance.Password);
+        }
+
+        /// <summary>
+        /// 设置用户数据库
+        /// </summary>
+        /// <param name="database">数据库</param>
+        /// <returns></returns>
+        public async Task SetDatabase(IAccountRepository database)
+        {
+            db = database;
+            SubscriberController subscriberController = new SubscriberController(database.Subscribers);
+            TopicController topicController=new TopicController(database);
+            instance.SubscriberList = await subscriberController.GetSubscribers();
+            instance.TopicList = await topicController.GetTopics();
+        }
+
+        /// <summary>
+        /// 登陆
+        /// </summary>
+        public void Login()
+        {
+            ByteString secret = GetSecret();
+            client.LogIn(secret);
+            client.Start();
+        }
+
+        /// <summary>
+        /// 注册
+        /// </summary>
+        public void Register()
+        {
+            ByteString secret = GetSecret();
+            client.Register(secret, instance.FormattedName, instance.Email);
+            client.Start();
+        }
+
+        /// <summary>
+        /// 发送注册验证码
+        /// </summary>
+        /// <param name="code">验证码</param>
+        public void SendVerificationCode(string code)
+        {
+            client.SendVerificationCode(GetSecret(), code);
+        }
+
+        /// <summary>
+        /// 忘记密码
+        /// </summary>
+        public void ForgetPassword()
+        {
+            client.ForgetPassword(instance.Email);
+            client.Start();
+        }
+
+        /// <summary>
+        /// 修改密码
+        /// </summary>
+        /// <param name="newPassword">新密码</param>
+        public void ChangePassword(string newPassword)
+        {
+            instance.Password = newPassword;
+            ByteString secret = GetSecret();
+            client.ChangePassword(secret);
+        }
+
+        /// <summary>
+        /// 设置显示名称
+        /// </summary>
+        /// <param name="newFormattedName">新显示名称</param>
+        public void SetFormattedName(string newFormattedName)
+        {
+            instance.FormattedName = newFormattedName;
+            client.SetDescription(new Topic("me"), newFormattedName);
+        }
+
+        /// <summary>
+        /// 设置头像
+        /// </summary>
+        /// <param name="file">文件</param>
+        /// <param name="size">文件大小</param>
+        /// <param name="bytes">字节数组</param>
+        public void SetAvator(StorageFile file,ulong size,byte[] bytes)
+        {
+            client.SetAvator(new Topic("me"), file, size, bytes);
+        }
+
+        /// <summary>
+        /// 添加标签
+        /// </summary>
+        /// <param name="tag">标签</param>
+        public void AddTag(string tag)
+        {
+            if (string.IsNullOrEmpty(tag))
+            {
+                return;
+            }
+            instance.Tags.Add(tag);
+            client.SetTags(new Topic("me"), instance.Tags);
+        }
+
+        /// <summary>
+        /// 移除标签
+        /// </summary>
+        /// <param name="tag">标签</param>
+        public void RemoveTag(string tag)
+        {
+            if (string.IsNullOrEmpty(tag) || !instance.Tags.Contains(tag))
+            {
+                return;
+            }
+            instance.Tags.Remove(tag);
+            client.SetTags(new Topic("me"), instance.Tags);
+        }
+
+        /// <summary>
+        /// 通过话题位置获取话题
+        /// </summary>
+        /// <param name="position">话题位置</param>
+        /// <returns>话题</returns>
+        public Topic GetTopicAt(int position)
+        {
+            return position < 0 ? null : instance.TopicList[position];
+        }
+
+        /// <summary>
+        /// 通过话题名获取话题
+        /// </summary>
+        /// <param name="name">话题名</param>
+        /// <returns>话题</returns>
+        public Topic GetTopicByName(string name)
+        {
+            int index = instance.TopicList.IndexOf(new Topic(name));
+            if (index == -1)
+            {
+                return null;
+            }
+            return instance.TopicList[index];
+        }
+
+        /// <summary>
+        /// 通过话题名获取话题控制器
+        /// </summary>
+        /// <param name="name">话题名</param>
+        /// <returns>话题控制器</returns>
+        public async Task<TopicController> GetTopicControllerByName(string name)
+        {
+            int index = instance.TopicList.IndexOf(new Topic(name));
+            if (index == -1)
+            {
+                return null;
+            }
+            client.SubscribeTopic(instance.TopicList[index]);
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(instance.TopicList[index]);
+            return topicController;
+        }
+
+        /// <summary>
+        /// 通过话题获取话题控制器
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns>话题控制器</returns>
+        public async Task<TopicController> GetTopicController(Topic topic)
+        {
+            if (topic == null)
+            {
+                return null;
+            }
+
+            client.SubscribeTopic(topic);
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(topic);
+            return topicController;
+        }
+
+        /// <summary>
+        /// 订阅话题
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns>结果</returns>
+        public async Task<bool> AddTopic(Topic topic)
+        {
+            if (instance.TopicList.Contains(topic) || topic.Name.Equals("me"))
+            {
+                return false;
+            }
+
+            instance.TopicList.Add(topic);
+            await db.Topics.UpsertTopic(topic);
+            return true;
+        }
+
+        /// <summary>
+        /// 通过话题位置移除话题
+        /// </summary>
+        /// <param name="position">话题位置</param>
+        /// <returns>结果</returns>
+        public async Task<bool> RemoveTopicAt(int position)
+        {
+            if (position < 0 || position > instance.TopicList.Count)
+            {
+                return false;
+            }
+
+            Topic topic = instance.TopicList[position];
+            topic.IsArchived = true;
+            await db.Topics.UpsertTopic(topic);
+            instance.TopicList.Remove(topic);
+            client.RemoveTopic(topic);
+            return true;
+        }
+
+        /// <summary>
+        /// 移除话题
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns>结果</returns>
+        public async Task<bool> RemoveTopic(Topic topic)
+        {
+            if (!instance.TopicList.Contains(topic))
+            {
+                return false;
+            }
+
+            instance.TopicList.Remove(topic);
+            topic.IsArchived = true;
+            await db.Topics.UpsertTopic(topic);
+            instance.TopicList.Remove(topic);
+            client.RemoveTopic(topic);
+            return true;
+        }
+
+        /// <summary>
+        /// 移动话题
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns></returns>
+        public bool MoveTopic(Topic topic)
+        {
+            if (!instance.TopicList.Contains(topic))
+            {
+                return false;
+            }
+            int oldPosition = instance.TopicList.IndexOf(topic);
+            instance.TopicList.RemoveAt(oldPosition);
+            instance.TopicList.Insert(0, topic);
+            db.Topics.UpsertTopic(topic);
+            return true;
+        }
+
+        /// <summary>
+        /// 置顶话题
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns>结果</returns>
+        public bool PinTopic(Topic topic)
+        {
+            if (!instance.TopicList.Contains(topic) || topic.Weight > 0)
+            {
+                return false;
+            }
+            int oldPosition = instance.TopicList.IndexOf(topic);
+            topic.Weight = instance.TopicList[0].Weight + 1;
+            instance.TopicList.RemoveAt(oldPosition);
+            instance.TopicList.Insert(0, topic);
+            db.Topics.UpsertTopic(topic);
+            return true;
+        }
+
+        /// <summary>
+        /// 取消置顶话题
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns>结果</returns>
+        public bool UnpinTopic(Topic topic)
+        {
+            if (!instance.TopicList.Contains(topic) || topic.Weight == 0)
+            {
+                return false;
+            }
+            topic.Weight = 0;
+            db.Topics.UpsertTopic(topic);
+            return true;
+        }
+
+        /// <summary>
+        /// 刷新话题列表
+        /// </summary>
+        /// <returns></returns>
+        public void RefreshTopicList()
+        {
+            client.RefreshTopicList();
+        }
+
+        /// <summary>
+        /// 通过订阅者获取订阅者控制器
+        /// </summary>
+        /// <param name="subscriber">订阅者</param>
+        /// <returns>订阅者控制器</returns>
+        public SubscriberController GetSubscriberController(Subscriber subscriber)
+        {
+            if (subscriber == null)
+            {
+                return null;
+            }
+
+            SubscriberController subscriberController = new SubscriberController(db.Subscribers);
+            subscriberController.SetSubscriber(subscriber);
+            return subscriberController;
+        }
+
+        /// <summary>
+        /// 新增订阅者
+        /// </summary>
+        /// <param name="subscriber">订阅者对象</param>
+        /// <param name="isTemporary">是否临时保存</param>
+        /// <returns>结果</returns>
+        public async Task<bool> AddSubscriber(Subscriber subscriber,bool isTemporary=false)
+        {
+            if (instance.SubscriberList.Contains(subscriber) || subscriber.TopicName == "fnd")
+            {
+                return false;
+            }
+            if (subscriber.TopicName == "me")
+            {
+                instance.FormattedName = subscriber.Username;
+                instance.Avatar = subscriber.PhotoData;
+                return true;
+            }
+            if (isTemporary == true)
+            {
+                if (searchSubscriberResult.Contains(subscriber))
+                {
+                    return false;
+                }
+                searchSubscriberResult.Add(subscriber);
+                return true;
+            }
+
+            Topic newTopic = new Topic(subscriber.TopicName);
+            instance.TopicList.Add(newTopic);
+            await db.Topics.UpsertTopic(newTopic);
+            instance.SubscriberList.Add(subscriber);
+            await db.Subscribers.UpsertSubscriber(subscriber);
+
+            client.SubscribeTopic(newTopic);
+            return true;
+        }
+
+        /// <summary>
+        /// 移除订阅者
+        /// </summary>
+        /// <param name="subscriber">订阅者对象</param>
+        /// <returns>结果</returns>
+        public async Task<bool> RemoveSubscriber(Subscriber subscriber)
+        {
+            if (!instance.SubscriberList.Contains(subscriber))
+            {
+                return false;
+            }
+
+            Topic removedTopic = GetTopicByName(subscriber.TopicName);
+            instance.SubscriberList.Remove(subscriber);
+            await db.Subscribers.DeleteSubscriber(subscriber);
+            instance.TopicList.Remove(removedTopic);
+            await db.Topics.DeleteTopic(removedTopic);
+
+            return true;
+        }
+
+        /// <summary>
+        /// 通过订阅者位置移除订阅者
+        /// </summary>
+        /// <param name="position">订阅者位置</param>
+        /// <returns>结果</returns>
+        public async Task<bool> RemoveSubsriberAt(int position)
+        {
+            if (position < 0 || position > instance.SubscriberList.Count)
+            {
+                return false;
+            }
+
+            Subscriber subscriber = instance.SubscriberList[position];
+            Topic removedTopic = GetTopicByName(subscriber.TopicName);
+            instance.SubscriberList.Remove(subscriber);
+            await db.Subscribers.DeleteSubscriber(subscriber);
+            instance.TopicList.Remove(removedTopic);
+            await db.Topics.DeleteTopic(removedTopic);
+
+            return true;
+        }
+
+        /// <summary>
+        /// 在线搜索订阅者
+        /// </summary>
+        /// <param name="condition">搜索条件</param>
+        /// <returns></returns>
+        public List<Subscriber> SearchSubscriberOnline(string condition)
+        {
+            client.FindSubscriber();
+            return searchSubscriberResult.Where(s=>s.Username.Contains(condition)||s.UserId.Contains(condition)).ToList();
+        }
+
+        /// <summary>
+        /// 在线搜索订阅者分页加载
+        /// </summary>
+        /// <param name="condition">搜索条件</param>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="pageSize">页面大小</param>
+        /// <param name="pageCount">页面数目</param>
+        /// <returns>搜索结果</returns>
+        public List<Subscriber> SearchSubscriberOnline(string condition,int pageIndex, int pageSize, ref int pageCount)
+        {
+            client.FindSubscriber();
+            var query = searchSubscriberResult.
+                                Where(s => s.Username.Contains(condition) ||
+                                s.UserId.Contains(condition));
+
+            pageCount = query.Count() % pageSize == 0 ? (query.Count() / pageSize) : (query.Count() / pageSize) + 1;
+
+            return query.Skip(pageIndex - 1).Take(pageSize).ToList();
+        }
+
+        /// <summary>
+        /// 获取消息控制器
+        /// </summary>
+        /// <returns>消息控制器</returns>
+        public MessageController GetMessageController()
+        {
+            MessageController messageController = new MessageController(db.Messages);
+            return messageController;
+        }
+
+        /// <summary>
+        /// 获取话题控制器
+        /// </summary>
+        /// <returns>订阅者控制器</returns>
+        public TopicController GetTopicController()
+        {
+            TopicController topicController = new TopicController(db);
+            return topicController;
+        }
+
+        /// <summary>
+        /// 获取订阅者控制器
+        /// </summary>
+        /// <returns>订阅者控制器</returns>
+        public SubscriberController GetSubscriberController()
+        {
+            SubscriberController subscriberController = new SubscriberController(db.Subscribers);
+            return subscriberController;
+        }
+
+        /// <summary>
+        /// 登陆成功
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">登陆成功参数</param>
+        private void LoginSuccess(object sender, LoginSuccessEventArgs args)
+        {
+            //用户状态改为在线
+            instance.State = AccountState.Online;
+        }
+
+        /// <summary>
+        /// 登陆失败
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">登陆失败参数</param>
+        private void LoginFailed(object sender, LoginFailedEventArgs args)
+        {
+            //用户状态改为离线
+            instance.State = AccountState.Offline;
+        }
+
+        /// <summary>
+        /// 注册失败
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">注册失败参数</param>
+        private void RegisterFailed(object sender, RegisterFailedEventArgs args)
+        {
+            //用户状态改为重复
+            instance.State = AccountState.Duplicate;
+        }
+
+        /// <summary>
+        /// 未连接服务器
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">未连接服务器参数</param>
+        private void Disconnected(object sender, DisconnectedEventArgs args)
+        {
+            //用户状态改为离线
+            instance.State = AccountState.Offline;
+        }
+
+        /// <summary>
+        /// 设置用户信息
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">设置用户信息参数</param>
+        private void SetAccountInformation(object sender, SetAccountEventArgs args)
+        {
+            if (args.UserId != null)
+            {
+                //设置用户信息
+                instance.UserId = args.UserId;
+            }
+            else
+            {
+                //设置用户标签
+                instance.Tags = args.Tags;
+            }
+
+        }
+
+        /// <summary>
+        /// 添加话题
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">添加话题参数</param>
+        private async void AddTopic(object sender, AddTopicEventArgs args)
+        {
+            //调用添加话题方法
+            await AddTopic(args.Topic);
+        }
+
+        /// <summary>
+        /// 添加订阅者
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">添加订阅者参数</param>
+        private async void AddSubscriber(object sender, AddSubscriberEventArgs args)
+        {
+             //调用添加订阅者方法
+             await AddSubscriber(args.Subscriber,args.isTemporary);
+        }
+
+        /// <summary>
+        /// 添加信息
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">添加信息参数</param>
+        private async void AddMessage(object sender, AddMessageEventArgs args)
+        {
+            Topic currentTopic = GetTopicByName(args.TopicName);
+            //移动话题位置
+            MoveTopic(currentTopic);
+
+            TopicController topicController = await GetTopicController(currentTopic);
+            //调用对应话题添加消息方法
+            await topicController.AddMessage(args.Message);
+        }
+
+        /// <summary>
+        /// 订阅者状态改变
+        /// </summary>
+        /// <param name="sender">发送者</param>
+        /// <param name="args">订阅者状态改变参数</param>
+        private void SubscriberStateChanged(object sender,SubscriberStateChangedEventArgs args)
+        {
+            SubscriberController subscriberController = GetSubscriberController(args.Subscriber);
+
+            //调用更改订阅者状态方法
+            subscriberController.ChangeSubscriberState(args.IsOnline);
+        }
+    }
+}
