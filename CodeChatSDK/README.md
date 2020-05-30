@@ -126,7 +126,7 @@ accountController.Register();
 
 ### **发送注册验证码**
 
-验证码发送操作建议在LoginSuccessEvent的绑定函数中执行
+验证码发送操作建议在RegisterSuccessEvent的绑定函数中执行
 
 ```c#
 //验证码
