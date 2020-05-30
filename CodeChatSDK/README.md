@@ -126,7 +126,7 @@ accountController.Register();
 
 ### **发送注册验证码**
 
-验证码发送操作建议在LoginSuccessEvent的绑定函数中执行
+验证码发送操作建议在RegisterSuccessEvent的绑定函数中执行
 
 ```c#
 //验证码
@@ -586,7 +586,7 @@ if (file != null)
     //获取文件属性
     BasicProperties property = await file.GetBasicPropertiesAsync();
     
-	//转换成Bytes数组
+    //转换成Bytes数组
     IBuffer buffer = await FileIO.ReadBufferAsync(file);
     byte[] bytes = buffer.ToArray();
     
@@ -711,8 +711,8 @@ if (currentMessage.IsPlainText == false)
 	foreach(string base64 in base64s)
 	{
 		//遍历base64列表进行操作
-         //可用Converter中提供的方法将base64转为Bitmap对象
-        Bitmap image = Converter.ConvertBase64ToImage(base64);
+        	//可用Converter中提供的方法将base64转为Bitmap对象
+        	Bitmap image = Converter.ConvertBase64ToImage(base64);
 	}
 
 }
@@ -763,9 +763,9 @@ private async void RegisterSuccess(object sendero, RegisterSuccessEventArgs args
     {
     	//执行注册成功后界面变化相关操作
         //建议跳转至验证码输入界面
-		string code = "123456";
-		accountController.SendVerificationCode(code);
-	});
+	string code = "123456";
+	accountController.SendVerificationCode(code);
+    });
 }
 ```
 
@@ -856,12 +856,12 @@ private async void SubscriberStateChange(object sender, SubscriberStateChangedEv
     	//args.IsOnline可获得状态
         if (args.IsOnline)
         {
-        	//args.Subscriber可获得变化的订阅者
+            //args.Subscriber可获得变化的订阅者
             //上线界面变化操作
         }
         else
         {
-        	//args.Subscriber可获得变化的订阅者
+            //args.Subscriber可获得变化的订阅者
             //下线界面变化操作
         }
     });
