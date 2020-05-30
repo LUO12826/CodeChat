@@ -50,6 +50,9 @@ namespace CodeChatSDK.Models
         /// </summary>
         public string PhotoType { get; set; }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
         public Subscriber()
         {
             Status = 1;

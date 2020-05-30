@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.EventHandler
 {
     /// <summary>
     /// 添加消息
@@ -22,6 +22,7 @@ namespace CodeChatSDK
         /// 所属话题名
         /// </summary>
         public string TopicName { get; set; }
+
         /// <summary>
         /// 聊天消息
         /// </summary>

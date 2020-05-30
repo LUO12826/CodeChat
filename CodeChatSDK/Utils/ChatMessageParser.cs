@@ -30,14 +30,16 @@ namespace CodeChatSDK.Utils
                 chatMsg.Content = message.Content.ToStringUtf8();
                 chatMsg.SeqId = message.SeqId;
                 chatMsg.TopicName = message.Topic;
+                chatMsg.IsPlainText = false;
                 if(ParseGenericAttachment(chatMsg).Count != 0)
                 {
-                    chatMsg.IsPlainText = false;
+                    chatMsg.IsAttachment = true;
                 }
                 else
                 {
-                    chatMsg.IsPlainText = true;
+                    chatMsg.IsAttachment = false;
                 }
+
                 ParseCode(chatMsg);
             }
             else
@@ -63,7 +65,7 @@ namespace CodeChatSDK.Utils
         /// <summary>
         /// 解析消息Content
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">消息</param>
         public static void ParseContent(ChatMessage message)
         {
             if (message.Content == null)
@@ -91,7 +93,7 @@ namespace CodeChatSDK.Utils
         /// <summary>
         /// 解析代码
         /// </summary>
-        /// <param name="message"></param>
+        /// <param name="message">消息</param>
         public static void ParseCode(ChatMessage message)
         {
             if (message.Text == null || message.Fmt == null)
@@ -115,6 +117,12 @@ namespace CodeChatSDK.Utils
             }
         }
 
+        /// <summary>
+        /// 解析URL
+        /// </summary>
+        /// <param name="message">消息</param>
+        /// <param name="baseurl">API基准地址</param>
+        /// <returns>URL列表</returns>
         public static List<string> ParseUrl(ChatMessage message, string baseurl)
         {
             List<string> urls = new List<string>();
@@ -127,6 +135,11 @@ namespace CodeChatSDK.Utils
             return urls;
         }
 
+        /// <summary>
+        /// 获取消息中的图片
+        /// </summary>
+        /// <param name="message">消息</param>
+        /// <returns>Base64字符串列表</returns>
         public static List<string> ParseImageBase64(ChatMessage message)
         {
             List<string> base64s = new List<string>();

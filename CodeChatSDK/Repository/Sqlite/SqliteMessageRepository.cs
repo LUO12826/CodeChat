@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 
 namespace CodeChatSDK.Repository.Sqlite
 {
+
     public class SqliteMessageRepository:IMessageRepository
     {
         private readonly AccountContext db;
@@ -133,10 +134,7 @@ namespace CodeChatSDK.Repository.Sqlite
             }
             else
             {
-                //long id = currentMessage.Id;
                 //db.Entry(currentMessage).CurrentValues.SetValues(message);
-                //currentMessage.Id = id;
-                //message.Id = id;
             }
 
             await db.SaveChangesAsync();

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.EventHandler
 {
     /// <summary>
     /// 登陆失败

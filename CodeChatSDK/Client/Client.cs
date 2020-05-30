@@ -158,6 +158,10 @@ namespace CodeChatSDK
         /// </summary>
         public event RemoveSubscriberEventHandler RemoveSubscriberEvent;
 
+        /// <summary>
+        /// 订阅者状态改变事件
+        /// </summary>
+
         public event SubscriberStateChangedEventHandler SubscriberStateChangedEvent;
 
         /// <summary>
@@ -226,7 +230,6 @@ namespace CodeChatSDK
         /// <summary>
         /// 开始连接
         /// </summary>
-        /// <returns></returns>
         public void Start()
         {
             stream = InitStream();
@@ -245,6 +248,7 @@ namespace CodeChatSDK
         /// <summary>
         /// 登陆
         /// </summary>
+        /// <param name="secret">登陆密钥</param>
         public void LogIn(ByteString secret)
         {
             Topic me = new Topic("me");
@@ -257,6 +261,7 @@ namespace CodeChatSDK
         /// 注册
         /// </summary>
         /// <param name="formattedName">显示名称</param>
+        /// <param name="email">注册邮箱</param>
         public void Register(ByteString secret, string formattedName,string email)
         {
             ClientPost(Hello());
@@ -310,8 +315,8 @@ namespace CodeChatSDK
         /// <summary>
         /// 发送消息
         /// </summary>
-        /// <param name="topic">当前Topic</param>
-        /// <param name="chatMessage">消息内容</param>
+        /// <param name="topic">发送Topic</param>
+        /// <param name="chatMessage">消息</param>
         /// <param name="noEcho">是否获取当前信息</param>
         public void Send(Topic topic, ChatMessage chatMessage, bool noEcho = false)
         {
@@ -323,12 +328,16 @@ namespace CodeChatSDK
         /// </summary>
         /// <param name="topic">消息所属话题</param>
         /// <param name="message">消息</param>
-        /// <returns></returns>
         public void RemoveMessage(Topic topic, ChatMessage message)
         {
             ClientPost(DeleteMessage(topic, message.SeqId));
         }
 
+        /// <summary>
+        /// 标记为已读
+        /// </summary>
+        /// <param name="topic">消息所属话题</param>
+        /// <param name="message">消息</param>
         public void NoteMessage(Topic topic,ChatMessage message)
         {
             ClientPost(NoteRead(topic.Name, message.SeqId));
@@ -338,7 +347,7 @@ namespace CodeChatSDK
         /// 删除话题
         /// </summary>
         /// <param name="topic">话题</param>
-        /// <returns></returns>
+
         public void RemoveTopic(Topic topic)
         {
             ClientPost(SetArchived(topic,true));
@@ -349,7 +358,6 @@ namespace CodeChatSDK
         /// 订阅话题
         /// </summary>
         /// <param name="topic">话题</param>
-        /// <returns></returns>
         public void SubscribeTopic(Topic topic)
         {
             ClientPost(Subscribe(topic));
@@ -358,7 +366,6 @@ namespace CodeChatSDK
         /// <summary>
         /// 刷新话题列表
         /// </summary>
-        /// <returns></returns>
         public void RefreshTopicList()
         {
             ClientPost(GetMeSubs());
@@ -370,7 +377,6 @@ namespace CodeChatSDK
         /// <param name="topic">当前Topic</param>
         /// <param name="since">起始消息SeqID</param>
         /// <param name="before">结束消息SeqID</param>
-        /// <returns></returns>
         public void Load(Topic topic, int since, int before)
         {
             ClientPost(GetData(topic, since, before));
@@ -408,6 +414,10 @@ namespace CodeChatSDK
             ClientPost(GetFindSubs());
         }
 
+        /// <summary>
+        /// 移除订阅者
+        /// </summary>
+        /// <param name="subscriber">订阅者</param>
         public void RemoveSubscriber(Subscriber subscriber)
         {
             Topic removedTopic = new Topic(subscriber.TopicName);
@@ -603,10 +613,12 @@ namespace CodeChatSDK
         }
 
         /// <summary>
-        /// 设置头像
+        /// 设置头像（仅限自己和群聊话题）
         /// </summary>
-        /// <param name="topic"></param>
-        /// <param name="filePath"></param>
+        /// <param name="topic">话题</param>
+        /// <param name="file">文件</param>
+        /// <param name="size">文件大小</param>
+        /// <param name="bytes">字节数组</param>
         public void SetAvator(Topic topic, StorageFile file, ulong size, byte[] bytes)
         {
             //判断文件是否为空
@@ -623,9 +635,10 @@ namespace CodeChatSDK
         }
 
         /// <summary>
-        /// 设置私密备注
+        /// 设置话题备注
         /// </summary>
-        /// <returns></returns>
+        /// <param name="topic">话题</param>
+        /// <param name="comment">备注</param>
         public void SetPrivateComment(Topic topic, string comment)
         {
             ClientPost(Subscribe(topic));
@@ -633,11 +646,10 @@ namespace CodeChatSDK
         }
 
         /// <summary>
-        /// 设置标签
+        /// 设置标签（仅限自己和群聊话题）
         /// </summary>
         /// <param name="topic">话题</param>
-        /// <param name="tags">标签</param>
-        /// <returns></returns>
+        /// <param name="tags">标签列表</param>
         public void SetTags(Topic topic,List<string> tags)
         {
             ClientPost(Subscribe(topic));
@@ -645,11 +657,10 @@ namespace CodeChatSDK
         }
 
         /// <summary>
-        /// 设置显示名称
+        /// 设置显示名称（仅限自己）
         /// </summary>
-        /// <param name="topic"></param>
-        /// <param name="formattedName"></param>
-        /// <returns></returns>
+        /// <param name="topic">话题</param>
+        /// <param name="formattedName">显示名称</param>
         public void SetDescription(Topic topic, string formattedName)
         {
             ClientPost(Subscribe(topic));
@@ -659,12 +670,16 @@ namespace CodeChatSDK
         /// <summary>
         /// 修改密码
         /// </summary>
-        /// <returns></returns>
+        /// <param name="secret">密钥</param>
         public void ChangePassword(ByteString secret)
         {
             ClientPost(Account(Schema, secret));
         }
 
+        /// <summary>
+        /// 初始化流
+        /// </summary>
+        /// <returns></returns>
         private AsyncDuplexStreamingCall<ClientMsg, ServerMsg> InitStream()
         {
             var options = new List<ChannelOption>
@@ -680,6 +695,9 @@ namespace CodeChatSDK
             return stream;
         }
 
+        /// <summary>
+        /// 发送消息循环
+        /// </summary>
         private void SendMessageLoop()
         {
             Task sendBackendTask = new Task(async () =>
@@ -708,6 +726,9 @@ namespace CodeChatSDK
             sendBackendTask.Start();
         }
 
+        /// <summary>
+        /// 接受消息循环
+        /// </summary>
         private void ClientMessageLoop()
         {
             Task receiveTask = new Task(async () =>
@@ -774,17 +795,264 @@ namespace CodeChatSDK
             
         }
 
+        /// <summary>
+        /// 获取下一个消息ID
+        /// </summary>
+        /// <returns></returns>
         private string GetNextId()
         {
             ++nextId;
             return nextId.ToString();
         }
 
+        /// <summary>
+        /// 消息入队
+        /// </summary>
+        /// <param name="message"></param>
         private void ClientPost(ClientMsg message)
         {
             sendMessageQueue.Enqueue(message);
         }
 
+        /// <summary>
+        /// 添加回调
+        /// </summary>
+        /// <param name="id">消息ID</param>
+        /// <param name="bundle">回调</param>
+        private void AddCallback(string id, Callback bundle)
+        {
+            onCompletion.Add(id, bundle);
+        }
+
+        /// <summary>
+        /// 执行回调
+        /// </summary>
+        /// <param name="id">消息ID</param>
+        /// <param name="code">应答码</param>
+        /// <param name="text">应答消息</param>
+        /// <param name="topic">话题</param>
+        /// <param name="parameters">其他参数</param>
+        private void ExecuteCallback(string id, int code, string text, string topic, MapField<string, ByteString> parameters)
+        {
+            if (onCompletion.ContainsKey(id))
+            {
+                var bundle = onCompletion[id];
+                var type = onCompletion[id].Type;
+                onCompletion.Remove(id);
+
+                if (code >= 200 && code <= 400)
+                {
+                    var arg = bundle.Arg;
+                    bundle.Action?.Invoke(arg, parameters);
+                    switch (type)
+                    {
+                        case CallbackType.Acc:
+                            RegisterSuccessEvent(this, new RegisterSuccessEventArgs());
+
+                            break;
+                        case CallbackType.Login:
+                            if (code == 300)
+                            {
+                                RegisterFailedEvent(this, new RegisterFailedEventArgs() { Exception = new Exception(text) });
+                            }
+                            else
+                            {
+                                LoginSuccessEvent(this, new LoginSuccessEventArgs());
+                            }
+
+                            break;
+                        case CallbackType.DelMsg:
+                            ChatMessage removedMessage = new ChatMessage();
+                            removedMessage.TopicName = topic;
+                            removedMessage.SeqId = int.Parse(arg);
+
+                            RemoveMessageEvent?.Invoke(this, new RemoveMessageEventArgs() { Message = removedMessage });
+                            break;
+                        case CallbackType.DelTopic:
+                            Subscriber removedSubscriber = new Subscriber();
+                            removedSubscriber.TopicName = topic;
+                            removedSubscriber.UserId = topic;
+
+                            RemoveSubscriberEvent?.Invoke(this, new RemoveSubscriberEventArgs() { Subscriber = removedSubscriber });
+                            break;
+                        case CallbackType.Sub:
+                            Subscriber newSubscriber = new Subscriber();
+                            newSubscriber.TopicName = topic;
+                            newSubscriber.UserId = topic;
+                            newSubscriber.Username = topic;
+
+                            AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs { Subscriber = newSubscriber });
+                            break;
+                        case CallbackType.Leave:
+                            Topic removedTopic = new Topic(topic);
+
+                            RemoveTopicEvent?.Invoke(this, new RemoveTopicEventArgs() { Topic = removedTopic });
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                else
+                {
+                    switch (type)
+                    {
+                        case CallbackType.Login:
+
+                            LoginFailedEvent(this, new LoginFailedEventArgs() { Exception = new Exception(text) });
+                            break;
+                        case CallbackType.Acc:
+
+                            RegisterFailedEvent(this, new RegisterFailedEventArgs() { Exception = new Exception(text) });
+                            break;
+                        default:
+                            break;
+
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 登陆委托
+        /// </summary>
+        /// <param name="paramaters">参数</param>
+        private void OnLogin(MapField<string, ByteString> paramaters)
+        {
+            if (paramaters == null)
+            {
+                return;
+            }
+            if (paramaters.ContainsKey("user"))
+            {
+                string userId = paramaters["user"].ToString(Encoding.ASCII);
+                SetAccountEvent?.Invoke(this, new SetAccountEventArgs() { UserId = userId });
+            }
+
+            Topic me = new Topic("me");
+
+            ClientPost(GetTags(me));
+            ClientPost(GetMeSubs());
+
+            //保存令牌供上传使用
+            token = JsonConvert.DeserializeObject<string>(paramaters["token"].ToString(Encoding.UTF8));
+
+        }
+
+        /// <summary>
+        /// 元数据解析
+        /// </summary>
+        /// <param name="meta">元数据</param>
+        private void OnGetMeMeta(ServerMeta meta)
+        {
+            if (meta.Sub != null && meta.Sub.Count != 0)
+            {
+                foreach (var sub in meta.Sub)
+                {
+                    Topic topic = new Topic(sub.Topic);
+                    Subscriber subscriber = new Subscriber();
+
+                    var publicInfo = sub.Public.ToStringUtf8();
+                    var publicObject = JsonConvert.DeserializeObject<JObject>(publicInfo);
+                    var privateInfo = sub.Private.ToStringUtf8();
+                    var privateObject = JsonConvert.DeserializeObject<JObject>(privateInfo);
+
+                    topic.Updated = sub.UpdatedAt;
+                    topic.Read = sub.ReadId;
+                    topic.Recieve = sub.RecvId;
+                    topic.Clear = sub.DelId;
+                    topic.LastUsed = sub.TouchedAt;
+                    topic.MinLocalSeqId = sub.RecvId;
+                    topic.MaxLocalSeqId = sub.RecvId;
+                    topic.IsArchived = false;
+                    topic.PrivateComment = sub.UserId;
+                    topic.Weight = 0;
+                    topic.Type = publicObject == null ? "group" : "user";
+
+                    if (privateObject != null && privateObject.Count != 0)
+                    {
+                        if (privateObject["arch"] != null)
+                        {
+                            topic.IsArchived = bool.Parse(privateObject["arch"].ToString());
+                        }
+                        if (privateObject["comment"] != null)
+                        {
+                            topic.PrivateComment = privateObject["comment"].ToString();
+                        }
+
+                    }
+
+                    subscriber.UserId = sub.Topic;
+                    subscriber.Online = sub.Online;
+                    subscriber.TopicName = sub.Topic;
+                    subscriber.Username = sub.UserId;
+                    subscriber.Type = publicObject == null ? "group" : "user";
+                    subscriber.PhotoData = string.Empty;
+                    subscriber.PhotoType = string.Empty;
+                    subscriber.Status = 1;
+                    if (publicObject != null)
+                    {
+                        subscriber.Username = publicObject["fn"].ToString();
+                        if (publicObject.ContainsKey("photo"))
+                        {
+                            subscriber.PhotoData = publicObject["photo"]["data"].ToString();
+                            subscriber.PhotoType = publicObject["photo"]["type"].ToString();
+                        }
+                    }
+
+                    topic.SubsriberList.Add(subscriber);
+
+                    AddTopicEvent?.Invoke(this, new AddTopicEventArgs() { Topic = topic });
+
+                    AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber, isTemporary = false });
+
+                }
+            }
+
+            if (meta.Tags != null && meta.Tags.Count != 0)
+            {
+                List<string> tags = meta.Tags.ToList();
+                SetAccountEvent(this, new SetAccountEventArgs() { Tags = tags });
+            }
+        }
+
+        /// <summary>
+        /// 元数据解析
+        /// </summary>
+        /// <param name="meta">元数据</param>
+        private void OnGetFindMeta(ServerMeta meta)
+        {
+            if (meta.Sub != null && meta.Sub.Count != 0)
+            {
+                foreach (var sub in meta.Sub)
+                {
+                    Subscriber subscriber = new Subscriber();
+
+                    var publicInfo = sub.Public.ToStringUtf8();
+                    var publicObject = JsonConvert.DeserializeObject<JObject>(publicInfo);
+
+                    subscriber.UserId = sub.UserId;
+                    subscriber.TopicName = sub.UserId;
+                    subscriber.Username = sub.UserId;
+                    subscriber.Type = publicObject == null ? "group" : "user";
+                    subscriber.PhotoData = string.Empty;
+                    subscriber.PhotoType = string.Empty;
+
+                    if (publicObject != null)
+                    {
+                        subscriber.Username = publicObject["fn"].ToString();
+                        if (publicObject.ContainsKey("photo"))
+                        {
+                            subscriber.PhotoData = publicObject["photo"]["data"].ToString();
+                            subscriber.PhotoType = publicObject["photo"]["type"].ToString();
+                        }
+                    }
+
+                    AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber, isTemporary = true });
+                }
+            }
+        }
+
+        //以下都为消息封装
         private ClientMsg NoteRead(string topic, int seqId)
         {
             return new ClientMsg() { Note = new ClientNote() { SeqId = seqId, Topic = topic, What = InfoNote.Read } };
@@ -1014,219 +1282,5 @@ namespace CodeChatSDK
             ClientSet set = new ClientSet() { Id = id, Topic = "fnd", Query = new SetQuery() { Desc = new Pbx.SetDesc() { Public = publicField } } };
             return new ClientMsg() { Set = set };
         }
-
-        private void AddCallback(string id, Callback bundle)
-        {
-            onCompletion.Add(id, bundle);
-        }
-
-        private void ExecuteCallback(string id, int code, string text, string topic, MapField<string, ByteString> parameters)
-        {
-            if (onCompletion.ContainsKey(id))
-            {
-                var bundle = onCompletion[id];
-                var type = onCompletion[id].Type;
-                onCompletion.Remove(id);
-
-                if (code >= 200 && code <= 400)
-                {
-                    var arg = bundle.Arg;
-                    bundle.Action?.Invoke(arg, parameters);
-                    switch (type)
-                    {
-                        case CallbackType.Acc:
-                            RegisterSuccessEvent(this, new RegisterSuccessEventArgs() { Exception = new Exception("Please enter the verification code.") });
-
-                            break;
-                        case CallbackType.Login:
-                            if(code == 300)
-                            {
-                                RegisterFailedEvent(this, new RegisterFailedEventArgs() { Exception = new Exception(text) });
-                            }
-                            else
-                            {
-                                LoginSuccessEvent(this, new LoginSuccessEventArgs());
-                            }
-
-                            break;
-                        case CallbackType.DelMsg:
-                            ChatMessage removedMessage = new ChatMessage();
-                            removedMessage.TopicName = topic;
-                            removedMessage.SeqId = int.Parse(arg);
-
-                            RemoveMessageEvent?.Invoke(this, new RemoveMessageEventArgs() { Message = removedMessage });
-                            break;
-                        case CallbackType.DelTopic:
-                            Subscriber removedSubscriber = new Subscriber();
-                            removedSubscriber.TopicName = topic;
-                            removedSubscriber.UserId=topic;
-
-                            RemoveSubscriberEvent?.Invoke(this, new RemoveSubscriberEventArgs() { Subscriber = removedSubscriber });
-                            break;
-                        case CallbackType.Sub:
-                            Subscriber newSubscriber = new Subscriber();
-                            newSubscriber.TopicName = topic;
-                            newSubscriber.UserId = topic;
-                            newSubscriber.Username = topic;
-
-                            AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs { Subscriber = newSubscriber });
-                            break;
-                        case CallbackType.Leave:
-                            Topic removedTopic = new Topic(topic);
-
-                            RemoveTopicEvent?.Invoke(this, new RemoveTopicEventArgs() { Topic = removedTopic });
-                            break;
-                        default:
-                            break;
-                    }
-                }
-                else
-                {
-                    switch (type)
-                    {
-                        case CallbackType.Login:
-
-                            LoginFailedEvent(this, new LoginFailedEventArgs() { Exception = new Exception(text) });
-                            break;
-                        case CallbackType.Acc:
-
-                            RegisterFailedEvent(this, new RegisterFailedEventArgs() { Exception = new Exception(text) });
-                            break;
-                        default:
-                            break;
-
-                    }
-                }
-            }
-        }
-
-        private void OnLogin(MapField<string, ByteString> paramaters)
-        {
-            if (paramaters == null)
-            {
-                return;
-            }
-            if (paramaters.ContainsKey("user"))
-            {
-                string userId = paramaters["user"].ToString(Encoding.ASCII);
-                SetAccountEvent?.Invoke(this, new SetAccountEventArgs() { UserId = userId });
-            }
-
-            Topic me = new Topic("me");
-
-            ClientPost(GetTags(me));
-            ClientPost(GetMeSubs());
-
-            //保存令牌供上传使用
-            token = JsonConvert.DeserializeObject<string>(paramaters["token"].ToString(Encoding.UTF8));
-
-        }
-
-        private void OnGetMeMeta(ServerMeta meta)
-        {
-            if (meta.Sub != null && meta.Sub.Count != 0)
-            {
-                foreach (var sub in meta.Sub)
-                {
-                    Topic topic = new Topic(sub.Topic);
-                    Subscriber subscriber = new Subscriber();
-
-                    var publicInfo = sub.Public.ToStringUtf8();
-                    var publicObject = JsonConvert.DeserializeObject<JObject>(publicInfo);
-                    var privateInfo = sub.Private.ToStringUtf8();
-                    var privateObject = JsonConvert.DeserializeObject<JObject>(privateInfo);
-
-                    topic.Updated = sub.UpdatedAt;
-                    topic.Read = sub.ReadId;
-                    topic.Recieve = sub.RecvId;
-                    topic.Clear = sub.DelId;
-                    topic.LastUsed = sub.TouchedAt;
-                    topic.MinLocalSeqId = sub.RecvId;
-                    topic.MaxLocalSeqId = sub.RecvId;
-                    topic.IsArchived = false;
-                    topic.PrivateComment = sub.UserId;
-                    topic.Weight = 0;
-                    topic.Type = publicObject == null ? "group" : "user";
-
-                    if (privateObject != null && privateObject.Count != 0 )
-                    {
-                        if (privateObject["arch"] != null)
-                        {
-                            topic.IsArchived = bool.Parse(privateObject["arch"].ToString());
-                        }
-                        if (privateObject["comment"] != null)
-                        {
-                            topic.PrivateComment = privateObject["comment"].ToString();
-                        }
-                        
-                    }
-
-                    subscriber.UserId = sub.Topic;
-                    subscriber.Online = sub.Online;
-                    subscriber.TopicName = sub.Topic;
-                    subscriber.Username = sub.UserId;
-                    subscriber.Type = publicObject == null ? "group" : "user";
-                    subscriber.PhotoData = string.Empty;
-                    subscriber.PhotoType = string.Empty;
-                    subscriber.Status = 1;
-                    if (publicObject != null)
-                    {
-                        subscriber.Username = publicObject["fn"].ToString();
-                        if (publicObject.ContainsKey("photo"))
-                        {
-                            subscriber.PhotoData = publicObject["photo"]["data"].ToString();
-                            subscriber.PhotoType = publicObject["photo"]["type"].ToString();
-                        }
-                    }
-
-                    topic.SubsriberList.Add(subscriber);
-
-                    AddTopicEvent?.Invoke(this, new AddTopicEventArgs() { Topic = topic });
-
-                    AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber,isTemporary=false });
-
-                }
-            }
-
-            if (meta.Tags != null && meta.Tags.Count!=0)
-            {
-                List<string> tags = meta.Tags.ToList();
-                SetAccountEvent(this, new SetAccountEventArgs() { Tags = tags });
-            }
-        }
-
-        private void OnGetFindMeta(ServerMeta meta)
-        {
-            if (meta.Sub != null && meta.Sub.Count != 0)
-            {
-                foreach (var sub in meta.Sub)
-                {
-                    Subscriber subscriber = new Subscriber();
-
-                    var publicInfo = sub.Public.ToStringUtf8();
-                    var publicObject = JsonConvert.DeserializeObject<JObject>(publicInfo);
-
-                    subscriber.UserId = sub.UserId;
-                    subscriber.TopicName = sub.UserId;
-                    subscriber.Username = sub.UserId;
-                    subscriber.Type = publicObject == null ? "group" : "user";
-                    subscriber.PhotoData = string.Empty;
-                    subscriber.PhotoType = string.Empty;
-
-                    if (publicObject != null)
-                    {
-                        subscriber.Username = publicObject["fn"].ToString();
-                        if (publicObject.ContainsKey("photo"))
-                        {
-                            subscriber.PhotoData = publicObject["photo"]["data"].ToString();
-                            subscriber.PhotoType = publicObject["photo"]["type"].ToString();
-                        }
-                    }
-
-                    AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber,isTemporary=true });
-                }
-            }
-        }
-
     }
 }

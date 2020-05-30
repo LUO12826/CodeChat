@@ -11,9 +11,14 @@ namespace CodeChatSDK.Controllers
 {
     public class TopicController
     {
-
+        /// <summary>
+        /// 话题对象
+        /// </summary>
         private Topic instance;
 
+        /// <summary>
+        /// 数据库
+        /// </summary>
         private IAccountRepository db;
 
         /// <summary>
@@ -21,12 +26,21 @@ namespace CodeChatSDK.Controllers
         /// </summary>
         private Client client;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="database">数据库</param>
         public TopicController(IAccountRepository database)
         {
             client = Client.Instance;
             db = database;
         }
 
+        /// <summary>
+        /// 设置话题对象
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns></returns>
         public async Task SetTopic(Topic topic)
         {
             instance = topic;
@@ -38,7 +52,7 @@ namespace CodeChatSDK.Controllers
         /// 增加订阅者
         /// </summary>
         /// <param name="subsricber">订阅者对象</param>
-        /// <returns></returns>
+        /// <returns>结果</returns>
         public async Task<bool> AddSubscriber(Subscriber subscriber)
         {
             if (instance.SubsriberList.Contains(subscriber))
@@ -62,7 +76,7 @@ namespace CodeChatSDK.Controllers
         /// 移除订阅者
         /// </summary>
         /// <param name="subscriber">订阅者对象</param>
-        /// <returns></returns>
+        /// <returns>结果</returns>
         public async Task<bool> RemoveSubscriber(Subscriber subscriber)
         {
             if (!instance.SubsriberList.Contains(subscriber))
@@ -99,6 +113,7 @@ namespace CodeChatSDK.Controllers
         /// 新增消息
         /// </summary>
         /// <param name="message">消息</param>
+        /// <returns>结果</returns>
         public async Task<bool> AddMessage(ChatMessage message)
         {
 
@@ -137,6 +152,7 @@ namespace CodeChatSDK.Controllers
         /// 删除消息
         /// </summary>
         /// <param name="message">消息</param>
+        /// <returns>结果</returns>
         public async Task<bool> RemoveMessage(ChatMessage message)
         {
             if (!instance.MessageList.Contains(message))
@@ -183,11 +199,16 @@ namespace CodeChatSDK.Controllers
             return true;
         }
 
-        public async void NoteRead(ChatMessage message)
+        /// <summary>
+        /// 标记消息为已读
+        /// </summary>
+        /// <param name="message">消息</param>
+        /// <returns>结果</returns>
+        public async Task<bool> NoteRead(ChatMessage message)
         {
             if (!instance.MessageList.Contains(message))
             {
-                return;
+                return false;
             }
 
             MessageController messageController = new MessageController(db.Messages);
@@ -200,6 +221,8 @@ namespace CodeChatSDK.Controllers
             instance.LastUsed = ChatMessageBuilder.GetTimeStamp();
             var dbContext = db.Topics.GetRepository();
             await dbContext.UpsertTopic(instance);
+
+            return true;
         }
 
         /// <summary>
@@ -252,42 +275,53 @@ namespace CodeChatSDK.Controllers
             await dbContext.UpsertTopic(instance);
         }
 
-        public async Task<List<ChatMessage>> SearchMessage(string condition)
-        {
-            MessageController messageController = new MessageController(db.Messages);
-            return await messageController.SearchMessage(instance, condition);
-        }
-
-        public List<ChatMessage> SearchMessage(string condition,int pageIndex,int pageSize, ref int pageCount)
-        {
-            MessageController messageController = new MessageController(db.Messages);
-            return messageController.SearchMessage(instance, condition,pageIndex, pageSize, ref pageCount);
-        }
-
+        /// <summary>
+        /// 插入或更新话题
+        /// </summary>
         public async void UpsertTopic()
         {
             var dbContext = db.Topics.GetRepository();
             await dbContext.UpsertTopic(instance);
         }
 
+        /// <summary>
+        /// 删除话题
+        /// </summary>
         public async void DeleteTopic()
         {
             var dbContext = db.Topics.GetRepository();
             await dbContext.DeleteTopic(instance);
         }
 
+        /// <summary>
+        /// 获取话题
+        /// </summary>
+        /// <returns>话题列表</returns>
         public async Task<List<Topic>> GetTopics()
         {
             var dbContext = db.Topics.GetRepository();
             return await dbContext.GetAsync() as List<Topic>;
         }
 
+        /// <summary>
+        /// 本地搜索话题
+        /// </summary>
+        /// <param name="condition">搜索条件</param>
+        /// <returns>结果列表</returns>
         public async Task<List<Topic>> SearchTopic(string condition)
         {
             var dbContext = db.Topics.GetRepository();
             return await dbContext.GetAsync(condition) as List<Topic>;
         }
 
+        /// <summary>
+        /// 本地搜索话题分页加载
+        /// </summary>
+        /// <param name="condition">搜索条件</param>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="pageSize">页面大小</param>
+        /// <param name="pageCount">页面数目</param>
+        /// <returns>搜索结果</returns>
         public List<Topic> SearchTopic(string condition,int pageIndex,int pageSize,ref int pageCount)
         {
             var dbContext = db.Topics.GetRepository();

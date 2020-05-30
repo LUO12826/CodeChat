@@ -98,7 +98,10 @@ namespace CodeChatSDK.Utils
             return message;
         }
 
-
+        /// <summary>
+        /// 获取时间戳
+        /// </summary>
+        /// <returns>时间戳</returns>
         public static long GetTimeStamp()
         {
             TimeSpan timeSpan = DateTime.UtcNow - new DateTime(1970, 1, 1, 0, 0, 0, 0);

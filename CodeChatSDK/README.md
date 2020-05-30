@@ -38,6 +38,8 @@ client.SubscriberStateChangedEvent += SubscriberStateChange;
 
 ### **登陆**
 
+用户对象与用户控制器对象可保存为界面类的私有变量，供后续操作使用。
+
 ```c#
 //获取用户单例
 Account account = AccountController.Instance;
@@ -204,13 +206,50 @@ accountController.RemoveTag(tag);
 
 
 
-## 订阅者
+## **订阅者**
 
 ### **获取订阅者列表**
 
 ```c#
 //获取订阅者列表
 List<Subscriber> subscribers = account.SubscriberList；
+```
+
+
+
+### **获取订阅者控制器**
+
+```c#
+//通过AccountController获得，未指定特定订阅者，只可用于本地搜索订阅者
+SubscriberController subscriberController = accountController.GetSubscriberController();
+```
+
+
+
+### **本地搜索订阅者**
+
+```c#
+//返回所有结果
+//搜索条件
+string condition = "hello";
+
+//搜索范围为所有订阅者
+List<Subscriber> subscribers = await subscriberController.SearchSubscriber(condition);
+
+
+//分页返回结果
+//搜索条件
+string condition = "hello";
+
+//分页页码，从1开始
+int pageIndex = 1;
+//页面大小
+int pageSize = 2;
+//页面数量，执行函数后将赋值为页面数量
+int pageCount = 0;
+
+//搜索范围为所有订阅者
+List<Subscriber> subscribers = subscriberController.SearchSubscriber(condition, pageIndex, pageSize, ref pageCount);
 ```
 
 
@@ -255,34 +294,6 @@ else
 
 
 
-### **本地搜索订阅者**
-
-```c#
-//返回所有结果
-//搜索条件
-string condition = "hello";
-
-//搜索范围为所有订阅者
-List<Subscriber> subscribers = await accountController.SearchSubscriber(condition);
-
-
-//分页返回结果
-//搜索条件
-string condition = "hello";
-
-//分页页码，从1开始
-int pageIndex = 1;
-//页面大小
-int pageSize = 2;
-//页面数量，执行函数后将赋值为页面数量
-int pageCount = 0;
-
-//搜索范围为所有订阅者
-List<Subscriber> subscribers = accountController.SearchSubscriber(condition, pageIndex, pageSize, ref pageCount);
-```
-
-
-
 ### **在线搜索订阅者**
 
 ```c#
@@ -311,41 +322,13 @@ List<Subscriber> subscribers = accountController.SearchSubscriberOnline(conditio
 
 
 
-## 话题
+## **话题**
 
 ### **获取话题列表**
 
 ```c#
 //获取话题列表
 List<Topic> topics = account.TopicList;
-```
-
-
-
-### **本地搜索话题列表**
-
-```c#
-//返回所有结果
-//搜索条件
-string condition = "hello";
-
-//搜索范围为所有话题
-List<Topic> topics = await accountController.SearchTopic(condition);
-
-
-//分页返回结果
-//搜索条件
-string condition = "hello";
-
-//分页页码，从1开始
-int pageIndex = 1;
-//页面大小
-int pageSize = 2;
-//页面数量，执行函数后将赋值为页面数量
-int pageCount = 0;
-
-//搜索范围为所有话题
-List<Topic> topics = accountController.SearchTopic(condition, pageIndex, pageSize, ref pageCount);
 ```
 
 
@@ -377,7 +360,12 @@ Topic currentTopic = accountController.GetTopicAt(index);
 
 ### **获取话题控制器**
 
+对任何话题进行操作（如移除话题、发送消息、移除消息、搜索当前话题消息、设置话题备注）时，都需要通过话题控制器。
+
 ```c#
+//通过AccountController获得，未指定特定话题，只可用于本地搜索话题
+TopicController topicController = accountController.GetTopicController();
+
 //获取当前话题
 Topic currentTopic = accountController.GetTopicByName(topic);
 
@@ -386,6 +374,34 @@ TopicController topicController = await accountController.GetTopicController(cur
 
 //根据话题名获取话题控制器
 TopicController topicController = await accountController.GetTopicControllerByName(topic);
+```
+
+
+
+### **本地搜索话题列表**
+
+```c#
+//返回所有结果
+//搜索条件
+string condition = "hello";
+
+//搜索范围为所有话题
+List<Topic> topics = await topicController.SearchTopic(condition);
+
+
+//分页返回结果
+//搜索条件
+string condition = "hello";
+
+//分页页码，从1开始
+int pageIndex = 1;
+//页面大小
+int pageSize = 2;
+//页面数量，执行函数后将赋值为页面数量
+int pageCount = 0;
+
+//搜索范围为所有话题
+List<Topic> topics = topicController.SearchTopic(condition, pageIndex, pageSize, ref pageCount);
 ```
 
 
@@ -420,7 +436,18 @@ else
 
 ```c#
 //置顶话题
-accountController.PinTopic(currentTopic);
+bool result = accountController.PinTopic(currentTopic);
+
+//判断结果
+if(result == true)
+{
+    //置顶成功操作
+}
+else
+{
+    //置顶失败操作
+    //失败原因为不存在该话题或话题已置顶
+}
 ```
 
 
@@ -429,7 +456,18 @@ accountController.PinTopic(currentTopic);
 
 ```c#
 //取消置顶话题
-accountController.UnpinTopic(currentTopic);
+bool result = accountController.UnpinTopic(currentTopic);
+
+//判断结果
+if(result == true)
+{
+    //取消置顶成功操作
+}
+else
+{
+    //取消置顶失败操作
+    //失败原因为不存在该话题或话题未置顶
+}
 ```
 
 
@@ -455,6 +493,15 @@ List<ChatMessage> ChatMessageList = currentTopic.MessageList;
 
 
 
+### **获取消息控制器**
+
+```c#
+//通过AccountController获得，未指定特定话题，只可用于本地搜索全部消息
+MessageController messageController = accountController.GetMessageController();
+```
+
+
+
 ### **本地搜索消息列表**
 
 ```c#
@@ -463,10 +510,10 @@ List<ChatMessage> ChatMessageList = currentTopic.MessageList;
 string condition = "hello";
 
 //搜索范围为所有消息
-List<ChatMessage> messages = await accountController.SearchMessage(condition);
+List<ChatMessage> messages = await messageController.SearchMessage(condition);
 
 //搜索范围为当前话题
-List<ChatMessage> messages = await topicController.SearchMessage(condition);
+List<ChatMessage> messages = await messageController.SearchMessage(currentTopic, condition);
 
 
 //分页返回结果
@@ -480,10 +527,10 @@ int pageSize = 2;
 int pageCount = 0;
 
 //搜索范围为所有消息
-List<ChatMessage> messages = accountController.SearchMessage(condition, pageIndex, pageSize, ref pageCount);
+List<ChatMessage> messages = messageController.SearchMessage(condition, pageIndex, pageSize, ref pageCount);
 
 //搜索范围为当前话题
-List<ChatMessage> messages = topicController.SearchMessage(condition, pageIndex, pageSize, ref pageCount);
+List<ChatMessage> messages = messageController.SearchMessage(currentTopic,condition, pageIndex, pageSize, ref pageCount);
 ```
 
 
@@ -614,10 +661,7 @@ topicController.NoteRead(currentMessage);
 #### **普通消息**
 
 ```c#
-if (currentMessage.IsPlainText == true)
-{
-	string text = currentMessage.Text;
-}
+string text = currentMessage.Text;
 ```
 
 
@@ -639,8 +683,11 @@ if (currentMessage.IsCode == true)
 
 ```c#
 //判断是否为普通消息
-if (currentMessage.IsPlainText == false)
+if (currentMessage.IsAttachment == true)
 {
+    //附件说明信息
+    string text = currentMessage.Text;
+    
 	//通过消息解析器获取URL列表
 	List<string> urls = ChatMessageParser.ParseUrl(currentMessage,client.ApiBaseUrl);
     
@@ -648,6 +695,26 @@ if (currentMessage.IsPlainText == false)
     {
         //遍历URL列表进行操作
     }
+}
+```
+
+
+
+#### **图片Base64**
+
+```c#
+//判断是否为普通消息
+if (currentMessage.IsPlainText == false)
+{
+    List<string> base64s = ChatMessageParser.ParseImageBase64(currentMessage);
+
+	foreach(string base64 in base64s)
+	{
+		//遍历base64列表进行操作
+        //可用Converter中提供的方法将base64转为Bitmap对象
+        Bitmap image = Converter.ConvertBase64ToImage(base64);
+	}
+
 }
 ```
 

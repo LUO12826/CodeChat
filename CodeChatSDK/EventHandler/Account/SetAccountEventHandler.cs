@@ -22,7 +22,7 @@ namespace CodeChatSDK.EventHandler
         public string UserId { get; set; }
 
         /// <summary>
-        /// 标签
+        /// 标签列表
         /// </summary>
         public List<string> Tags { get; set; }
     }

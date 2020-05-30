@@ -21,6 +21,7 @@ namespace CodeChatSDK.EventHandler
         /// 所属话题名
         /// </summary>
         public string TopicName { get; set; }
+
         /// <summary>
         /// 聊天消息
         /// </summary>

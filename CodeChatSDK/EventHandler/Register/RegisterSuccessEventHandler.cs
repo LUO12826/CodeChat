@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.EventHandler
 {
     /// <summary>
     /// 注册成功
@@ -16,9 +16,6 @@ namespace CodeChatSDK
     /// </summary>
     public class RegisterSuccessEventArgs
     {
-        /// <summary>
-        /// 注册成功异常
-        /// </summary>
-        public Exception Exception { get; set; }
+
     }
 }

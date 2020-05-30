@@ -60,6 +60,12 @@ namespace CodeChatSDK.Models
         /// </summary>
         [JsonIgnore]
         public bool IsRead { get; set; }
+        
+        /// <summary>
+        /// 是否含有附件
+        /// </summary>
+        [JsonIgnore]
+        public bool IsAttachment { get; set; }
 
         /// <summary>
         /// 代码类型

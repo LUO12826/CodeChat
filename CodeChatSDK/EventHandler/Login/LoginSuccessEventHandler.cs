@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.EventHandler
 {
     /// <summary>
     /// 登陆成功
@@ -17,6 +17,6 @@ namespace CodeChatSDK
     /// </summary>
     public class LoginSuccessEventArgs
     {
-        public Exception Exception { get; set; }
+        
     }
 }

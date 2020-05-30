@@ -23,7 +23,7 @@ namespace CodeChatSDK.EventHandler
         public Subscriber Subscriber { get; set; }
 
         /// <summary>
-        /// 是否临时查看
+        /// 是否临时添加
         /// </summary>
         public bool isTemporary { get; set; }
     }
