@@ -191,7 +191,7 @@ if (file != null)
 ```c#
 //添加标签
 string tag = "new_tag";
-accountController.AddTag(tag);accountController.AddTag(tag);
+accountController.AddTag(tag);
 ```
 
 
@@ -360,7 +360,7 @@ Topic currentTopic = accountController.GetTopicAt(index);
 
 ### **获取话题控制器**
 
-对任何话题进行操作（如移除话题、发送消息、移除消息、搜索当前话题消息、设置话题备注）时，都需要通过话题控制器。
+对任何话题进行操作（如移除话题、发送消息、移除消息、设置话题备注）时，都需要通过话题控制器。
 
 ```c#
 //通过AccountController获得，未指定特定话题，只可用于本地搜索话题
@@ -561,7 +561,7 @@ CodeType codeType = CodeType.JAVA;
 string code = "printf(\"HelloWorld!\n\");";
 
 //通过消息构造器构造消息
-ChatMessage message = ChatMessageBuilder.BuildCodeMessage(CodeType.JAVA, text);
+ChatMessage message = ChatMessageBuilder.BuildCodeMessage(codeType, code);
 
 //发送消息
 topicController.SendMessage(message);
@@ -711,7 +711,7 @@ if (currentMessage.IsPlainText == false)
 	foreach(string base64 in base64s)
 	{
 		//遍历base64列表进行操作
-        //可用Converter中提供的方法将base64转为Bitmap对象
+         //可用Converter中提供的方法将base64转为Bitmap对象
         Bitmap image = Converter.ConvertBase64ToImage(base64);
 	}
 
