@@ -1,8 +1,9 @@
-﻿using System;
+﻿using CodeChatSDK.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.EventHandler
 {
     /// <summary>
     /// 登陆成功
@@ -16,9 +17,6 @@ namespace CodeChatSDK
     /// </summary>
     public class LoginSuccessEventArgs
     {
-        /// <summary>
-        /// 聊天消息
-        /// </summary>
-        public ChatMessage Message { get; set; }
+        
     }
 }

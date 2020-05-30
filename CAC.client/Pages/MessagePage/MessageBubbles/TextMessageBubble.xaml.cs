@@ -6,7 +6,7 @@ using Windows.UI.Xaml.Media;
 
 namespace CAC.client.MessagePage
 {
-    public sealed partial class TextMessageBubble : UserControl
+    sealed partial class TextMessageBubble : UserControl
     {
 
         public static readonly DependencyProperty TextProperty =

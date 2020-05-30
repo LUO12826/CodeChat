@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CodeChatSDK.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -20,6 +21,7 @@ namespace CodeChatSDK.EventHandler
         /// 所属话题名
         /// </summary>
         public string TopicName { get; set; }
+
         /// <summary>
         /// 聊天消息
         /// </summary>

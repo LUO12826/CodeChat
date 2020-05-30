@@ -36,7 +36,7 @@
             </Grid>
 
             <ContentPresenter x:Name="messageViewerPresenter" Grid.Row="2" Content="{x:Bind VM.CurrentViewer, Mode=OneWay}"/>
-            <cc:InputBox Name="inputBox" Grid.Row="3" DidSentContent="inputBox_DidSentContent"/>
+            <cc:InputBox Name="inputBox" Grid.Row="3" DidSentContent="inputBox_DidSendContent"/>
         </Grid>
 
         <Grid x:Name="noChatGrid">

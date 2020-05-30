@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.EventHandler
 {
     /// <summary>
     /// 注册失败
@@ -19,6 +19,6 @@ namespace CodeChatSDK
         /// <summary>
         /// 注册失败异常
         /// </summary>
-        public Exception exception { get; set; }
+        public Exception Exception { get; set; }
     }
 }

@@ -36,13 +36,13 @@ namespace CAC.client.MessagePage
         //点击了移除cell的按钮时
         private void RemoveCellBtn_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
-            Debug.WriteLine((sender as Button).DataContext);
+            VM.RequestRemoveChat((sender as Button).DataContext as IChatListItem);
         }
 
         //点击了某个cell时
         private void ChatsList_ItemClick(object sender, ItemClickEventArgs e)
         {
-            VM.DidSelectChat(e.ClickedItem as ChatListBaseItemVM);
+            VM.DidSelectChat(e.ClickedItem as IChatListItem);
         }
     }
 }

@@ -2,6 +2,7 @@
 using CAC.client.Common;
 using System.Drawing;
 
+
 namespace CAC.client.MessagePage
 {
     /// <summary>
@@ -10,7 +11,8 @@ namespace CAC.client.MessagePage
     class MessageItemBaseVM : BaseViewModel
     {
         private string _UserID;
-        private string _NickName;
+        private string _UserName;
+        private string _Note;
         private bool _SendByMe;
         private DateTime _TimeStamp;
         private string _Base64Avatar;
@@ -24,11 +26,27 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public string NickName {
-            get => _NickName;
+        public string UserName {
+            get => _UserName;
             set {
-                _NickName = value;
+                _UserName = value;
                 RaisePropertyChanged(nameof(UserID));
+                RaisePropertyChanged(nameof(DisplayName));
+            }
+        }
+
+        public string Note {
+            get => _Note;
+            set {
+                _Note = value;
+                RaisePropertyChanged(nameof(Note));
+                RaisePropertyChanged(nameof(DisplayName));
+            }
+        }
+
+        public string DisplayName {
+            get {
+                return _Note.IsNullOrEmpty() ? _UserName : _Note;
             }
         }
 

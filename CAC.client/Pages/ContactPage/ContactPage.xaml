@@ -3,12 +3,28 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:CAC.client.ContactPage"
+    xmlns:cc="using:CAC.client.CustomControls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Grid>
+        <cc:ResizableMasterDetail MasterDefaultWidth="260" MasterMaxWidth="350" MasterThresholdWidth="200" MasterMinWidth="200">
+            <cc:ResizableMasterDetail.MasterContent>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <local:ContactList Grid.Row="1"/>
+                </Grid>
 
+            </cc:ResizableMasterDetail.MasterContent>
+
+            <cc:ResizableMasterDetail.DetailContent>
+                <local:ContactDetailControl/>
+            </cc:ResizableMasterDetail.DetailContent>
+        </cc:ResizableMasterDetail>
     </Grid>
 </Page>

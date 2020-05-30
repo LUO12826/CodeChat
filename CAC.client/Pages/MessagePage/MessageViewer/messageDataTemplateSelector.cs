@@ -27,6 +27,12 @@ namespace CAC.client.MessagePage
                 else if(itemVM is ImageMessageVM) {
                     return resourceDict["MessageViewerImageLeftCell"] as DataTemplate;
                 }
+                else if(itemVM is CodeMessageVM) {
+                    return resourceDict["MessageViewerCodeLeftCell"] as DataTemplate;
+                }
+                else if(itemVM is FileMessageVM) {
+                    return resourceDict["MessageViewerCodeLeftCell"] as DataTemplate;
+                }
             }
             else {
                 if(itemVM is TextMessageVM) {
@@ -34,6 +40,12 @@ namespace CAC.client.MessagePage
                 }
                 else if (itemVM is ImageMessageVM) {
                     return resourceDict["MessageViewerImageRightCell"] as DataTemplate;
+                }
+                else if (itemVM is CodeMessageVM) {
+                    return resourceDict["MessageViewerCodeRightCell"] as DataTemplate;
+                }
+                else if (itemVM is FileMessageVM) {
+                    return resourceDict["MessageViewerCodeRightCell"] as DataTemplate;
                 }
             }
             throw new NotImplementedException("messageViewer模板选择器错误");

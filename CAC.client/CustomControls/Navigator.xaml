@@ -14,6 +14,107 @@
 
     <UserControl.Resources>
         <con:DoubleToGridLength x:Key="DoubleToGridLength"/>
+        <Style x:Key="NavigatorListViewItemContainerStyle" TargetType="ListViewItem">
+            <Setter Property="FontFamily" Value="{ThemeResource ContentControlThemeFontFamily}"/>
+            <Setter Property="FontSize" Value="{ThemeResource ControlContentThemeFontSize}"/>
+            <Setter Property="Background" Value="{ThemeResource ListViewItemBackground}"/>
+            <Setter Property="Foreground" Value="{ThemeResource ListViewItemForeground}"/>
+            <Setter Property="TabNavigation" Value="Local"/>
+            <Setter Property="IsHoldingEnabled" Value="True"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="MinWidth" Value="0"/>
+            <Setter Property="MinHeight" Value="{ThemeResource ListViewItemMinHeight}"/>
+            <Setter Property="AllowDrop" Value="False"/>
+            <Setter Property="UseSystemFocusVisuals" Value="{StaticResource UseSystemFocusVisuals}"/>
+            <Setter Property="FocusVisualMargin" Value="0"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Padding" Value="0 10 0 10"/>
+            <Setter Property="Height" Value="60"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListViewItem">
+                        <ListViewItemPresenter x:Name="Root" CheckBrush="{ThemeResource ListViewItemCheckBrush}" 
+                                               ContentMargin="{TemplateBinding Padding}" 
+                                               CheckBoxBrush="{ThemeResource ListViewItemCheckBoxBrush}" 
+                                               ContentTransitions="{TemplateBinding ContentTransitions}" 
+                                               CheckMode="{ThemeResource ListViewItemCheckMode}" 
+                                               DragOpacity="{ThemeResource ListViewItemDragThemeOpacity}" 
+                                               DisabledOpacity="{ThemeResource ListViewItemDisabledThemeOpacity}" 
+                                               DragBackground="{ThemeResource ListViewItemDragBackground}" 
+                                               DragForeground="{ThemeResource ListViewItemDragForeground}" 
+                                               FocusBorderBrush="{ThemeResource ListViewItemFocusBorderBrush}" 
+                                               FocusVisualMargin="{TemplateBinding FocusVisualMargin}" 
+                                               FocusSecondaryBorderBrush="{ThemeResource ListViewItemFocusSecondaryBorderBrush}" 
+                                               HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" 
+                                               Control.IsTemplateFocusTarget="True" 
+                                               PressedBackground="{ThemeResource ListViewItemBackgroundPressed}" 
+                                               PlaceholderBackground="{ThemeResource ListViewItemPlaceholderBackground}" 
+                                               PointerOverForeground="{ThemeResource ListViewItemForegroundPointerOver}" 
+                                               PointerOverBackground="{ThemeResource ListViewItemBackgroundPointerOver}" 
+                                               RevealBorderThickness="{ThemeResource ListViewItemRevealBorderThemeThickness}" 
+                                               ReorderHintOffset="{ThemeResource ListViewItemReorderHintThemeOffset}" 
+                                               RevealBorderBrush="{ThemeResource ListViewItemRevealBorderBrush}" 
+                                               RevealBackground="{ThemeResource ListViewItemRevealBackground}" 
+                                               SelectedForeground="{ThemeResource ListViewItemForegroundSelected}" 
+                                               SelectionCheckMarkVisualEnabled="{ThemeResource ListViewItemSelectionCheckMarkVisualEnabled}" 
+                                               SelectedBackground="Transparent" 
+                                               SelectedPressedBackground="{ThemeResource ListViewItemBackgroundSelectedPressed}" 
+                                               SelectedPointerOverBackground="{ThemeResource ListViewItemBackgroundSelectedPointerOver}" 
+                                               VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}">
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup x:Name="CommonStates">
+                                    <VisualState x:Name="Normal"/>
+                                    <VisualState x:Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(Content.Foreground)" Value="Blue"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOver">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPointerOver}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOverSelected">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="PointerOver"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPointerOver}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PointerOverPressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="Pressed">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                    <VisualState x:Name="PressedSelected">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.(RevealBrush.State)" Value="Pressed"/>
+                                            <Setter Target="Root.RevealBorderBrush" Value="{ThemeResource ListViewItemRevealBorderBrushPressed}"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                                <VisualStateGroup x:Name="DisabledStates">
+                                    <VisualState x:Name="Enabled"/>
+                                    <VisualState x:Name="Disabled">
+                                        <VisualState.Setters>
+                                            <Setter Target="Root.RevealBorderThickness" Value="0"/>
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                        </ListViewItemPresenter>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
     
     <Grid>
@@ -33,9 +134,9 @@
                           Tapped="avatar_Tapped" Tag="avatar"/>
 
         </Grid>
-        <ListView x:Name="naviItemList" Grid.Row="2" Margin="0 10 0 0"
+        <ListView x:Name="naviItemList" Grid.Row="2" Margin="0 10 0 0" ItemContainerStyle="{StaticResource NavigatorListViewItemContainerStyle}"
                               IsItemClickEnabled="True" ItemClick="naviItemList_ItemClick">
-            <ListView.ItemContainerStyle>
+            <!--<ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">
                     <Setter Property="HorizontalContentAlignment" Value="Center"/>
                     <Setter Property="HorizontalAlignment" Value="Stretch"/>
@@ -43,32 +144,35 @@
                     <Setter Property="Padding" Value="0 10 0 10"/>
                     <Setter Property="Height" Value="60"/>
                 </Style>
-            </ListView.ItemContainerStyle>
-
+            </ListView.ItemContainerStyle>-->
             <ListViewItem>
-                <FontIcon Tag="chat" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe96d;" FontSize="26" Foreground="Gray"/>
+                <Grid Tag="chat">
+                    <Rectangle Height="40" Width="5" Visibility="Collapsed"/>
+                    <!--<FontIcon Tag="chat" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe96d;" FontSize="26" Foreground="Gray"/>-->
+                    <SymbolIcon Symbol="Message"/>
+                </Grid>
+
             </ListViewItem>
 
             <ListViewItem>
-                <FontIcon Tag="contact" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe944;" FontSize="26" Foreground="Gray"/>
+                <Grid Tag="contact">
+                    <Rectangle Height="40" Width="5" Visibility="Collapsed"/>
+                    <!--<FontIcon Tag="contact" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe944;" FontSize="26" Foreground="Gray"/>-->
+                    <SymbolIcon Symbol="ContactInfo"/>
+                </Grid>
             </ListViewItem>
 
         </ListView>
 
-        <ListView x:Name="additionItemList" Grid.Row="3" 
-                              IsItemClickEnabled="True" ItemClick="naviItemList_ItemClick">
-            <ListView.ItemContainerStyle>
-                <Style TargetType="ListViewItem">
-                    <Setter Property="HorizontalContentAlignment" Value="Center"/>
-                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
-                    <Setter Property="MinWidth" Value="0"/>
-                    <Setter Property="Padding" Value="0 10 0 10"/>
-                    <Setter Property="Height" Value="60"/>
-                </Style>
-            </ListView.ItemContainerStyle>
+        <ListView x:Name="additionItemList" Grid.Row="3" ItemContainerStyle="{StaticResource NavigatorListViewItemContainerStyle}"
+                  IsItemClickEnabled="True" ItemClick="naviItemList_ItemClick">
 
             <ListViewItem>
-                <FontIcon Tag="settings" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe994;" FontSize="26" Foreground="Gray"/>
+                <Grid Tag="settings">
+                    <!--<FontIcon Tag="settings" FontFamily="{StaticResource IcoMoon}" Glyph="&#xe994;" FontSize="26" Foreground="Gray"/>-->
+                    <SymbolIcon Symbol="Setting"/>
+                </Grid>
+
             </ListViewItem>
         </ListView>
     </Grid>

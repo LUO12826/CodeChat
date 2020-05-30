@@ -29,9 +29,9 @@ namespace CAC.client.MessagePage
             VM = MessagePageViewModel.ChatPanelViewModel;
         }
 
-        private void inputBox_DidSentContent(object sender, SentContentEventArgs e)
+        private void inputBox_DidSendContent(object sender, SentContentEventArgs e)
         {
-
+            VM.DidSendContent(e);
         }
     }
 }

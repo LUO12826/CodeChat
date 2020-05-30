@@ -23,8 +23,16 @@
 
     <script src="ms-appx-web:///Monaco/monaco-editor/min/vs/loader.js"></script>
     <script>
+        //编辑器对象
         var editor;
+        //当前使用的模型
         var model;
+        //当前会话的token
+        var currentSession = '';
+        //Monaco editor中，切换编辑器的编辑上下文是通过切换model实现的。为了实现多tab，这里用两个数组保存各个model和state
+        var models = [];
+        var states = [];
+
         var contexts = {};
         var decorations = [];
         var modifingSelection = false; // Supress updates to selection when making edits.
@@ -42,6 +50,7 @@
 
             // Listen for Content Changes
             model.onDidChangeContent((event) => {
+                //文本变化时，立刻告知c#类
                 Parent.setValue("Text", model.getValue());
                 //console.log("buffers: " + JSON.stringify(model._buffer._pieceTree._buffers));
                 //console.log("commandMgr: " + JSON.stringify(model._commandManager));
@@ -81,6 +90,53 @@
             Debug.log("Loaded Monaco");
             Parent.callAction("Loaded");
         });
+
+        var SwitchToSession = function(userToken, language, Code) {
+            if(currentSession === userToken) return;
+            saveState();
+            let newModel;
+            if(!models.hasOwnProperty(userToken)) {
+                newModel = monaco.editor.createModel(Code, language);
+                models[userToken] = newModel;
+			}
+            else {
+                newModel = models[userToken];
+			}
+            editor.setModel(newModel);
+            Debug.log("set model");
+            model = newModel;
+            currentSession = userToken;
+            restoreState();
+		}
+
+        var saveState = function() {
+            if(currentSession === '') {
+                return;     
+			}
+            states[currentSession] = editor.saveViewState();
+		}
+
+        var restoreState = function() {
+            if(states.hasOwnProperty(currentSession)) {
+                editor.restoreViewState(states[currentSession]);
+		        editor.focus();   
+			}
+		}
+
+        var CloseSession = function(userToken) {
+
+            if(models.hasOwnProperty(userToken)) {
+                if(models[userToken] === model) {
+                    editor.setModel(null);
+                    currentSession = '';
+				}
+                delete models[userToken];
+			}
+            if(states.hasOwnProperty(userToken)) {
+                delete states[currentSession];     
+			}
+		}
+
 
         // TODO: Split these helper functions out into separate .js/.ts files.
         var registerCompletionItemProvider = function (languageId, characters) {

@@ -4,6 +4,9 @@ using System.Text;
 
 namespace CodeChatSDK
 {
+    /// <summary>
+    /// 回调类型
+    /// </summary>
     public enum CallbackType
     {
         Unknown,
@@ -16,6 +19,7 @@ namespace CodeChatSDK
         Pub,
         Note,
         Leave,
-        Del,
+        DelTopic,
+        DelMsg,
     }
 }
