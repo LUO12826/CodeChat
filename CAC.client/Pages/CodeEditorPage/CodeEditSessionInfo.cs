@@ -12,7 +12,7 @@ namespace CAC.client.CodeEditorPage
     class CodeEditSessionInfo
     {
         public ContactItemViewModel Contact { get; set; }
-        public int MessageID { get; set; }
+        public long MessageID { get; set; }
         public string Code { get; set; }
         public string Language { get; set; }
         public DateTime CreateTime { get; set; }

@@ -3,9 +3,11 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:mtuc="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:local="using:CAC.client">
-    
+
+    <FontFamily x:Key="microsoft">Segoe MDL2 Assets</FontFamily>
     <FontFamily x:Key="IcoMoon">/Assets/fonts/IcoMoon-Free.ttf#IcoMoon-Free</FontFamily>
     <FontFamily x:Key="CAC-1">/Assets/fonts/CAC-1.ttf#CAC-1</FontFamily>
+    <FontFamily x:Key="CAC-2">/Assets/fonts/CAC-2.ttf#CAC-2</FontFamily>
 
     <FontIcon x:Key="CodeSymbol" FontFamily="{StaticResource CAC-1}" Glyph="E"/>
     <!--全局滚动条样式-->

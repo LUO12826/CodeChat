@@ -25,9 +25,5 @@ namespace CAC.client.LoginPage
 
         }
 
-        private void temp_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
     }
 }

@@ -32,7 +32,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Text="{x:Bind VM.ChatListItem.ChatName, Mode=OneWay}" VerticalAlignment="Center" FontSize="18" Margin="10 0 0 0"/>
+                <TextBlock Text="{x:Bind VM.ChatListItem.Contact.DisplayName, Mode=OneWay}" VerticalAlignment="Center" FontSize="18" Margin="10 0 0 0"/>
             </Grid>
 
             <ContentPresenter x:Name="messageViewerPresenter" Grid.Row="2" Content="{x:Bind VM.CurrentViewer, Mode=OneWay}"/>

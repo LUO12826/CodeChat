@@ -126,6 +126,22 @@ namespace CAC.client.CustomControls
                 DidSentContent?.Invoke(this, arg);
             }
         }
+
+        private void SendCodePanel_DidSendCode(string lang, string code)
+        {
+            if (code.IsNullOrEmpty()) {
+                return;
+            }
+            var arg = new SentContentEventArgs() {
+                Type = MessageType.code,
+                Language = lang,
+                Content = code
+            };
+            DidSentContent?.Invoke(this, arg);
+
+            sendCodeButton.Flyout.Hide();
+
+        }
     }
 
     class SentContentEventArgs : EventArgs

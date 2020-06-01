@@ -38,9 +38,9 @@
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" 
                                       VerticalAlignment="Top"
-                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Contact.Base64Avatar, Mode=OneWay}"/>
                         
-                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind DisplayName,Mode=OneWay}" 
+                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind Contact.DisplayName, Mode=OneWay}" 
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         
@@ -63,9 +63,9 @@
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.Column="1" Grid.RowSpan="2" Width="34" Height="34" Margin="10 5 0 0" 
                                       VerticalAlignment="Top" Style="{StaticResource RoundImageEx}"
-                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyBase64Avatar, Mode=OneWay}"/>
+                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyContactInfo.Base64Avatar, Mode=OneWay}"/>
 
-                        <TextBlock x:Name="NickName" Text="{x:Bind DisplayName,Mode=OneWay}" HorizontalAlignment="Right"
+                        <TextBlock x:Name="NickName" Text="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyContactInfo.DisplayName, Mode=OneWay}" HorizontalAlignment="Right"
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         
@@ -88,9 +88,9 @@
                         </Grid.ColumnDefinitions>
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" VerticalAlignment="Top"
-                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Contact.Base64Avatar, Mode=OneWay}"/>
 
-                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind DisplayName,Mode=OneWay}" 
+                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind Contact.DisplayName, Mode=OneWay}" 
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         
@@ -112,9 +112,9 @@
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.Column="1" Grid.RowSpan="2" Width="34" Height="34" Margin="10 5 0 0" 
                                       VerticalAlignment="Top" Style="{StaticResource RoundImageEx}"
-                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyBase64Avatar, Mode=OneWay}"/>
+                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyContactInfo.Base64Avatar, Mode=OneWay}"/>
 
-                        <TextBlock x:Name="NickName" Text="{x:Bind DisplayName,Mode=OneWay}"  HorizontalAlignment="Right"
+                        <TextBlock x:Name="NickName" Text="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyContactInfo.DisplayName, Mode=OneWay}" HorizontalAlignment="Right"
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         
@@ -137,13 +137,14 @@
                         </Grid.ColumnDefinitions>
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" VerticalAlignment="Top"
-                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Base64Avatar, Mode=OneWay}"/>
+                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Contact.Base64Avatar, Mode=OneWay}"/>
 
-                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind DisplayName,Mode=OneWay}"
+                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind Contact.DisplayName, Mode=OneWay}"
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         <local:CodeMessageBubble Grid.Row="1" Grid.Column="1" RunResult="{x:Bind RunResult,Mode=TwoWay}"
-                                                 Code="{x:Bind Code,Mode=OneWay}" Language="{x:Bind Language, Mode=OneWay}"/>
+                                                 Code="{x:Bind Code,Mode=OneWay}" Language="{x:Bind Language, Mode=OneWay}"
+                                                 DidTapEditButton="CodeMessageBubble_DidTapEditButton"/>
 
                     </Grid>
                 </DataTemplate>
@@ -161,14 +162,15 @@
 
                         <mtuc:ImageEx x:Name="Avatar" Grid.Column="1" Grid.RowSpan="2" Width="34" Height="34" Margin="10 5 0 0" 
                                       VerticalAlignment="Top" Style="{StaticResource RoundImageEx}"
-                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyBase64Avatar, Mode=OneWay}"/>
+                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyContactInfo.Base64Avatar, Mode=OneWay}"/>
 
-                        <TextBlock x:Name="NickName" Text="{x:Bind DisplayName,Mode=OneWay}" HorizontalAlignment="Right"
+                        <TextBlock x:Name="NickName" Text="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyContactInfo.DisplayName, Mode=OneWay}" HorizontalAlignment="Right"
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         
                         <local:CodeMessageBubble Grid.Row="1" RunResult="{x:Bind RunResult,Mode=TwoWay}"
-                                                 Code="{x:Bind Code,Mode=OneWay}" Language="{x:Bind Language, Mode=OneWay}"/>
+                                                 Code="{x:Bind Code,Mode=OneWay}" Language="{x:Bind Language, Mode=OneWay}"
+                                                 DidTapEditButton="CodeMessageBubble_DidTapEditButton"/>
                     </Grid>
                 </DataTemplate>
                 <!--#endregion-->

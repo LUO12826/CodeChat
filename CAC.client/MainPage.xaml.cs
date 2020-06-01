@@ -3,13 +3,16 @@ using Windows.UI.Xaml.Controls;
 using System.Diagnostics;
 using Windows.UI.Xaml.Navigation;
 using System;
-using Windows.UI.Xaml.Media.Animation;
+using GalaSoft.MvvmLight.Messaging;
+using CAC.client.CodeEditorPage;
 
 namespace CAC.client
 {
 
     sealed partial class MainPage : Page
     {
+        private CodeEditorPage.CodeEditorPage codeEditor => CodeEditorPage.CodeEditorPage.Default;
+
 
         private string avatar = "/Assets/640.jpeg";
         private string currentPage;
@@ -18,7 +21,19 @@ namespace CAC.client
         {
             this.InitializeComponent();
             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
-            naviFrame.ContentTransitions = null;
+            Messenger.Default.Register<CodeEditSessionInfo>(this, "RequestEditCodeToken", RequestEditCode);
+        }
+
+        private void RequestEditCode(CodeEditSessionInfo session)
+        {
+            int AddWidth = 300;
+            if(GlobalFunctions.TryResizeWindow(AddWidth, 0)) {
+                Debug.WriteLine("resize ok");
+            }
+            MainGrid.Expan(AddWidth);
+            codeEditorFrame.Content = codeEditor;
+            codeEditor.RequestOpenSession(session);
+            
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

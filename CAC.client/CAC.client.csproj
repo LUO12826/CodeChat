@@ -128,6 +128,7 @@
     <Compile Include="CustomControls\SendCodePanel.xaml.cs">
       <DependentUpon>SendCodePanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Global\CommunicationCore.cs" />
     <Compile Include="Pages\AvatarPage\AvatarPage.xaml.cs">
       <DependentUpon>AvatarPage.xaml</DependentUpon>
     </Compile>
@@ -177,9 +178,6 @@
     <Compile Include="Global\GlobalConfigs.cs" />
     <Compile Include="Global\GlobalFunctions.cs" />
     <Compile Include="Pages\ContactPage\ContactList\ContactItemViewModel.cs" />
-    <Compile Include="Pages\FunctionPage\FunctionPage.xaml.cs">
-      <DependentUpon>FunctionPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Pages\LoginPage\LoginPage.xaml.cs">
       <DependentUpon>LoginPage.xaml</DependentUpon>
     </Compile>
@@ -201,6 +199,9 @@
     </Compile>
     <Compile Include="Pages\MessagePage\MessageBubbles\CodeMessageBubble.xaml.cs">
       <DependentUpon>CodeMessageBubble.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Pages\MessagePage\MessageBubbles\FileMessageBubble.xaml.cs">
+      <DependentUpon>FileMessageBubble.xaml</DependentUpon>
     </Compile>
     <Compile Include="Pages\MessagePage\MessagePageViewModel.cs" />
     <Compile Include="Pages\MessagePage\MessagePage.xaml.cs">
@@ -309,10 +310,6 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Pages\FunctionPage\FunctionPage.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Pages\LoginPage\LoginPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -338,6 +335,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Pages\MessagePage\MessageBubbles\CodeMessageBubble.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Pages\MessagePage\MessageBubbles\FileMessageBubble.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -389,17 +390,15 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\emojis\" />
-    <Folder Include="Docs\" />
-    <Folder Include="ServiceAdapter\" />
-    <Folder Include="Service\" />
-  </ItemGroup>
-  <ItemGroup>
-    <PRIResource Include="Strings\zh-CN\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\fonts\IcoMoon-Free.ttf" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CodeChatSDK\CodeChatSDK.csproj">
+      <Project>{dcc4b23e-4c29-4c6a-923a-510bfe1e8233}</Project>
+      <Name>CodeChatSDK</Name>
+    </ProjectReference>
     <ProjectReference Include="..\MonacoEditorComponent\MonacoEditorComponent.csproj">
       <Project>{dd49485c-2d9b-4824-b64e-52193b43e4cb}</Project>
       <Name>MonacoEditorComponent</Name>
@@ -417,6 +416,7 @@
     <None Include="Assets\Code\example.php" />
     <None Include="Assets\Code\example.py" />
     <None Include="Assets\Code\example.rb" />
+    <Content Include="Assets\fonts\CAC-2.ttf" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

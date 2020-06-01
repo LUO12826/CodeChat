@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
 using CAC.client.CustomControls;
+using CAC.client.CodeEditorPage;
 
 namespace CAC.client.MessagePage
 {
@@ -40,7 +41,7 @@ namespace CAC.client.MessagePage
 
         public ChatPanelViewModel()
         {
-            Messenger.Default.Register<ChatListChatItemVM>(this, "RequireOpenChatToken", RequestOpenChat);
+            Messenger.Default.Register<ChatListChatItemVM>(this, "RequestOpenChatToken", RequestOpenChat);
         }
 
         //当缓存中有时，直接从缓存中取，否则新建
@@ -67,7 +68,6 @@ namespace CAC.client.MessagePage
         {
             if(e.Type == MessageType.image) {
                 CurrentViewer.VM.Messages.Add(new ImageMessageVM() {
-                    UserName = "aaa",
                     SendByMe = true,
                     ImageUri = e.Content
                 });

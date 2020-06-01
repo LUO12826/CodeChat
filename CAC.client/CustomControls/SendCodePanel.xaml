@@ -18,7 +18,7 @@
         </Grid.RowDefinitions>
         <monaco:CodeEditor x:Name="editor" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         
-        <ComboBox x:Name="languageOptionBox" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="100" Background="Transparent"
+        <ComboBox x:Name="languageOptionBox" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Background="Transparent"
                   SelectionChanged="languageOptionBox_SelectionChanged" ItemsSource="{x:Bind LanguageOptions}"/>
         
         <Button x:Name="sendButton" Style="{StaticResource transparentButtonStyle}" Grid.Row="2" 

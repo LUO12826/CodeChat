@@ -1,5 +1,8 @@
-﻿using Microsoft.Toolkit.Uwp.UI.Controls;
+﻿using CAC.client.Common;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -7,12 +10,42 @@ using Windows.UI.Xaml.Controls;
 
 namespace CAC.client.CustomControls
 {
+    enum NaviItems
+    {
+        chat, contact, settings
+    }
+
     /// <summary>
     /// 最右侧导航栏。没做成一个通用性很强的组件。
     /// </summary>
     sealed partial class Navigator : UserControl
     {
         public event EventHandler<object> OnNavigationChanged;
+
+        private ObservableCollection<NavigatorItem> naviItem = new ObservableCollection<NavigatorItem>() {
+            new NavigatorItem() {
+                Symbol = Symbol.Message,
+                FontSize = 20,
+                Tag = "chat",
+                Selected = true
+            },
+            new NavigatorItem() {
+                Symbol = Symbol.ContactInfo,
+                FontSize = 20,
+                Tag = "contact",
+                Selected = false
+            }
+        };
+
+        private ObservableCollection<NavigatorItem> additionalItem = new ObservableCollection<NavigatorItem>() {
+            new NavigatorItem() {
+                Symbol = Symbol.Setting,
+                FontSize = 20,
+                Tag = "settings",
+                Selected = false
+            }
+        };
+
 
         public static readonly DependencyProperty AvatarProperty =
             DependencyProperty.Register("Avatar", typeof(string), typeof(Navigator), new PropertyMetadata(""));
@@ -34,6 +67,24 @@ namespace CAC.client.CustomControls
             this.InitializeComponent();
             this.DataContext = this;
             OnNavigationChanged += (a, b) => { };
+
+        }
+
+        public void SelectItem(NaviItems item)
+        {
+            switch (item) {
+                case NaviItems.chat:
+                    naviItemList.SelectedItem = naviItem[0];
+                    break;
+                case NaviItems.contact:
+                    naviItemList.SelectedItem = naviItem[1];
+                    break;
+                case NaviItems.settings:
+                    additionItemList.SelectedItem = additionalItem[0];
+                    break;
+                default:
+                    break;
+            }
         }
 
         private void naviItemList_ItemClick(object sender, ItemClickEventArgs e)
@@ -44,10 +95,8 @@ namespace CAC.client.CustomControls
             else if (sender == additionItemList) {
                 naviItemList.SelectedItem = null;
             }
-            else {
-
-            }
-            OnNavigationChanged(this, (e.ClickedItem as Grid).Tag);
+            
+            OnNavigationChanged(this, (e.ClickedItem as NavigatorItem).Tag);
         }
 
         private void avatar_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
@@ -56,12 +105,74 @@ namespace CAC.client.CustomControls
             additionItemList.SelectedItem = null;
             OnNavigationChanged(this, (sender as ImageEx).Tag);
         }
+
+        private void naviItemList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            clearSelection();
+            var sel = (sender as ListView).SelectedItem;
+            if(sel != null) {
+                (sel as NavigatorItem).Selected = true;
+            }
+        }
+
+        private void additionItemList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
+            clearSelection();
+            var sel = (sender as ListView).SelectedItem;
+            if (sel != null) {
+                (sel as NavigatorItem).Selected = true;
+            }
+        }
+
+        private void clearSelection()
+        {
+            foreach (var item in naviItem) {
+                item.Selected = false;
+            }
+            foreach (var item in additionalItem) {
+                item.Selected = false;
+            }
+        }
     }
 
-    class NavigatorItem
+    class NavigatorItem: BaseViewModel
     {
-        public string Symbol { get; set; }
-        public int FontSize { get; set; }
-        public string Tag { get; set; }
+        private Symbol _Symbol;
+        private int _FontSize;
+        private string _Tag;
+        private bool _Selected;
+
+        public Symbol Symbol {
+            get => _Symbol;
+            set {
+                _Symbol = value;
+                RaisePropertyChanged(nameof(Symbol));
+            }
+        }
+
+        public int FontSize {
+            get => _FontSize;
+            set {
+                _FontSize = value;
+                RaisePropertyChanged(nameof(FontSize));
+            }
+        }
+
+        public string Tag {
+            get => _Tag;
+            set {
+                _Tag = value;
+                RaisePropertyChanged(nameof(Tag));
+            }
+        }
+
+        public bool Selected {
+            get => _Selected;
+            set {
+                _Selected = value;
+                RaisePropertyChanged(nameof(Selected));
+            }
+        }
     }
 }

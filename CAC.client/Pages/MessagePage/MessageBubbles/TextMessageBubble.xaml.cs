@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿
 using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;

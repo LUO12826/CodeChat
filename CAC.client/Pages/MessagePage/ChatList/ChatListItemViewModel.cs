@@ -1,6 +1,7 @@
 ﻿using System;
 using Windows.UI.Xaml.Controls;
 using CAC.client.Common;
+using CAC.client.ContactPage;
 
 namespace CAC.client.MessagePage
 {
@@ -18,8 +19,6 @@ namespace CAC.client.MessagePage
     class ChatListBaseItemVM : BaseViewModel, IChatListItem
     {
         private string _ChatName;
-        private Uri _AvatarPath;
-        private string _Base64Avatar;
         private int _UnreadCount;
         private bool _CanPinToTop;
         private string _LatestMessage;
@@ -33,21 +32,6 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public Uri AvatarPath {
-            get => _AvatarPath;
-            set {
-                _AvatarPath = value;
-                RaisePropertyChanged(nameof(AvatarPath));
-            }
-        }
-
-        public string Base64Avatar {
-            get => _Base64Avatar;
-            set {
-                _Base64Avatar = value;
-                RaisePropertyChanged(nameof(Base64Avatar));
-            }
-        }
 
         public string LatestMessage {
             get => _LatestMessage;
@@ -92,23 +76,23 @@ namespace CAC.client.MessagePage
     class ChatListChatItemVM : ChatListBaseItemVM
     {
         #region private members
-        private string _UserID;
 
         private string _Draft;
         private bool _PinToTop;
         private bool _Sendfailed;
         private ChatType _ChatType;
         private NotificationType _NotificationType;
+        private ContactItemViewModel _Contact;
 
         #endregion
 
         #region properties
 
-        public string UserID {
-            get => _UserID;
+        public ContactItemViewModel Contact {
+            get => _Contact;
             set {
-                _UserID = value;
-                RaisePropertyChanged(nameof(UserID));
+                _Contact = value;
+                RaisePropertyChanged(nameof(Contact));
             }
         }
 

@@ -12,10 +12,10 @@
 
     <UserControl.Resources>
         <con:DoubleToGridLength x:Key="DoubleToGridLength"/>
-        
-        <!--<Style x:Key="SplitterButton" TargetType="Button">
-            <Setter Property="Background" Value="{ThemeResource SystemControlPageBackgroundBaseMediumBrush}"/>
-            <Setter Property="Foreground" Value="{ThemeResource SystemControlPageBackgroundBaseMediumBrush}"/>
+
+        <Style x:Key="SplitterButton" TargetType="Button">
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
+            <Setter Property="Foreground" Value="{ThemeResource SystemControlBackgroundBaseLowBrush}"/>
             <Setter Property="BorderThickness" Value="{ThemeResource ButtonBorderThemeThickness}"/>
             <Setter Property="Padding" Value="{StaticResource ButtonPadding}"/>
             <Setter Property="HorizontalAlignment" Value="Left"/>
@@ -57,7 +57,7 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>-->
+        </Style>
     </UserControl.Resources>
 
     <Grid>
@@ -67,7 +67,7 @@
             <ColumnDefinition x:Name="Detailcolumn" Width="*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
 
-        <Button x:Name="Splitter" AllowFocusOnInteraction="False" BorderThickness="0" Grid.Column="1"
+        <Button x:Name="Splitter" Style="{StaticResource SplitterButton}" AllowFocusOnInteraction="False" BorderThickness="0" Grid.Column="1"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch" 
                 PointerMoved="Splitter_PointerMoved" 
                 PointerReleased="Splitter_PointerReleased"

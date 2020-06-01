@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AngleSharp.Dom.Events;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -18,7 +19,8 @@ namespace CAC.client.MessagePage
 {
     sealed partial class CodeMessageBubble : UserControl
     {
-
+        public event EventHandler DidTapRunButton;
+        public event EventHandler DidTapEditButton;
 
         public static readonly DependencyProperty CodeProperty =
             DependencyProperty.Register("Code", typeof(string), typeof(CodeMessageBubble), new PropertyMetadata(""));
@@ -43,7 +45,7 @@ namespace CAC.client.MessagePage
 
 
         public static readonly DependencyProperty RunResultProperty =
-            DependencyProperty.Register("RunResult", typeof(string), typeof(CodeMessageBubble), new PropertyMetadata(""));
+            DependencyProperty.Register("RunResult", typeof(string), typeof(CodeMessageBubble), new PropertyMetadata(null));
         /// <summary>
         /// 运行结果
         /// </summary>
@@ -63,6 +65,16 @@ namespace CAC.client.MessagePage
         public CodeMessageBubble()
         {
             this.InitializeComponent();
+        }
+
+        private void BtnRun_Click(object sender, RoutedEventArgs e)
+        {
+            DidTapRunButton?.Invoke(this, new EventArgs());
+        }
+
+        private void BtnEdit_Click(object sender, RoutedEventArgs e)
+        {
+            DidTapEditButton?.Invoke(this, new EventArgs());
         }
     }
 }

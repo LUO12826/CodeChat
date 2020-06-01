@@ -54,7 +54,7 @@
                         </Button>
 
                         <!--头像-->
-                        <mtuc:ImageEx x:Name="Avatar" Width="50" Height="50" Source="{x:Bind Base64Avatar}"
+                        <mtuc:ImageEx x:Name="Avatar" Width="50" Height="50" Source="{x:Bind Contact.Base64Avatar, Mode=OneWay}"
                               HorizontalAlignment="Left" Style="{StaticResource RoundImageEx}"
                               VerticalAlignment="Center"
                               CornerRadius="25"
@@ -66,7 +66,7 @@
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{x:Bind ChatName}" 
+                            <TextBlock Text="{x:Bind Contact.DisplayName, Mode=OneWay}" 
                            TextTrimming="WordEllipsis"
                            HorizontalAlignment="Left" VerticalAlignment="Bottom" 
                            FontSize="15px"

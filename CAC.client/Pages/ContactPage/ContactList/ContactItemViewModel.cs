@@ -48,6 +48,7 @@ namespace CAC.client.ContactPage
             }
         }
 
+        //显示的优先级是：备注、用户名、用户ID。
         public string DisplayName {
             get {
                 string user = UserName.IsNullOrEmpty() ? UserID : UserName;

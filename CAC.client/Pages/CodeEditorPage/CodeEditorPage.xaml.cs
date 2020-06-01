@@ -17,7 +17,20 @@ namespace CAC.client.CodeEditorPage
     /// </summary>
     sealed partial class CodeEditorPage : Page
     {
-        public event Action CodeEditorPageLoaded;
+        public event Action AllSessionClosed;
+
+
+        private static CodeEditorPage _instance = null;
+
+        public static CodeEditorPage Default {
+            get {
+                if(_instance == null) {
+                    _instance = new CodeEditorPage();
+                }
+                return _instance;
+            }
+        }
+
 
         private WrappedMonacoEditor codeEditor;
 
@@ -51,8 +64,6 @@ namespace CAC.client.CodeEditorPage
             while (waitingSessions.TryDequeue(out var session)) {
 
                     handleAddSession(session);
-                
-                
             }
         }
 
@@ -62,8 +73,6 @@ namespace CAC.client.CodeEditorPage
         //如果内部的编辑器还没加载好，加入等待队列。
         public void RequestOpenSession(CodeEditSessionInfo session)
         {
-
-
             if (!innerEditorLoaded) {
                 initMonaco();
                 waitingSessions.Enqueue(session);
@@ -96,6 +105,11 @@ namespace CAC.client.CodeEditorPage
         private void editorTabView_TabCloseRequested(muxc.TabView sender, muxc.TabViewTabCloseRequestedEventArgs args)
         {
             RequestCloseSession(args.Tab.Tag as CodeEditSessionInfo);
+            //如果最后一个也关掉了。
+            if (editorTabView.TabItems.Count == 0) {
+                AllSessionClosed?.Invoke();
+                editorPresenter.Content = null;
+            }
         }
 
         //判断当前编辑器中是否有某个session。哈希值是根据用户id和消息id计算的。
@@ -120,7 +134,8 @@ namespace CAC.client.CodeEditorPage
                 editorTabView.TabItems.Add(newTab);
                 openedSessions.Add(session, newTab);
                 editorTabView.SelectedItem = newTab;
-
+                if (editorPresenter.Content == null)
+                    editorPresenter.Content = codeEditor;
             }
         }
 
