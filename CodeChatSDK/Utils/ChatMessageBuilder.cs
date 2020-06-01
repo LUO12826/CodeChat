@@ -1,13 +1,6 @@
 ﻿using CodeChatSDK.Models;
-using Newtonsoft.Json;
-using Pbx;
 using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.IO;
-using System.Threading.Tasks;
-using Windows.Media.Core;
 
 namespace CodeChatSDK.Utils
 {
@@ -28,6 +21,8 @@ namespace CodeChatSDK.Utils
             message.Text = text;
             message.Ent = new List<EntMessage>();
             message.Fmt = new List<FmtMessage>();
+
+            //设置附件信息
             message.Ent.Add(new EntMessage()
             {
                 Tp = "EX",
@@ -40,6 +35,8 @@ namespace CodeChatSDK.Utils
 
                 }
             });
+
+            //设置附件说明消息范围
             message.Fmt.Add(new FmtMessage()
             {
                 At = text.Length,
@@ -47,6 +44,7 @@ namespace CodeChatSDK.Utils
                 Key = 0,
             });
 
+            //格式转换
             if (text.Contains("\n"))
             {
                 for (int i = 0; i < text.Length; i++)
@@ -74,6 +72,8 @@ namespace CodeChatSDK.Utils
             message.Text = text;
             message.Ent = new List<EntMessage>();
             message.Fmt = new List<FmtMessage>();
+
+            //格式转换
             if (text.Contains("\r"))
             {
                 for (int i = 0; i < text.Length - 1; i++)
@@ -86,13 +86,16 @@ namespace CodeChatSDK.Utils
                 }
             }
 
+            //定位代码范围
             var leftLen = baseLen + (text.Length - text.TrimStart().Length);
             var subLen = text.Length - text.TrimEnd().Length;
             var validLen = message.Text.Length - leftLen - subLen;
 
+            //设置代码范围
             FmtMessage fmt = new FmtMessage() { Tp = "CO", At = leftLen, Len = validLen };
             message.Fmt.Add(fmt);
 
+            //附上代码类型
             message.Text += type.ToString();
 
             return message;

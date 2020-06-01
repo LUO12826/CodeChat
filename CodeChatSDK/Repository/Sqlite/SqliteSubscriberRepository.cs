@@ -8,15 +8,31 @@ using System.Threading.Tasks;
 
 namespace CodeChatSDK.Repository.Sqlite
 {
+    /// <summary>
+    /// SQLite订阅者数据表
+    /// </summary>
     class SqliteSubscriberRepository:ISubscriberRepository
     {
+        /// <summary>
+        /// 用户数据库上下文
+        /// </summary>
         private readonly AccountContext db;
 
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="context">用户数据库上下文</param>
         public SqliteSubscriberRepository(AccountContext context)
         {
             db = context;
         }
 
+        /// <summary>
+        /// 删除订阅者
+        /// </summary>
+        /// <param name="subscriber">订阅者</param>
+        /// <returns>订阅者</returns>
         public async Task DeleteSubscriber(Subscriber Subscriber)
         {
             var currentSubscriber = await db.Subscribers.FirstOrDefaultAsync(s=>s.UserId==Subscriber.UserId);
@@ -32,11 +48,20 @@ namespace CodeChatSDK.Repository.Sqlite
             }
         }
 
+        /// <summary>
+        /// 获取所有订阅者
+        /// </summary>
+        /// <returns>订阅者列表</returns>
         public async Task<IEnumerable<Subscriber>> GetAsync()
         {
             return await db.Subscribers.ToListAsync();
         }
 
+        /// <summary>
+        /// 获取符合条件的订阅者
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <returns>订阅者列表</returns>
         public async Task<IEnumerable<Subscriber>> GetAsync(string condition)
         {
             return await db.Subscribers.
@@ -45,6 +70,11 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
+        /// <summary>
+        /// 获取对应话题的订阅者
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns>订阅者列表</returns>
         public async Task<IEnumerable<Subscriber>> GetAsync(Topic topic)
         {
             return await db.Subscribers.
@@ -52,6 +82,14 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
+        /// <summary>
+        /// 获取符合条件的订阅者
+        /// </summary>
+        /// <param name="condition">搜索条件</param>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="pageSize">页面大小</param>
+        /// <param name="pageCount">页面数目</param>
+        /// <returns>订阅者列表</returns>
         public IEnumerable<Subscriber> GetSync(string condition, int pageIndex, int pageSize, ref int pageCount)
         {
             var query = db.Subscribers.
@@ -64,11 +102,11 @@ namespace CodeChatSDK.Repository.Sqlite
 
         }
 
-        public ISubscriberRepository GetRepository()
-        {
-            return new SqliteSubscriberRepository(db.GetContext());
-        }
-
+        /// <summary>
+        /// 新增或更新订阅者
+        /// </summary>
+        /// <param name="subscriber">订阅者</param>
+        /// <returns>订阅者</returns>
         public async Task<Subscriber> UpsertSubscriber(Subscriber subscriber)
         {
             var currentSubscriber = await db.Subscribers.FirstOrDefaultAsync(s => s.UserId == subscriber.UserId);
@@ -84,6 +122,15 @@ namespace CodeChatSDK.Repository.Sqlite
 
             await db.SaveChangesAsync();
             return subscriber;
+        }
+
+        /// <summary>
+        /// 获取订阅者数据表
+        /// </summary>
+        /// <returns>订阅者数据表</returns>
+        public ISubscriberRepository GetRepository()
+        {
+            return new SqliteSubscriberRepository(db.GetContext());
         }
     }
 }

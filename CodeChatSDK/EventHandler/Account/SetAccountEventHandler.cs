@@ -22,6 +22,23 @@ namespace CodeChatSDK.EventHandler
         public string UserId { get; set; }
 
         /// <summary>
+        /// 显示名称
+        /// </summary>
+
+        public string FormattedName { get; set; }
+
+        /// <summary>
+        /// 邮箱地址
+        /// </summary>
+        public string Email { get; set; }
+
+        /// <summary>
+        /// 用户头像
+        /// </summary>
+
+        public string Avatar { get; set; }
+
+        /// <summary>
         /// 标签列表
         /// </summary>
         public List<string> Tags { get; set; }

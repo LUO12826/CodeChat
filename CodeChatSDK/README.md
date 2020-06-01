@@ -436,7 +436,7 @@ else
 
 ```c#
 //置顶话题
-bool result = accountController.PinTopic(currentTopic);
+bool result = await accountController.PinTopic(currentTopic);
 
 //判断结果
 if(result == true)
@@ -456,7 +456,7 @@ else
 
 ```c#
 //取消置顶话题
-bool result = accountController.UnpinTopic(currentTopic);
+bool result = await accountController.UnpinTopic(currentTopic);
 
 //判断结果
 if(result == true)

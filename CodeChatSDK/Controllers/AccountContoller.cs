@@ -95,8 +95,12 @@ namespace CodeChatSDK.Controllers
         public async Task SetDatabase(IAccountRepository database)
         {
             db = database;
+
+            //获取控制器
             SubscriberController subscriberController = new SubscriberController(database.Subscribers);
             TopicController topicController=new TopicController(database);
+
+            //填充数据
             instance.SubscriberList = await subscriberController.GetSubscribers();
             instance.TopicList = await topicController.GetTopics();
         }
@@ -267,13 +271,19 @@ namespace CodeChatSDK.Controllers
         /// <returns>结果</returns>
         public async Task<bool> AddTopic(Topic topic)
         {
-            if (instance.TopicList.Contains(topic) || topic.Name.Equals("me"))
+            if (instance.TopicList.Contains(topic) || topic.Name.Equals("me") || topic.Name.Equals("fnd"))
             {
                 return false;
             }
 
+            //话题列表更新
             instance.TopicList.Add(topic);
-            await db.Topics.UpsertTopic(topic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(topic);
+            topicController.UpsertTopic();
+
             return true;
         }
 
@@ -291,9 +301,19 @@ namespace CodeChatSDK.Controllers
 
             Topic topic = instance.TopicList[position];
             topic.IsArchived = true;
-            await db.Topics.UpsertTopic(topic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(topic);
+            topicController.DeleteTopic();
+            
+            //话题列表更新
             instance.TopicList.Remove(topic);
+
+
+            //服务器更新
             client.RemoveTopic(topic);
+
             return true;
         }
 
@@ -311,9 +331,19 @@ namespace CodeChatSDK.Controllers
 
             instance.TopicList.Remove(topic);
             topic.IsArchived = true;
-            await db.Topics.UpsertTopic(topic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(topic);
+            topicController.UpsertTopic();
+
+            //话题列表更新
             instance.TopicList.Remove(topic);
+
+            //服务器更新
             client.RemoveTopic(topic);
+
+
             return true;
         }
 
@@ -322,16 +352,23 @@ namespace CodeChatSDK.Controllers
         /// </summary>
         /// <param name="topic">话题</param>
         /// <returns></returns>
-        public bool MoveTopic(Topic topic)
+        public async Task<bool> MoveTopic(Topic topic)
         {
             if (!instance.TopicList.Contains(topic))
             {
                 return false;
             }
+
+            //话题列表更新
             int oldPosition = instance.TopicList.IndexOf(topic);
             instance.TopicList.RemoveAt(oldPosition);
             instance.TopicList.Insert(0, topic);
-            db.Topics.UpsertTopic(topic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(topic);
+            topicController.UpsertTopic();
+
             return true;
         }
 
@@ -340,17 +377,24 @@ namespace CodeChatSDK.Controllers
         /// </summary>
         /// <param name="topic">话题</param>
         /// <returns>结果</returns>
-        public bool PinTopic(Topic topic)
+        public async Task<bool> PinTopic(Topic topic)
         {
             if (!instance.TopicList.Contains(topic) || topic.Weight > 0)
             {
                 return false;
             }
+
+            //话题列表更新
             int oldPosition = instance.TopicList.IndexOf(topic);
             topic.Weight = instance.TopicList[0].Weight + 1;
             instance.TopicList.RemoveAt(oldPosition);
             instance.TopicList.Insert(0, topic);
-            db.Topics.UpsertTopic(topic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(topic);
+            topicController.UpsertTopic();
+
             return true;
         }
 
@@ -359,14 +403,21 @@ namespace CodeChatSDK.Controllers
         /// </summary>
         /// <param name="topic">话题</param>
         /// <returns>结果</returns>
-        public bool UnpinTopic(Topic topic)
+        public async Task<bool> UnpinTopic(Topic topic)
         {
             if (!instance.TopicList.Contains(topic) || topic.Weight == 0)
             {
                 return false;
             }
+
+            //权重置为0
             topic.Weight = 0;
-            db.Topics.UpsertTopic(topic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(topic);
+            topicController.UpsertTopic();
+
             return true;
         }
 
@@ -404,16 +455,11 @@ namespace CodeChatSDK.Controllers
         /// <returns>结果</returns>
         public async Task<bool> AddSubscriber(Subscriber subscriber,bool isTemporary=false)
         {
-            if (instance.SubscriberList.Contains(subscriber) || subscriber.TopicName == "fnd")
+            if (instance.SubscriberList.Contains(subscriber) || subscriber.TopicName == "fnd" || subscriber.TopicName == "me")
             {
                 return false;
             }
-            if (subscriber.TopicName == "me")
-            {
-                instance.FormattedName = subscriber.Username;
-                instance.Avatar = subscriber.PhotoData;
-                return true;
-            }
+
             if (isTemporary == true)
             {
                 if (searchSubscriberResult.Contains(subscriber))
@@ -425,11 +471,24 @@ namespace CodeChatSDK.Controllers
             }
 
             Topic newTopic = new Topic(subscriber.TopicName);
-            instance.TopicList.Add(newTopic);
-            await db.Topics.UpsertTopic(newTopic);
-            instance.SubscriberList.Add(subscriber);
-            await db.Subscribers.UpsertSubscriber(subscriber);
 
+            //话题列表更新
+            instance.TopicList.Add(newTopic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(newTopic);
+            topicController.UpsertTopic();
+
+            //订阅者列表更新
+            instance.SubscriberList.Add(subscriber);
+
+            //数据库更新
+            SubscriberController subscriberController = new SubscriberController(db.Subscribers);
+            subscriberController.SetSubscriber(subscriber);
+            subscriberController.UpsertSubscriber();
+            
+            //服务器更新
             client.SubscribeTopic(newTopic);
             return true;
         }
@@ -447,10 +506,22 @@ namespace CodeChatSDK.Controllers
             }
 
             Topic removedTopic = GetTopicByName(subscriber.TopicName);
+
+            //订阅者列表更新
             instance.SubscriberList.Remove(subscriber);
-            await db.Subscribers.DeleteSubscriber(subscriber);
+
+            //数据库更新
+            SubscriberController subscriberController = new SubscriberController(db.Subscribers);
+            subscriberController.SetSubscriber(subscriber);
+            subscriberController.DeleteSubscriber();
+
+            //话题列表更新
             instance.TopicList.Remove(removedTopic);
-            await db.Topics.DeleteTopic(removedTopic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(removedTopic);
+            topicController.DeleteTopic();
 
             return true;
         }
@@ -469,10 +540,22 @@ namespace CodeChatSDK.Controllers
 
             Subscriber subscriber = instance.SubscriberList[position];
             Topic removedTopic = GetTopicByName(subscriber.TopicName);
+
+            //订阅者列表更新
             instance.SubscriberList.Remove(subscriber);
-            await db.Subscribers.DeleteSubscriber(subscriber);
+
+            //数据库更新
+            SubscriberController subscriberController = new SubscriberController(db.Subscribers);
+            subscriberController.SetSubscriber(subscriber);
+            subscriberController.DeleteSubscriber();
+
+            //话题列表更新
             instance.TopicList.Remove(removedTopic);
-            await db.Topics.DeleteTopic(removedTopic);
+
+            //数据库更新
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(removedTopic);
+            topicController.DeleteTopic();
 
             return true;
         }
@@ -589,15 +672,30 @@ namespace CodeChatSDK.Controllers
         /// <param name="args">设置用户信息参数</param>
         private void SetAccountInformation(object sender, SetAccountEventArgs args)
         {
-            if (args.UserId != null)
+            if (string.IsNullOrEmpty(args.UserId)==false)
             {
                 //设置用户信息
                 instance.UserId = args.UserId;
             }
-            else
+            if(args.Tags!=null && args.Tags.Count != 0)
             {
                 //设置用户标签
                 instance.Tags = args.Tags;
+            }
+            if(string.IsNullOrEmpty(args.FormattedName)==false)
+            {
+                //设置用户显示名称
+                instance.FormattedName = args.FormattedName;
+            }
+            if (string.IsNullOrEmpty(args.Avatar)==false)
+            {
+                //设置用户头像
+                instance.Avatar = args.Avatar;
+            }
+            if (string.IsNullOrEmpty(args.Email) == false)
+            {
+                //设置邮箱地址
+                instance.Email = args.Email;
             }
 
         }
@@ -633,7 +731,7 @@ namespace CodeChatSDK.Controllers
         {
             Topic currentTopic = GetTopicByName(args.TopicName);
             //移动话题位置
-            MoveTopic(currentTopic);
+            await MoveTopic(currentTopic);
 
             TopicController topicController = await GetTopicController(currentTopic);
             //调用对应话题添加消息方法

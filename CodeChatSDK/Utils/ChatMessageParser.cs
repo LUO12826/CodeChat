@@ -20,8 +20,11 @@ namespace CodeChatSDK.Utils
         public static ChatMessage Parse(ServerData message)
         {
             ChatMessage chatMsg;
+
+            //判断是否为普通文本消息
             if (message.Head.ContainsKey("mime"))
             {
+                //服务器解析为聊天消息
                 chatMsg = JsonConvert.DeserializeObject<ChatMessage>(message.Content.ToStringUtf8()
                         , new JsonSerializerSettings()
                         {
@@ -30,6 +33,7 @@ namespace CodeChatSDK.Utils
                 chatMsg.Content = message.Content.ToStringUtf8();
                 chatMsg.SeqId = message.SeqId;
                 chatMsg.TopicName = message.Topic;
+                chatMsg.From = message.FromUserId;
                 chatMsg.IsPlainText = false;
                 if(ParseGenericAttachment(chatMsg).Count != 0)
                 {
@@ -44,10 +48,12 @@ namespace CodeChatSDK.Utils
             }
             else
             {
+                //服务器消息解析为聊天消息
                 chatMsg = new ChatMessage() { Text = JsonConvert.DeserializeObject<string>(message.Content.ToStringUtf8()) };
                 chatMsg.Content = message.Content.ToStringUtf8();
                 chatMsg.SeqId = message.SeqId;
                 chatMsg.TopicName = message.Topic;
+                chatMsg.From = message.FromUserId;
                 chatMsg.IsPlainText = true;
             }
 
@@ -68,17 +74,21 @@ namespace CodeChatSDK.Utils
         /// <param name="message">消息</param>
         public static void ParseContent(ChatMessage message)
         {
+            //判断内容是否为空
             if (message.Content == null)
             {
                 return;
             }
 
+            //判断是否为普通文本消息
             if (message.IsPlainText == true)
             {
+                //解析内容为聊天消息
                 message.Text = JsonConvert.DeserializeObject<string>(message.Content);
             }
             else
             {
+                //解析内容为聊天消息
                 var chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message.Content
                         , new JsonSerializerSettings()
                         {
@@ -96,14 +106,17 @@ namespace CodeChatSDK.Utils
         /// <param name="message">消息</param>
         public static void ParseCode(ChatMessage message)
         {
+            //判断是否为空文本
             if (message.Text == null || message.Fmt == null)
             {
                 return;
             }
+
             foreach (var fmt in message.Fmt)
             {
                 if (!string.IsNullOrEmpty(fmt.Tp))
                 {
+                    //解析代码内容及代码类型
                     if (fmt.Tp == "CO")
                     {
                         string code = message.Text.Substring(fmt.At.Value, fmt.Len.Value);
@@ -129,6 +142,7 @@ namespace CodeChatSDK.Utils
             List<EntData> attachments = ParseGenericAttachment(message);
             foreach (EntData attachment in attachments)
             {
+                //进行URL拼接
                 string url = baseurl + attachment.Ref;
                 urls.Add(url);
             }

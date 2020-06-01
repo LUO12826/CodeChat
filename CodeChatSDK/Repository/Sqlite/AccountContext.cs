@@ -52,6 +52,10 @@ namespace CodeChatSDK.Repository.Sqlite
         /// </summary>
         public DbSet<ChatMessage> Messages { get; set; }
 
+        /// <summary>
+        /// 获取用户数据库上下文
+        /// </summary>
+        /// <returns></returns>
         public AccountContext GetContext()
         {
             return new AccountContext(path);

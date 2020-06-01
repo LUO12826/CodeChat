@@ -9,15 +9,31 @@ using Windows.UI.Xaml.Controls;
 
 namespace CodeChatSDK.Repository.Sqlite
 {
+    /// <summary>
+    /// SQLite话题数据表
+    /// </summary>
     public class SqliteTopicRepository : ITopicRepository
     {
+        /// <summary>
+        /// 用户数据库上下文
+        /// </summary>
         private readonly AccountContext db;
 
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="context">用户数据库上下文</param>
         public SqliteTopicRepository(AccountContext context)
         {
             db = context;
         }
 
+        /// <summary>
+        /// 删除话题
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns>话题</returns>
         public async Task DeleteTopic(Topic topic)
         {
             var currentTopic = await db.Topics.FirstOrDefaultAsync(t => t.Name == topic.Name);
@@ -29,6 +45,10 @@ namespace CodeChatSDK.Repository.Sqlite
             }
         }
 
+        /// <summary>
+        /// 获取所有话题
+        /// </summary>
+        /// <returns>话题列表</returns>
         public async Task<IEnumerable<Topic>> GetAsync()
         {
             return await db.Topics.
@@ -38,6 +58,11 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
+        /// <summary>
+        /// 获取符合条件的话题
+        /// </summary>
+        /// <param name="condition">条件</param>
+        /// <returns>话题列表</returns>
         public async Task<IEnumerable<Topic>> GetAsync(string condition)
         {
             return await db.Topics.
@@ -48,6 +73,14 @@ namespace CodeChatSDK.Repository.Sqlite
                             ToListAsync();
         }
 
+        /// <summary>
+        /// 获取符合条件的话题分页加载
+        /// </summary>
+        /// <param name="condition">搜索条件</param>
+        /// <param name="pageIndex">页码</param>
+        /// <param name="pageSize">页面大小</param>
+        /// <param name="pageCount">页面数目</param>
+        /// <returns>话题列表</returns>
         public IEnumerable<Topic> GetSync(string condition, int pageIndex, int pageSize, ref int pageCount)
         {
             var query = db.Topics.
@@ -62,11 +95,11 @@ namespace CodeChatSDK.Repository.Sqlite
 
         }
 
-        public ITopicRepository GetRepository()
-        {
-            return new SqliteTopicRepository(db.GetContext());
-        }
-
+        /// <summary>
+        /// 新增或更新话题
+        /// </summary>
+        /// <param name="topic">话题</param>
+        /// <returns>话题</returns>
         public async Task<Topic> UpsertTopic(Topic topic)
         {
             var currentTopic = await db.Topics.FirstOrDefaultAsync(t => t.Name == topic.Name);
@@ -82,6 +115,15 @@ namespace CodeChatSDK.Repository.Sqlite
 
             await db.SaveChangesAsync();
             return topic;
+        }
+
+        /// <summary>
+        /// 获取订阅者数据表
+        /// </summary>
+        /// <returns>订阅者数据表</returns>
+        public ITopicRepository GetRepository()
+        {
+            return new SqliteTopicRepository(db.GetContext());
         }
     }
 }

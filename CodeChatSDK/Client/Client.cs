@@ -238,7 +238,7 @@ namespace CodeChatSDK
             {
                 ClientMessageLoop();
             }
-            catch (Exception e)
+            catch
             {
                 Thread.Sleep(2000);
                 Reset();
@@ -704,21 +704,26 @@ namespace CodeChatSDK
              {
                  while (!cancellationTokenSource.IsCancellationRequested)
                  {
+                     //判断待发送队列是否为空
                      if (sendMessageQueue.Count > 0)
                      {
+                         //消息出队
                          ClientMsg message = sendMessageQueue.Dequeue();
                          try
                          {
+                             //发送消息
                              await stream.RequestStream.WriteAsync(message);
                          }
                          catch (Exception e)
                          {
+                             //发送失败消息入队以便再次发送
                              sendMessageQueue.Enqueue(message);
                              Thread.Sleep(1000);
                          }
                      }
                      else
                      {
+                         //无消息等待
                          Thread.Sleep(100);
                      }
                  }
@@ -737,6 +742,7 @@ namespace CodeChatSDK
                   {
                       try
                       {
+                          //判断是否接收到消息
                           if (!await stream.ResponseStream.MoveNext())
                           {
                               Thread.Sleep(100);
@@ -746,29 +752,31 @@ namespace CodeChatSDK
                               ServerMsg response = stream.ResponseStream.Current;
                               if (response.Ctrl != null)
                               {
+                                  //回调消息
                                   ExecuteCallback(response.Ctrl.Id, response.Ctrl.Code, response.Ctrl.Text, response.Ctrl.Topic, response.Ctrl.Params);
                               }
                               else if (response.Data != null)
                               {
-                                  Thread.Sleep(100);
+                                  //聊天消息
                                   ChatMessage replyMessage = ChatMessageParser.Parse(response.Data.Clone());
                                   AddMessageEvent(this, new AddMessageEventArgs() { TopicName = response.Data.Topic, Message = replyMessage });
                               }
                               else if (response.Pres != null)
                               {
+                                  //状态变化消息
                                   ClientPost(Subscribe(new Topic(response.Pres.Src)));
 
                                   if ((response.Pres.What == ServerPres.Types.What.On))
                                   {
-                                      
-                                      SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = true });
                                       ClientPost(Subscribe(new Topic(response.Pres.Topic)));
+                                      SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = true });
+                                      
                                   }
                                   else if (response.Pres.What == ServerPres.Types.What.Off)
                                   {
-
-                                      SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = false });
                                       ClientPost(Leave(new Topic(response.Pres.Topic)));
+                                      SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = false });
+                                      
                                   }
                                   else
                                   {
@@ -777,17 +785,20 @@ namespace CodeChatSDK
                               }
                               else if (response.Meta != null && response.Meta.Topic == "me")
                               {
+                                  //数据消息
                                   OnGetMeMeta(response.Meta);
                               }
                               else if (response.Meta != null && response.Meta.Topic == "fnd")
                               {
+                                  //数据消息
                                   OnGetFindMeta(response.Meta);
                               }
                           }
                       }
                       catch(Exception e)
                       {
-
+                          DisconnectedEvent(this, new DisconnectedEventArgs() { Exception = e });
+                          Thread.Sleep(100);
                       }
                   }
               }, cancellationTokenSource.Token);
@@ -925,12 +936,14 @@ namespace CodeChatSDK
             if (paramaters.ContainsKey("user"))
             {
                 string userId = paramaters["user"].ToString(Encoding.ASCII);
+
+                //设置用户ID
                 SetAccountEvent?.Invoke(this, new SetAccountEventArgs() { UserId = userId });
             }
 
-            Topic me = new Topic("me");
+            ClientPost(GetTags(new Topic("me")));
 
-            ClientPost(GetTags(me));
+            //获取话题列表
             ClientPost(GetMeSubs());
 
             //保存令牌供上传使用
@@ -944,6 +957,7 @@ namespace CodeChatSDK
         /// <param name="meta">元数据</param>
         private void OnGetMeMeta(ServerMeta meta)
         {
+            //判断订阅者数据是否为空
             if (meta.Sub != null && meta.Sub.Count != 0)
             {
                 foreach (var sub in meta.Sub)
@@ -956,6 +970,7 @@ namespace CodeChatSDK
                     var privateInfo = sub.Private.ToStringUtf8();
                     var privateObject = JsonConvert.DeserializeObject<JObject>(privateInfo);
 
+                    //话题信息填充
                     topic.Updated = sub.UpdatedAt;
                     topic.Read = sub.ReadId;
                     topic.Recieve = sub.RecvId;
@@ -981,6 +996,7 @@ namespace CodeChatSDK
 
                     }
 
+                    //订阅者信息填充
                     subscriber.UserId = sub.Topic;
                     subscriber.Online = sub.Online;
                     subscriber.TopicName = sub.Topic;
@@ -1001,17 +1017,60 @@ namespace CodeChatSDK
 
                     topic.SubsriberList.Add(subscriber);
 
+                    //添加话题
                     AddTopicEvent?.Invoke(this, new AddTopicEventArgs() { Topic = topic });
 
+                    //添加订阅者
                     AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber, isTemporary = false });
 
                 }
             }
 
+            //判断标签数据是否为空
             if (meta.Tags != null && meta.Tags.Count != 0)
             {
                 List<string> tags = meta.Tags.ToList();
+
+                //设置用户标签
                 SetAccountEvent(this, new SetAccountEventArgs() { Tags = tags });
+            }
+
+            //判断说明数据是否为空
+            if (meta.Desc != null)
+            {
+                TopicDesc desc = meta.Desc;
+                var publicInfo = desc.Public.ToStringUtf8();
+                var publicObject = JsonConvert.DeserializeObject<JObject>(publicInfo);
+
+                if (publicObject != null)
+                {
+                    string formattedName = publicObject["fn"].ToString();
+                    string avatar = string.Empty;
+                    if (publicObject.ContainsKey("photo"))
+                    {
+                        avatar = publicObject["photo"]["data"].ToString();
+                    }
+
+                    //设置用户显示名称及头像
+                    SetAccountEvent(this, new SetAccountEventArgs() { FormattedName = formattedName, Avatar = avatar });
+                }
+            }
+
+            //判断验证数据是否为空
+            if (meta.Cred != null)
+            {
+                RepeatedField<ServerCred> creds = meta.Cred;
+                foreach(ServerCred cred in creds)
+                {
+                    if (cred.Method.Equals("email"))
+                    {
+                        string email = cred.Value;
+
+                        //设置用户验证邮箱地址
+                        SetAccountEvent(this, new SetAccountEventArgs() { Email = email });
+                    }
+                    
+                }
             }
         }
 
@@ -1021,6 +1080,7 @@ namespace CodeChatSDK
         /// <param name="meta">元数据</param>
         private void OnGetFindMeta(ServerMeta meta)
         {
+            //判断订阅者数据是否为空
             if (meta.Sub != null && meta.Sub.Count != 0)
             {
                 foreach (var sub in meta.Sub)
@@ -1030,6 +1090,7 @@ namespace CodeChatSDK
                     var publicInfo = sub.Public.ToStringUtf8();
                     var publicObject = JsonConvert.DeserializeObject<JObject>(publicInfo);
 
+                    //填充订阅者信息
                     subscriber.UserId = sub.UserId;
                     subscriber.TopicName = sub.UserId;
                     subscriber.Username = sub.UserId;
@@ -1047,6 +1108,7 @@ namespace CodeChatSDK
                         }
                     }
 
+                    //添加订阅者
                     AddSubscriberEvent?.Invoke(this, new AddSubscriberEventArgs() { Subscriber = subscriber, isTemporary = true });
                 }
             }
@@ -1171,7 +1233,7 @@ namespace CodeChatSDK
             var id = GetNextId();
             AddCallback(id, new Callback(id, CallbackType.Get, null, "me"));
 
-            return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = "me", Query = new GetQuery() { What = "sub" } } };
+            return new ClientMsg() { Get = new ClientGet() { Id = id, Topic = "me", Query = new GetQuery() { What = "sub desc tags cred" } } };
         }
 
         private ClientMsg GetFindSubs()

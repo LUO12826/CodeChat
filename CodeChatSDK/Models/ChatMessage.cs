@@ -23,6 +23,12 @@ namespace CodeChatSDK.Models
         public string TopicName { get; set; }
 
         /// <summary>
+        /// 消息来自
+        /// </summary>
+        [JsonIgnore]
+        public string From { get; set; }
+
+        /// <summary>
         /// 消息文本
         /// </summary>
         [NotMapped]
