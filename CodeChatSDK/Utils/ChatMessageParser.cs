@@ -91,8 +91,24 @@ namespace CodeChatSDK.Utils
             //判断是否为普通文本消息
             if (message.IsPlainText == true)
             {
-                //解析内容为聊天消息
-                message.Text = JsonConvert.DeserializeObject<string>(message.Content);
+                try
+                {
+                    //解析内容为聊天消息
+                    message.Text = JsonConvert.DeserializeObject<string>(message.Content);
+                }
+                catch
+                {
+                    //解析内容为聊天消息
+                    var chatMessage = JsonConvert.DeserializeObject<ChatMessage>(message.Content
+                        , new JsonSerializerSettings()
+                        {
+                            NullValueHandling = NullValueHandling.Ignore
+                        });
+                    message.Ent = chatMessage.Ent;
+                    message.Fmt = chatMessage.Fmt;
+                    message.Text = chatMessage.Text;
+                }
+                
             }
             else
             {
