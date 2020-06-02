@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Toolkit.Uwp.Helpers;
+using System;
 
 namespace CAC.client.Common
 {
@@ -7,7 +8,7 @@ namespace CAC.client.Common
     /// </summary>
     public static class Extensions
     {
-
+        
         public static bool IsNullOrEmpty(this string a)
         {
             return a == null || a == "";
@@ -50,6 +51,7 @@ namespace CAC.client.Common
         {
             return a.ToUniversalTime() - new DateTime(1970, 1, 1, 0, 0, 0);
         }
+
 
         /// <summary>
         /// 将时间简单转化为便于阅读的时间
@@ -107,7 +109,7 @@ namespace CAC.client.Common
 
             //如果这个时间晚于当前的时间。目前没有仔细考虑这样的情况。
             if (dateTime >= nowTime) {
-                return dateTime.ToString("YYYY/M/d");
+                return dateTime.ToString("yyyy/M/d");
             }
             //如果时间和当前时间是同一天
             if (dateTime.IsSameDay(nowTime)) {
@@ -129,7 +131,7 @@ namespace CAC.client.Common
             else if (dateTime.Year == nowTime.Year) {
                 return dateTime.ToString("M/d");
             }
-            return dateTime.ToString("YYYY/M/d");
+            return dateTime.ToString("yyyy/M/d");
         }
 
         /// <summary>
@@ -141,7 +143,7 @@ namespace CAC.client.Common
 
             //如果这个时间晚于当前的时间。目前没有仔细考虑这样的情况。
             if (dateTime >= nowTime) {
-                return dateTime.ToString("YYYY/M/d H:mm");
+                return dateTime.ToString("yyyy/M/d H:mm");
             }
             //如果时间和当前时间是同一天
             if (dateTime.IsSameDay(nowTime)) {
@@ -159,7 +161,7 @@ namespace CAC.client.Common
             else if (dateTime.Year == nowTime.Year) {
                 return dateTime.ToString("M/d") + dateTime.ToString("H:mm");
             }
-            return dateTime.ToString("YYYY/M/d H:mm");
+            return dateTime.ToString("yyyy/M/d H:mm");
         }
     }
 }

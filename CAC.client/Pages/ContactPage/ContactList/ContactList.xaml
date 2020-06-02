@@ -11,7 +11,7 @@
     d:DesignWidth="400">
 
     <UserControl.Resources>
-        <CollectionViewSource x:Name="contactListDataSource" IsSourceGrouped="True" Source="{x:Bind VM.Contacts}" ItemsPath="Contacts"/>
+        <CollectionViewSource x:Name="contactListDataSource" IsSourceGrouped="True" Source="{x:Bind VM.ContactGroup, Mode=OneWay}" ItemsPath="Contacts"/>
         
         <!--列表中的联系人项。与之同级别的还有群组项（虽然现在不一定有）-->
         <DataTemplate x:Key="ContactListContactTemplate" x:DataType="local:ContactItemViewModel">
@@ -51,17 +51,6 @@
             </Grid>
         </DataTemplate>
         
-        <!--树状图列表中的分组标题,已废弃-->
-        <DataTemplate x:Key="ContactListGroupHeaderTemplate" x:DataType="local:ContactGroupViewModel">
-            <TreeViewItem ItemsSource="{x:Bind Contacts, Mode=OneWay}" IsExpanded="True" Content="{x:Bind GroupName}">
-
-                <!--<TextBlock Text="{x:Bind GroupName, Mode=OneWay}" 
-                           TextTrimming="WordEllipsis"
-                           HorizontalAlignment="Left" VerticalAlignment="Bottom" 
-                           FontSize="16"
-                           Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}"/>-->
-            </TreeViewItem>
-        </DataTemplate>
 
         <!--列表中的群组项-->
         <DataTemplate x:Key="ContactListGroupChatTemplate">
@@ -70,8 +59,7 @@
         <!--模板选择器-->
         <local:ContactListItemTemplateSelector x:Key="ContactListItemTemplateSelector"
                                                ContactListContactTemplate="{StaticResource ContactListContactTemplate}"
-                                               ContactListGroupChatTemplate="{StaticResource ContactListGroupChatTemplate}"
-                                               ContactListGroupHeaderTemplate="{StaticResource ContactListGroupHeaderTemplate}"/>
+                                               ContactListGroupChatTemplate="{StaticResource ContactListGroupChatTemplate}"/>
     </UserControl.Resources>
 
     <Grid>

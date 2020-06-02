@@ -6,6 +6,7 @@ using Windows.UI.Xaml.Input;
 using CAC.client.Common;
 using RichTextControls;
 using CAC.client;
+using System.Diagnostics;
 
 namespace CAC.client.CustomControls
 {
@@ -36,8 +37,11 @@ namespace CAC.client.CustomControls
 
         private void sendButton_Tapped(object sender, TappedRoutedEventArgs e)
         {
+            editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
             if (!Code.IsNullOrEmpty()) {
                 DidSendCode?.Invoke(editor.CodeLanguage, Code);
+                Debug.WriteLine(editor.CodeLanguage);
+                Debug.WriteLine(Code);
             }
         }
 

@@ -21,6 +21,7 @@ namespace CAC.client.ContactPage
         private string _Base64Avatar;
         private string _Email;
         private string _Address;
+        private bool _IsOnline;
 
         public string UserID {
             get => _UserID;
@@ -70,11 +71,20 @@ namespace CAC.client.ContactPage
                 RaisePropertyChanged(nameof(Email));
             }
         }
+
         public string Address {
             get => _Address;
             set {
                 _Address = value;
                 RaisePropertyChanged(nameof(Address));
+            }
+        }
+
+        public bool IsOnline {
+            get => _IsOnline;
+            set {
+                _IsOnline = value;
+                RaisePropertyChanged(nameof(IsOnline));
             }
         }
     }

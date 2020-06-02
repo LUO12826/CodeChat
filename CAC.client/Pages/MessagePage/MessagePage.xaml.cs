@@ -18,6 +18,7 @@ namespace CAC.client.MessagePage
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            MessagePageViewModel.OnNavigateTo();
         }
     }
 

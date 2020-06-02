@@ -10,6 +10,7 @@ using System.IO;
 using Windows.UI.Xaml.Documents;
 using Windows.UI.Text;
 using Windows.UI.Xaml.Media;
+using Windows.Storage;
 
 namespace CAC.client.CustomControls
 {
@@ -73,14 +74,14 @@ namespace CAC.client.CustomControls
 
         private void sendText()
         {
-            TextInputBox.TextDocument.GetText(Windows.UI.Text.TextGetOptions.None, out string text);
+            TextInputBox.TextDocument.GetText(Windows.UI.Text.TextGetOptions.UseLf, out string text);
             if (text.IsNullOrEmpty()) {
                 return;
             }
             var arg = new SentContentEventArgs() {
                 Type = MessageType.text,
                 Language = null,
-                Content = text
+                Content = text.Trim()
             };
             DidSentContent?.Invoke(this, arg);
             TextInputBox.TextDocument.SetText(Windows.UI.Text.TextSetOptions.None, "");
@@ -98,10 +99,17 @@ namespace CAC.client.CustomControls
             var file = await picker.PickSingleFileAsync();
 
             if (file != null) {
+
+                var prop = await file.GetBasicPropertiesAsync();
+                if (prop.Size > GlobalConfigs.MaxUploadFileSize) {
+                    showFileTooLarge();
+                    return;
+                }
+
                 var arg = new SentContentEventArgs() {
                     Type = MessageType.image,
                     Language = null,
-                    Content = file.Path
+                    File = file
                 };
                 DidSentContent?.Invoke(this, arg);
             }
@@ -118,10 +126,17 @@ namespace CAC.client.CustomControls
             var file = await picker.PickSingleFileAsync();
 
             if (file != null) {
+
+                var prop = await file.GetBasicPropertiesAsync();
+                if(prop.Size > GlobalConfigs.MaxUploadFileSize) {
+                    showFileTooLarge();
+                    return;
+                }
+
                 var arg = new SentContentEventArgs() {
                     Type = MessageType.file,
                     Language = null,
-                    Content = file.Path
+                    File = file
                 };
                 DidSentContent?.Invoke(this, arg);
             }
@@ -142,6 +157,13 @@ namespace CAC.client.CustomControls
             sendCodeButton.Flyout.Hide();
 
         }
+
+        private async void showFileTooLarge()
+        {
+            var msgDialog = new Windows.UI.Popups.MessageDialog("当前仅支持上传小于10MB的文件。") { Title = "文件过大" };
+            msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定"));
+            await msgDialog.ShowAsync();
+        }
     }
 
     class SentContentEventArgs : EventArgs
@@ -149,5 +171,6 @@ namespace CAC.client.CustomControls
         public MessageType Type { get; set; }
         public string Language { get; set; }
         public string Content { get; set; }
+        public StorageFile File { get; set; }
     }
 }

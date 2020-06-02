@@ -16,7 +16,7 @@
             <RowDefinition Height="40"/>
             
         </Grid.RowDefinitions>
-        <monaco:CodeEditor x:Name="editor" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <monaco:CodeEditor x:Name="editor" Text="{x:Bind Code, Mode=TwoWay}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         
         <ComboBox x:Name="languageOptionBox" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120" Background="Transparent"
                   SelectionChanged="languageOptionBox_SelectionChanged" ItemsSource="{x:Bind LanguageOptions}"/>

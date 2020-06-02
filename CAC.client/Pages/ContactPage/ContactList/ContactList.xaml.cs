@@ -6,14 +6,11 @@ namespace CAC.client.ContactPage
 {
     sealed partial class ContactList : UserControl
     {
-        public ContactListViewModel VM;
+        public ContactListViewModel VM = new ContactListViewModel();
 
         public ContactList()
         {
             this.InitializeComponent();
-            VM = new ContactListViewModel();
-
-            contactListView.SelectedItem = null;
         }
 
         private void contactListView_ItemClick(object sender, ItemClickEventArgs e)
