@@ -90,7 +90,6 @@ namespace CodeChatSDK.Repository.Sqlite
                             OrderByDescending(t => t.LastUsed);
 
             pageCount = query.Count() % pageSize == 0 ? (query.Count() / pageSize) : (query.Count() / pageSize) + 1;
-                            ;
             return query.Skip(pageIndex-1).Take(pageSize).ToList();
 
         }

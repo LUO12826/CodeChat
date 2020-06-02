@@ -1105,8 +1105,8 @@ namespace CodeChatSDK
                         subscriber.Username = publicObject["fn"].ToString();
                         if (publicObject.ContainsKey("photo"))
                         {
-                            subscriber.PhotoData = publicObject["photo"]["data"].ToString();
                             subscriber.PhotoType = publicObject["photo"]["type"].ToString();
+                            subscriber.PhotoData = $"data:image/{subscriber.PhotoType};base64,{ publicObject["photo"]["data"]}";
                         }
                     }
 

@@ -45,7 +45,9 @@ namespace CodeChatSDK.Controllers
         {
             instance = topic;
             MessageController messageController = new MessageController(db.Messages);
+            SubscriberController subscriberController = new SubscriberController(db.Subscribers);
             instance.MessageList = await messageController.GetMessages(instance,instance.Limit);
+            instance.SubsriberList = await subscriberController.GetSubscribers(instance);
         }
         
         /// <summary>
