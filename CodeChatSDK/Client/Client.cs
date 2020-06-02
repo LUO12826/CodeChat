@@ -1010,8 +1010,9 @@ namespace CodeChatSDK
                         subscriber.Username = publicObject["fn"].ToString();
                         if (publicObject.ContainsKey("photo"))
                         {
-                            subscriber.PhotoData = publicObject["photo"]["data"].ToString();
+                            
                             subscriber.PhotoType = publicObject["photo"]["type"].ToString();
+                            subscriber.PhotoData = $"data:image/{subscriber.PhotoType};base64,{ publicObject["photo"]["data"]}";
                         }
                     }
 
@@ -1048,7 +1049,8 @@ namespace CodeChatSDK
                     string avatar = string.Empty;
                     if (publicObject.ContainsKey("photo"))
                     {
-                        avatar = publicObject["photo"]["data"].ToString();
+                        string avatarType = publicObject["photo"]["type"].ToString();
+                        avatar = $"data:image/{avatarType};base64,{ publicObject["photo"]["data"]}";
                     }
 
                     //设置用户显示名称及头像
