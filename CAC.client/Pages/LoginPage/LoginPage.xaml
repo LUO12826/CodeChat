@@ -536,7 +536,6 @@
             </Grid>
 
             <Button x:Name="loginButton" Margin="0 10 0 0" Width="250" Height="44" Content="登录" HorizontalAlignment="Center"/>
-            <Button x:Name="temp" Click="temp_Click"/>
         </StackPanel>
     </Grid>
 </Page>

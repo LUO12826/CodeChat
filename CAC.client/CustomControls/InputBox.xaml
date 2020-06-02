@@ -207,7 +207,7 @@
                     VerticalAlignment="Stretch" Width="40">
                 <Button.Flyout>
                     <Flyout>
-                        <cc:SendCodePanel MinHeight="300" MinWidth="300" Width="400"/>
+                        <cc:SendCodePanel MinHeight="300" MinWidth="300" Width="400" DidSendCode="SendCodePanel_DidSendCode"/>
                     </Flyout>
                 </Button.Flyout>
                 <FontIcon FontFamily="{StaticResource CAC-1}" Glyph="E"/>
@@ -221,6 +221,5 @@
                 HorizontalAlignment="Right" Height="40" Width="40" Tapped="sendButton_Tapped">
             <FontIcon FontFamily="{StaticResource CAC-1}" Glyph="A"/>
         </Button>
-                
     </Grid>
 </UserControl>

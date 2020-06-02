@@ -37,7 +37,7 @@ namespace CAC.client.ContactPage
 
         public void DidSelectContact(ContactBaseViewModel contactItem)
         {
-            Messenger.Default.Send(contactItem, "RequireOpenContactToken");
+            Messenger.Default.Send(contactItem, "RequestOpenContactToken");
         }
     }
 }

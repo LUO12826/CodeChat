@@ -15,13 +15,7 @@ namespace CAC.client.CustomControls
         public event PropertyChangedEventHandler PropertyChanged;
         private string _Code;
 
-        private IEnumerable<HighlightLanguage> LanguageOptions {
-            get {
-                foreach (var lang in Enum.GetValues(typeof(HighlightLanguage))) {
-                    yield return (HighlightLanguage)lang;
-                }
-            }
-        }
+        private IEnumerable<string> LanguageOptions => GlobalConfigs.HighlightLanguageList;
 
         public string Code {
             get => _Code;
@@ -34,6 +28,7 @@ namespace CAC.client.CustomControls
         public SendCodePanel()
         {
             this.InitializeComponent();
+            languageOptionBox.SelectedIndex = 0;
             editor.Options.Minimap = new Monaco.Editor.IEditorMinimapOptions() {
                 Enabled = false,
             };
@@ -48,8 +43,9 @@ namespace CAC.client.CustomControls
 
         private void languageOptionBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            int index = (int)(HighlightLanguage)languageOptionBox.SelectedItem;
-            editor.CodeLanguage = GlobalConfigs.HighlightLanguageList[index].ToLower();
+            int index = languageOptionBox.SelectedIndex;
+            editor.CodeLanguage = GlobalConfigs.HighlightLanguageListLower[index];
+            editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
         }
     }
 }

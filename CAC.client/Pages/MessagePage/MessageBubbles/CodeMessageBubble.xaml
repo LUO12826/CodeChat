@@ -12,9 +12,11 @@
     d:DesignWidth="400">
     <UserControl.Resources>
         <con:StringToHightlightLanguage x:Key="StringToHightlightLanguage"/>
+        <con:NullToVisibility x:Key="NullToVisibility"/>
+        
     </UserControl.Resources>
-    
-    <Grid>
+
+    <Grid Background="{x:Bind BgColor, Mode=OneWay}" Padding="10" CornerRadius="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
@@ -23,15 +25,30 @@
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
-        
-        <Grid Background="{x:Bind BgColor, Mode=OneWay}" Padding="10" CornerRadius="4">
-            <ScrollViewer x:Name="richTextHost" MaxHeight="400" MaxWidth="1000">
-                <richText:CodeHighlightedTextBlock HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"
-                                               Code="{x:Bind Code, Mode=OneWay}" MaxWidth="1000"
-                                               HighlightLanguage="{x:Bind Language,Mode=OneWay, Converter={StaticResource StringToHightlightLanguage}}"/>
-            </ScrollViewer>
-            
 
+
+        <ScrollViewer x:Name="richTextHost" MaxHeight="400" MaxWidth="1000">
+            <richText:CodeHighlightedTextBlock HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"
+                                        Code="{x:Bind Code, Mode=OneWay}" MaxWidth="1000"
+                                        HighlightLanguage="{x:Bind Language,Mode=OneWay, Converter={StaticResource StringToHightlightLanguage}}"/>
+        </ScrollViewer>
+
+        <StackPanel Grid.RowSpan="2" Grid.Column="1">
+            <Button x:Name="BtnRun" Height="30" Width="30" Style="{StaticResource transparentButtonStyle}" 
+                    Padding="0" Click="BtnRun_Click">
+                <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="A" FontSize="14"/>
+            </Button>
+            
+            <Button x:Name="BtnEdit" Height="30" Width="30" Style="{StaticResource transparentButtonStyle}" 
+                    Padding="0" Click="BtnEdit_Click">
+                <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="B" FontSize="14"/>
+            </Button>
+            
+        </StackPanel>
+
+        <Grid Grid.Row="1" Visibility="{x:Bind RunResult,Mode=OneWay, Converter={StaticResource NullToVisibility}}">
+            <TextBlock Text="{x:Bind RunResult, Mode=OneWay}"/>
         </Grid>
     </Grid>
+    
 </UserControl>

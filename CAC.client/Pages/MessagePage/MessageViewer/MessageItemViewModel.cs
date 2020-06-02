@@ -1,7 +1,7 @@
 ﻿using System;
 using CAC.client.Common;
 using System.Drawing;
-
+using CAC.client.ContactPage;
 
 namespace CAC.client.MessagePage
 {
@@ -10,45 +10,38 @@ namespace CAC.client.MessagePage
     /// </summary>
     class MessageItemBaseVM : BaseViewModel
     {
-        private string _UserID;
-        private string _UserName;
-        private string _Note;
+        private long _ID;
         private bool _SendByMe;
+        private bool _SendFailed;
         private DateTime _TimeStamp;
-        private string _Base64Avatar;
+
         private Color _CellColor;
+        private ContactItemViewModel _Contact;
 
-        public string UserID {
-            get => _UserID;
+        public ContactItemViewModel Contact {
+            get => _Contact;
             set {
-                _UserID = value;
-                RaisePropertyChanged(nameof(UserID));
+                _Contact = value;
+                RaisePropertyChanged(nameof(Contact));
             }
         }
 
-        public string UserName {
-            get => _UserName;
+        public long ID {
+            get => _ID;
             set {
-                _UserName = value;
-                RaisePropertyChanged(nameof(UserID));
-                RaisePropertyChanged(nameof(DisplayName));
+                _ID = value;
+                RaisePropertyChanged(nameof(ID));
             }
         }
 
-        public string Note {
-            get => _Note;
+        public bool SendFailed {
+            get => _SendFailed;
             set {
-                _Note = value;
-                RaisePropertyChanged(nameof(Note));
-                RaisePropertyChanged(nameof(DisplayName));
+                _SendFailed = value;
+                RaisePropertyChanged(nameof(SendFailed));
             }
         }
 
-        public string DisplayName {
-            get {
-                return _Note.IsNullOrEmpty() ? _UserName : _Note;
-            }
-        }
 
         public bool SendByMe {
             get => _SendByMe;
@@ -66,13 +59,6 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public string Base64Avatar {
-            get => _Base64Avatar;
-            set {
-                _Base64Avatar = value;
-                RaisePropertyChanged(nameof(Base64Avatar));
-            }
-        }
 
         public Color CellColor {
             get => _CellColor;
@@ -82,13 +68,8 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public void didChangeAvatar(string userID, string base64Avatar)
-        {
-            if (userID == this.UserID) {
-                this.Base64Avatar = base64Avatar;
-            }
-        }
     }
+
 
     class NotificationMessageVM : MessageItemBaseVM
     {
@@ -98,7 +79,7 @@ namespace CAC.client.MessagePage
             get => _Message;
             set {
                 _Message = value;
-                RaisePropertyChanged("Message");
+                RaisePropertyChanged(nameof(Message));
             }
         }
     }

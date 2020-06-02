@@ -30,14 +30,7 @@ namespace CAC.client.CodeEditorPage
             }
         }
 
-        private IEnumerable<HighlightLanguage> LanguageOptions {
-            get {
-                foreach (var lang in Enum.GetValues(typeof(HighlightLanguage))) {
-                    yield return (HighlightLanguage)lang;
-                }
-            }
-        }
-
+        private IEnumerable<string> LanguageOptions => GlobalConfigs.HighlightLanguageList;
 
 
         public WrappedMonacoEditor()
@@ -58,14 +51,21 @@ namespace CAC.client.CodeEditorPage
 
         private async void switchToCurrentSession()
         {
-            if (!isEditorLoaded)
+            if (!isEditorLoaded || CurrentSession == null)
                 return;
+
+            int langIndex = GlobalFunctions.FindPosInLangList(CurrentSession.Language);
+            if(langIndex != 1) {
+                languageOptionBox.SelectedIndex = langIndex;
+            }
             await editor.SwitchToSession(CurrentSession.GetHashCode().ToString(), CurrentSession.Language, CurrentSession.Code);
+
         }
 
         private void languageOptionBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-
+            CurrentSession.Language = GlobalConfigs.HighlightLanguageListLower[languageOptionBox.SelectedIndex];
+            editor.CodeLanguage = CurrentSession.Language;
         }
     }
 

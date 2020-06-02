@@ -29,7 +29,7 @@
                         </cc:HorizontalSplitGrid.MasterContent>
                     
                         <cc:HorizontalSplitGrid.DetailContent>
-                            <Frame x:Name="codeEditorFrame" Width="0" Background="Azure"/>
+                            <Frame x:Name="codeEditorFrame" HorizontalAlignment="Stretch" Background="Azure"/>
                         </cc:HorizontalSplitGrid.DetailContent>
                     </cc:HorizontalSplitGrid>
 

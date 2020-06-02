@@ -28,26 +28,14 @@ namespace CAC.client.MessagePage
 
         private ScrollViewer _scrollViewer;
         private bool scrollViewerLoaded = false;
-        public string testa { get; set; } = CAC.client.GlobalConfigs.testB64Avator;
 
         public static readonly DependencyProperty VMProperty =
-            DependencyProperty.Register("VM", typeof(MessageViewerViewModel), typeof(MessageViewer), new PropertyMetadata(null, VMChanged));
+            DependencyProperty.Register("VM", typeof(MessageViewerViewModel), typeof(MessageViewer), new PropertyMetadata(null));
         public MessageViewerViewModel VM {
             get { return (MessageViewerViewModel)GetValue(VMProperty); }
             set { SetValue(VMProperty, value); }
         }
 
-        //当viewModel变化时。现在viewModel被设计为不变的（一个view始终对应一个vm，保存多个view），因此用不到了
-        private static void VMChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (d is MessageViewer viewer) {
-                
-                //这些本来是为保存滚动偏移设计的，现在不需要了。
-                var VM = e.OldValue as MessageViewerViewModel;
-                var newVM = e.NewValue as MessageViewerViewModel;
-
-            }
-        }
 
         public MessageViewer()
         {
@@ -60,7 +48,7 @@ namespace CAC.client.MessagePage
         {
             if (!scrollViewerLoaded)
                 return;
-            VM.VerticalScrollOffset = _scrollViewer.VerticalOffset;
+            //VM.VerticalScrollOffset = _scrollViewer.VerticalOffset;
         }
 
         private void MessageViewerList_Loaded(object sender, RoutedEventArgs e)
@@ -71,12 +59,12 @@ namespace CAC.client.MessagePage
         //各种原因引起ScrollViewer内容改变都会调用这个方法
         private void ScrollViewer_ViewChanged(object sender, ScrollViewerViewChangedEventArgs e)
         {
+            if(!scrollViewerLoaded) { return; }
             
         }
 
 
         //尝试加载scrollViewer。
-        //暂时不需要
         //原本尝试通过保存滚动偏移的方式恢复滚动位置，后来发现有诸多问题。
         public void TryLoadScrollViewer()
         {
@@ -105,6 +93,12 @@ namespace CAC.client.MessagePage
         {
             //改变滚动位置
             _scrollViewer?.ChangeView(null, offset, null, false);
+        }
+
+        private void CodeMessageBubble_DidTapEditButton(object sender, EventArgs e)
+        {
+            var codeMessage = (sender as CodeMessageBubble).DataContext as CodeMessageVM;
+            VM.RequestEditCode(codeMessage);
         }
     }
 }

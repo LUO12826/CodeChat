@@ -14,16 +14,32 @@
             <cc:ResizableMasterDetail.MasterContent>
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="100"/>
+                        <RowDefinition Height="32"/>
+                        <RowDefinition Height="80"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <local:ContactList Grid.Row="1"/>
+
+                    <Grid Grid.Row="1">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+
+                        <AutoSuggestBox VerticalAlignment="Center" 
+                                        Margin="10 0 5 0"
+                                        BorderBrush="{ThemeResource SystemControlPageBackgroundBaseLowBrush}"/>
+                        <Button Style="{StaticResource transparentButtonStyle}" Grid.Column="1">
+                            <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;" FontSize="16"/>
+                        </Button>
+                    </Grid>
+                    
+                    <local:ContactList Grid.Row="2"/>
                 </Grid>
 
             </cc:ResizableMasterDetail.MasterContent>
 
             <cc:ResizableMasterDetail.DetailContent>
-                <local:ContactDetailControl/>
+                <local:ContactDetailControl x:Name="contactDetail"/>
             </cc:ResizableMasterDetail.DetailContent>
         </cc:ResizableMasterDetail>
     </Grid>

@@ -97,7 +97,7 @@
             <SemanticZoom.ZoomedOutView>
                 <!--注意这里的组类型和绑定的处理方式-->
                 <ListView ItemsSource="{x:Bind contactListDataSource.View.CollectionGroups}" HorizontalAlignment="Stretch"
-                  SelectionMode="None">
+                  SelectionMode="Single">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="ICollectionViewGroup">
                             <TextBlock Text="{x:Bind ((local:ContactGroupViewModel)Group).GroupName}" FontSize="16"/>
