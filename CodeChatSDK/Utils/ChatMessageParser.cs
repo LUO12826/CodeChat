@@ -34,14 +34,22 @@ namespace CodeChatSDK.Utils
                 chatMsg.SeqId = message.SeqId;
                 chatMsg.TopicName = message.Topic;
                 chatMsg.From = message.FromUserId;
-                chatMsg.IsPlainText = false;
-                if(ParseGenericAttachment(chatMsg).Count != 0)
+
+                //判断是否存在附件
+                if (ParseGenericAttachment(chatMsg).Count != 0)
                 {
                     chatMsg.IsAttachment = true;
+                    chatMsg.IsPlainText = false;
+                }
+                //判断是否存在图片
+                else if (ParseImages(chatMsg).Count != 0)
+                {
+                    chatMsg.IsAttachment = false;
+                    chatMsg.IsPlainText = false;
                 }
                 else
                 {
-                    chatMsg.IsAttachment = false;
+                    chatMsg.IsPlainText = true;
                 }
 
                 ParseCode(chatMsg);
@@ -160,7 +168,7 @@ namespace CodeChatSDK.Utils
             List<EntData> images = ParseImages(message);
             foreach (EntData image in images)
             {
-                string base64 = image.Val;
+                string base64 = $"data:{image.Mime};base64,{image.Val}";
                 base64s.Add(base64);
             }
             return base64s;
