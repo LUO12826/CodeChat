@@ -6,6 +6,13 @@ using System.Linq;
 using GalaSoft.MvvmLight.Messaging;
 using CAC.client.CustomControls;
 using CAC.client.CodeEditorPage;
+using CodeChatSDK.Models;
+using Windows.Storage;
+using Windows.Storage.FileProperties;
+using Windows.Storage.Streams;
+using System.Runtime.InteropServices.WindowsRuntime;
+using CodeChatSDK;
+using CodeChatSDK.Utils;
 
 namespace CAC.client.MessagePage
 {
@@ -14,7 +21,10 @@ namespace CAC.client.MessagePage
         public event Action<string> SetInputBoxText;
         public event Func<string> GetInputBoxText;
 
+        //当前正在显示的聊天对应的聊天列表项
         private ChatListChatItemVM _ChatListItem;
+
+        //当前正在显示的聊天对应的MessageViewer
         private MessageViewer _CurrentViewer;
 
         //对messageViewer的缓存。我们希望切换回某个会话时保留上次的浏览位置，因此设立一个缓存。
@@ -42,6 +52,7 @@ namespace CAC.client.MessagePage
         public ChatPanelViewModel()
         {
             Messenger.Default.Register<ChatListChatItemVM>(this, "RequestOpenChatToken", RequestOpenChat);
+            Messenger.Default.Register<ChatListChatItemVM>(this, "RequestCloseChatToken", RequestCloseChat);
         }
 
         //当缓存中有时，直接从缓存中取，否则新建
@@ -52,7 +63,7 @@ namespace CAC.client.MessagePage
                 CurrentViewer = messageViewerCache[chatListItem];
             }
             else {
-                var viewerVM = new MessageViewer();
+                var viewerVM = new MessageViewer(chatListItem.TopicName);
                 CurrentViewer = viewerVM;
                 messageViewerCache.Add(chatListItem, viewerVM);
             }
@@ -64,14 +75,61 @@ namespace CAC.client.MessagePage
 
         }
 
+        private async void sendFileHelper(StorageFile file)
+        {
+            if (file == null)
+                return;
+
+            BasicProperties property = await file.GetBasicPropertiesAsync();
+            IBuffer buffer = await FileIO.ReadBufferAsync(file);
+            byte[] bytes = buffer.ToArray();
+
+            //试上传
+            UploadedAttachmentInfo uploadedAttachmentInfo = await CommunicationCore.client.Upload(file, property.Size, bytes);
+
+            //判断上传是否成功
+            if (uploadedAttachmentInfo != null) {
+                //附件消息说明（可为空）
+                string optionalMessage = "This is an attachment.";
+
+                //运用消息构造器构造消息
+                ChatMessage chatMessage = ChatMessageBuilder.BuildAttachmentMessage(uploadedAttachmentInfo, optionalMessage);
+                CurrentViewer.VM.topicController.SendMessage(chatMessage);
+            }
+            else {
+                //创建发送消息对象
+                ChatMessage chatMessage = new ChatMessage() { Text = "Fail to send.", IsPlainText = true };
+                CurrentViewer.VM.topicController.SendMessage(chatMessage);
+            }
+
+        }
+
         public void DidSendContent(SentContentEventArgs e)
         {
-            if(e.Type == MessageType.image) {
-                CurrentViewer.VM.Messages.Add(new ImageMessageVM() {
-                    SendByMe = true,
-                    ImageUri = e.Content
-                });
+
+            switch (e.Type) {
+                case MessageType.text:
+                    ChatMessage chatMessage = new ChatMessage() { Text = e.Content, IsPlainText = true };
+                    //发送消息
+                    CurrentViewer.VM.topicController.SendMessage(chatMessage);
+                    break;
+
+                case MessageType.code:
+
+                    var type = GlobalFunctions.StringToSDKcodeType(e.Language);
+                    ChatMessage message = ChatMessageBuilder.BuildCodeMessage(type, e.Content);
+                    CurrentViewer.VM.topicController.SendMessage(message);
+                    break;
+                case MessageType.image:
+                    sendFileHelper(e.File);
+                    break;
+                case MessageType.file:
+                    sendFileHelper(e.File);
+                    break;
+                default:
+                    break;
             }
+
         }
     }
 }

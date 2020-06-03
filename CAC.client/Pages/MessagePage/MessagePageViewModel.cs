@@ -1,9 +1,12 @@
 ﻿using CAC.client.Common;
+using System.Threading.Tasks;
 
 namespace CAC.client.MessagePage
 {
     class MessagePageViewModel : BaseViewModel
     {
+        public static bool initialized = false;
+
         public static ChatListViewModel ChatListViewModel = new ChatListViewModel();
 
         public static ChatPanelViewModel ChatPanelViewModel = new ChatPanelViewModel();
@@ -11,6 +14,15 @@ namespace CAC.client.MessagePage
         public MessagePageViewModel()
         {
             
+        }
+
+        public static async void OnNavigateTo()
+        {
+            if(!initialized) {
+                await Task.Delay(1000);
+                ChatListViewModel.ReloadChatList();
+                initialized = true;
+            }
         }
 
     }

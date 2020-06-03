@@ -2,6 +2,7 @@
 using CAC.client.Common;
 using System.Drawing;
 using CAC.client.ContactPage;
+using CodeChatSDK.Models;
 
 namespace CAC.client.MessagePage
 {
@@ -17,6 +18,8 @@ namespace CAC.client.MessagePage
 
         private Color _CellColor;
         private ContactItemViewModel _Contact;
+
+        public ChatMessage RawMessage { get; set; }
 
         public ContactItemViewModel Contact {
             get => _Contact;
@@ -121,9 +124,27 @@ namespace CAC.client.MessagePage
 
     class FileMessageVM : MessageItemBaseVM
     {
-        private Uri _FileUri;
+        private int _DownloadState;
+        private string _FileName;
+        private string _FileUri;
 
-        public Uri FileUri {
+        public string FileName {
+            get => _FileName;
+            set {
+                _FileName = value;
+                RaisePropertyChanged(nameof(FileName));
+            }
+        }
+
+        public int DownloadState {
+            get => _DownloadState;
+            set {
+                _DownloadState = value;
+                RaisePropertyChanged(nameof(DownloadState));
+            }
+        }
+
+        public string FileUri {
             get => _FileUri;
             set {
                 _FileUri = value;

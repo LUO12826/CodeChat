@@ -2,6 +2,7 @@
 using Windows.UI.Xaml.Controls;
 using CAC.client.Common;
 using CAC.client.ContactPage;
+using Windows.Storage.AccessCache;
 
 namespace CAC.client.MessagePage
 {
@@ -18,11 +19,20 @@ namespace CAC.client.MessagePage
     /// </summary>
     class ChatListBaseItemVM : BaseViewModel, IChatListItem
     {
+        private string _TopicName;
         private string _ChatName;
         private int _UnreadCount;
         private bool _CanPinToTop;
         private string _LatestMessage;
         private DateTime _LastActiveTime;
+
+        public string TopicName {
+            get => _TopicName;
+            set {
+                _TopicName = value;
+                RaisePropertyChanged(nameof(TopicName));
+            }
+        }
 
         public string ChatName {
             get => _ChatName;
@@ -31,7 +41,6 @@ namespace CAC.client.MessagePage
                 RaisePropertyChanged(nameof(ChatName));
             }
         }
-
 
         public string LatestMessage {
             get => _LatestMessage;

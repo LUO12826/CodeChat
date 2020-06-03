@@ -16,30 +16,44 @@
         
     </UserControl.Resources>
 
-    <Grid Background="{x:Bind BgColor, Mode=OneWay}" Padding="10" CornerRadius="4">
+    <Grid Background="{x:Bind BgColor, Mode=OneWay}" CornerRadius="4">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
 
 
-        <ScrollViewer x:Name="richTextHost" MaxHeight="400" MaxWidth="1000">
+        <ScrollViewer x:Name="richTextHost" MaxHeight="400" MaxWidth="1000" Grid.Column="1">
             <richText:CodeHighlightedTextBlock HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"
                                         Code="{x:Bind Code, Mode=OneWay}" MaxWidth="1000"
                                         HighlightLanguage="{x:Bind Language,Mode=OneWay, Converter={StaticResource StringToHightlightLanguage}}"/>
         </ScrollViewer>
 
-        <StackPanel Grid.RowSpan="2" Grid.Column="1">
+        <StackPanel x:Name="functionBtnsLeft" Grid.RowSpan="2" Grid.Column="0">
             <Button x:Name="BtnRun" Height="30" Width="30" Style="{StaticResource transparentButtonStyle}" 
                     Padding="0" Click="BtnRun_Click">
                 <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="A" FontSize="14"/>
             </Button>
-            
+
             <Button x:Name="BtnEdit" Height="30" Width="30" Style="{StaticResource transparentButtonStyle}" 
+                    Padding="0" Click="BtnEdit_Click">
+                <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="B" FontSize="14"/>
+            </Button>
+
+        </StackPanel>
+        
+        <StackPanel x:Name="functionBtnRight" Grid.RowSpan="2" Grid.Column="2">
+            <Button x:Name="BtnRun1" Height="30" Width="30" Style="{StaticResource transparentButtonStyle}" 
+                    Padding="0" Click="BtnRun_Click">
+                <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="A" FontSize="14"/>
+            </Button>
+            
+            <Button x:Name="BtnEdit1" Height="30" Width="30" Style="{StaticResource transparentButtonStyle}" 
                     Padding="0" Click="BtnEdit_Click">
                 <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="B" FontSize="14"/>
             </Button>

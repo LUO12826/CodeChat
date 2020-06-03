@@ -4,40 +4,43 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using CodeChatSDK.Models;
+using Windows.Graphics.Printing.Workflow;
 
+using System.Diagnostics;
 
 namespace CAC.client.ContactPage
 {
     class ContactListViewModel : BaseViewModel
     {
-        public ObservableCollection<ContactGroupViewModel> Contacts;
+        public ObservableCollection<ContactGroupViewModel> ContactGroup;
+
+        public ObservableCollection<ContactBaseViewModel> AllContact = new ObservableCollection<ContactBaseViewModel>();
 
         public ContactListViewModel()
         {
-            Contacts = new ObservableCollection<ContactGroupViewModel>();
-            Contacts.Add(new ContactGroupViewModel() {
-                GroupName = "测试分组",
+            ContactGroup = new ObservableCollection<ContactGroupViewModel>();
+            ContactGroup.Add(new ContactGroupViewModel() {
+                GroupName = "所有联系人",
                 IsExpanded = false,
-                Contacts = new ObservableCollection<ContactBaseViewModel>() {
-                    new ContactItemViewModel() {
-                        UserID = "11111",
-                        UserName = "昵称1",
-                        Base64Avatar = CAC.client.GlobalConfigs.testB64Avator
-                    },
-                    new ContactItemViewModel() {
-                        UserID = "22222",
-                        UserName = "昵称2",
-                        Base64Avatar = CAC.client.GlobalConfigs.testB64Avator
-                    }
-                }
+                Contacts = AllContact
             });
         }
 
         public void DidSelectContact(ContactBaseViewModel contactItem)
         {
             Messenger.Default.Send(contactItem, "RequestOpenContactToken");
+        }
+
+        public void ReloadContact()
+        {
+            AllContact.Clear();
+            var subscribers = CommunicationCore.account.SubscriberList;
+
+            foreach(var sub in subscribers) {
+                var contact = ModelConverter.SubscriberToContact(sub);
+                AllContact.Add(contact);
+            }
         }
     }
 }

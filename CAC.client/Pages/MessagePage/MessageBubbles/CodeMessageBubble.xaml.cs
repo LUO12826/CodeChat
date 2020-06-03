@@ -1,16 +1,9 @@
 ﻿using AngleSharp.Dom.Events;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
+
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
@@ -54,6 +47,21 @@ namespace CAC.client.MessagePage
             set { SetValue(RunResultProperty, value); }
         }
 
+        public static readonly DependencyProperty SendByMeProperty =
+            DependencyProperty.Register("SendByMe", typeof(bool), typeof(CodeMessageBubble), new PropertyMetadata(false, SendByMeChanged));
+
+        private static void SendByMeChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if(d is CodeMessageBubble codeBubble) {
+                codeBubble.ChangeBtnRow((bool)e.NewValue);
+            }
+        }
+
+        public bool SendByMe {
+            get { return (bool)GetValue(SendByMeProperty); }
+            set { SetValue(SendByMeProperty, value); }
+        }
+
         public static readonly DependencyProperty BgColorProperty =
             DependencyProperty.Register("BgColor", typeof(Brush), typeof(CodeMessageBubble),
                 new PropertyMetadata(new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255))));
@@ -65,6 +73,18 @@ namespace CAC.client.MessagePage
         public CodeMessageBubble()
         {
             this.InitializeComponent();
+        }
+
+        public void ChangeBtnRow(bool sendByMe)
+        {
+            if(sendByMe) {
+                functionBtnRight.Visibility = Visibility.Collapsed;
+                functionBtnsLeft.Visibility = Visibility.Visible;
+            }
+            else {
+                functionBtnRight.Visibility = Visibility.Visible;
+                functionBtnsLeft.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void BtnRun_Click(object sender, RoutedEventArgs e)

@@ -21,7 +21,7 @@
 
         <ListView x:Name="MessageViewerList" ItemsSource="{x:Bind VM.Messages, Mode=OneWay}" Loaded="MessageViewerList_Loaded"
                   ItemTemplateSelector="{StaticResource messageDataTemplateSelector}" ShowsScrollingPlaceholders="False"
-                  SelectionMode="None" IncrementalLoadingTrigger="Edge">
+                  SelectionMode="None" IncrementalLoadingTrigger="None">
             
             <ListView.Resources>
                 <!--#region 普通文字消息cell-->
@@ -142,7 +142,8 @@
                         <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind Contact.DisplayName, Mode=OneWay}"
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
-                        <local:CodeMessageBubble Grid.Row="1" Grid.Column="1" RunResult="{x:Bind RunResult,Mode=TwoWay}"
+                        
+                        <local:CodeMessageBubble Grid.Row="1" Grid.Column="1" RunResult="{x:Bind RunResult,Mode=TwoWay}" SendByMe="False"
                                                  Code="{x:Bind Code,Mode=OneWay}" Language="{x:Bind Language, Mode=OneWay}"
                                                  DidTapEditButton="CodeMessageBubble_DidTapEditButton"/>
 
@@ -168,12 +169,62 @@
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         
-                        <local:CodeMessageBubble Grid.Row="1" RunResult="{x:Bind RunResult,Mode=TwoWay}"
+                        <local:CodeMessageBubble Grid.Row="1" RunResult="{x:Bind RunResult,Mode=TwoWay}" SendByMe="True"
                                                  Code="{x:Bind Code,Mode=OneWay}" Language="{x:Bind Language, Mode=OneWay}"
                                                  DidTapEditButton="CodeMessageBubble_DidTapEditButton"/>
                     </Grid>
                 </DataTemplate>
                 <!--#endregion-->
+                
+                <!--#region 文件消息cell-->
+                <DataTemplate x:Key="MessageViewerFileLeftCell" x:DataType="local:FileMessageVM">
+                    <Grid HorizontalAlignment="Left">
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="NicknameRow"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition x:Name="AvatarColumn"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <mtuc:ImageEx x:Name="Avatar" Grid.RowSpan="2" Width="34" Height="34" Margin="0 5 10 0" VerticalAlignment="Top"
+                                      Style="{StaticResource RoundImageEx}" Source="{x:Bind Contact.Base64Avatar, Mode=OneWay}"/>
+
+                        <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind Contact.DisplayName, Mode=OneWay}"
+                                   Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+                        <local:FileMessageBubble Grid.Row="1" Grid.Column="1" FileName="{x:Bind FileName, Mode=OneWay}" 
+                                                 Url="{x:Bind FileUri,Mode=OneWay}" State="{x:Bind DownloadState, Mode=OneWay}"/>
+
+                    </Grid>
+                </DataTemplate>
+
+                <DataTemplate x:Key="MessageViewerFileRightCell" x:DataType="local:FileMessageVM">
+                    <Grid HorizontalAlignment="Right">
+                        <Grid.RowDefinitions>
+                            <RowDefinition x:Name="NicknameRow"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition x:Name="AvatarColumn"/>
+                        </Grid.ColumnDefinitions>
+
+                        <mtuc:ImageEx x:Name="Avatar" Grid.Column="1" Grid.RowSpan="2" Width="34" Height="34" Margin="10 5 0 0" 
+                                      VerticalAlignment="Top" Style="{StaticResource RoundImageEx}"
+                                      Source="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyContactInfo.Base64Avatar, Mode=OneWay}"/>
+
+                        <TextBlock x:Name="NickName" Text="{Binding ElementName=MessageViewerList, Path=DataContext.VM.MyContactInfo.DisplayName, Mode=OneWay}" HorizontalAlignment="Right"
+                                   Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
+                                   Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
+
+                        <local:FileMessageBubble Grid.Row="1" FileName="{x:Bind FileName, Mode=OneWay}" 
+                                                 Url="{x:Bind FileUri,Mode=OneWay}" State="{x:Bind DownloadState, Mode=OneWay}"/>
+                    </Grid>
+                </DataTemplate>
+
+                <!--#region -->
             </ListView.Resources>
 
             <ListView.ItemsPanel>

@@ -125,10 +125,17 @@
     <Compile Include="Common\FluidGridView.cs" />
     <Compile Include="Common\IncrementalCollection.cs" />
     <Compile Include="Converters\StringToHightlightLanguage.cs" />
+    <Compile Include="CustomControls\SearchUserControl.xaml.cs">
+      <DependentUpon>SearchUserControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CustomControls\SendCodePanel.xaml.cs">
       <DependentUpon>SendCodePanel.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Global\AccountHelper.cs" />
     <Compile Include="Global\CommunicationCore.cs" />
+    <Compile Include="Global\DatabaseHelper.cs" />
+    <Compile Include="Global\GlobalRef.cs" />
+    <Compile Include="Global\ModelConverter.cs" />
     <Compile Include="Pages\AvatarPage\AvatarPage.xaml.cs">
       <DependentUpon>AvatarPage.xaml</DependentUpon>
     </Compile>
@@ -243,6 +250,7 @@
     <Content Include="Assets\Code\example.java" />
     <Content Include="Assets\Code\example.js" />
     <Content Include="Assets\Code\example.sql" />
+    <Content Include="Assets\file.png" />
     <Content Include="NOTE.txt" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />
@@ -258,6 +266,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Page Include="CustomControls\SearchUserControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="CustomControls\SendCodePanel.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -390,6 +402,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\emojis\" />
+    <Folder Include="ModelConverter\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\fonts\IcoMoon-Free.ttf" />

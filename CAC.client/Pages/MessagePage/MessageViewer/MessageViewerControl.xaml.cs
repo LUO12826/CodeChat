@@ -44,6 +44,13 @@ namespace CAC.client.MessagePage
             VM = new MessageViewerViewModel();
         }
 
+        public MessageViewer(string topicName)
+        {
+            this.InitializeComponent();
+            this.MessageViewerList.DataContext = this;
+            VM = new MessageViewerViewModel(topicName);
+        }
+
         private void willChangeVM(ChatListBaseItemVM chat)
         {
             if (!scrollViewerLoaded)

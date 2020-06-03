@@ -34,7 +34,7 @@
                         </Button>
                     </Grid>
                     
-                    <local:ChatListControl Grid.Row="2"/>
+                    <local:ChatListControl x:Name="chatList" Grid.Row="2"/>
                 </Grid>
 
             </cc:ResizableMasterDetail.MasterContent>
