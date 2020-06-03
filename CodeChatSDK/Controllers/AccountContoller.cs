@@ -431,6 +431,22 @@ namespace CodeChatSDK.Controllers
         }
 
         /// <summary>
+        /// 通过订阅者ID获取订阅者
+        /// </summary>
+        /// <param name="userId">订阅者ID</param>
+        /// <returns></returns>
+        public Subscriber GetSubscriberByUserId(string userId)
+        {
+            int index = instance.SubscriberList.IndexOf(new Subscriber() { UserId = userId });
+            if (index == -1)
+            {
+                return null;
+            }
+
+            return instance.SubscriberList[index];
+        }
+
+        /// <summary>
         /// 通过订阅者获取订阅者控制器
         /// </summary>
         /// <param name="subscriber">订阅者</param>
@@ -441,7 +457,7 @@ namespace CodeChatSDK.Controllers
             {
                 return null;
             }
-
+            
             SubscriberController subscriberController = new SubscriberController(db.Subscribers);
             subscriberController.SetSubscriber(subscriber);
             return subscriberController;
@@ -755,10 +771,15 @@ namespace CodeChatSDK.Controllers
         /// <param name="args">订阅者状态改变参数</param>
         private void SubscriberStateChanged(object sender,SubscriberStateChangedEventArgs args)
         {
-            SubscriberController subscriberController = GetSubscriberController(args.Subscriber);
+            //获取拥有完整信息的订阅者
+            Subscriber subscriber = GetSubscriberByUserId(args.Subscriber.UserId);
+            if (subscriber != null)
+            {
+                SubscriberController subscriberController = GetSubscriberController(subscriber);
 
-            //调用更改订阅者状态方法
-            subscriberController.ChangeSubscriberState(args.IsOnline);
+                //调用更改订阅者状态方法
+                subscriberController.ChangeSubscriberState(args.IsOnline);
+            }     
         }
     }
 }

@@ -776,10 +776,12 @@ namespace CodeChatSDK
 
                                   if ((response.Pres.What == ServerPres.Types.What.On))
                                   {
+
                                       SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = true });
                                   }
                                   else if (response.Pres.What == ServerPres.Types.What.Off)
                                   {
+
                                       SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = false });
                                   }
                                   else
