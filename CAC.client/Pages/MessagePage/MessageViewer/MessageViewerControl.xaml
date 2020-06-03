@@ -194,7 +194,7 @@
                         <TextBlock x:Name="NickName" Grid.Column="1" Text="{x:Bind Contact.DisplayName, Mode=OneWay}"
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
-                        <local:FileMessageBubble Grid.Row="1" Grid.Column="1" FileName="{x:Bind FileName, Mode=OneWay}" 
+                        <local:FileMessageBubble Grid.Row="1" Grid.Column="1" FileName="{x:Bind FileName, Mode=OneWay}"
                                                  Url="{x:Bind FileUri,Mode=OneWay}" State="{x:Bind DownloadState, Mode=OneWay}"/>
 
                     </Grid>
@@ -224,7 +224,7 @@
                     </Grid>
                 </DataTemplate>
 
-                <!--#region -->
+                <!--#endregion-->
             </ListView.Resources>
 
             <ListView.ItemsPanel>

@@ -101,6 +101,8 @@ namespace CAC.client.MessagePage
 
             try {
                 System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(url);
+                request.Headers.Add("X-Tinode-APIKey", CommunicationCore.client.ApiKey);
+                request.Headers.Add("X-Tinode-Auth", "Token " + CommunicationCore.client.Token);
                 System.Net.WebResponse response = await request.GetResponseAsync();
 
                 System.IO.Stream ns = response.GetResponseStream();

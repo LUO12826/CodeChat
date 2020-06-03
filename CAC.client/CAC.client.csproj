@@ -402,7 +402,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Assets\emojis\" />
-    <Folder Include="ModelConverter\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Assets\fonts\IcoMoon-Free.ttf" />

@@ -1,14 +1,26 @@
 ﻿using CAC.client.Common;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
+using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
+using Windows.UI.Xaml.Media.Imaging;
 using Windows.UI.Xaml.Navigation;
-
+using System.Net.Http;
+using Microsoft.Toolkit.Uwp.Helpers;
+using System.Net.Cache;
+using CodeChatSDK.Utils;
+using System.Drawing;
+using Brush = Windows.UI.Xaml.Media.Brush;
 
 namespace CAC.client.MessagePage
 {
@@ -16,6 +28,8 @@ namespace CAC.client.MessagePage
     {
 
         private bool _isLoading = false;
+        private bool isDownloading = false;
+
         public bool isLoading {
             get => _isLoading;
             set {
@@ -50,12 +64,19 @@ namespace CAC.client.MessagePage
             set { SetValue(ImageBase64Property, value); }
         }
 
-        private static void ImageUriChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static async void ImageUriChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if(d is ImageMessageBubble ib) {
-                if(!(e.NewValue as string).IsNullOrEmpty()) {
-                    ib.isLoading = true;
-                    ib.image.Source = e.NewValue as string;
+                ib.isLoading = true;
+                if (!(e.NewValue as string).IsNullOrEmpty()) {
+                    Debug.WriteLine(e.NewValue as string);
+                    var bitmap = await ib.dowloadImage(e.NewValue as string);
+                    if(bitmap != null) {
+                        await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                            ib.image.Source = bitmap;
+                        });
+                        
+                    }
                 }
             }
         }
@@ -66,6 +87,7 @@ namespace CAC.client.MessagePage
             if (d is ImageMessageBubble ib) {
                 if (!(e.NewValue as string).IsNullOrEmpty() && ib.ImageUri.IsNullOrEmpty()) {
                     ib.isLoading = true;
+                    //Bitmap image = Converter.ConvertBase64ToImage(e.NewValue as string);
                     ib.image.Source = e.NewValue as string;
                 }
             }
@@ -92,5 +114,50 @@ namespace CAC.client.MessagePage
             ProgressRingBorder.Visibility = Visibility.Collapsed;
             image.Visibility = Visibility.Visible;
         }
+
+        //下载图片。
+        private async Task<BitmapImage> dowloadImage(string url)
+        {
+
+            if (isDownloading)
+                return null;
+
+            isDownloading = true;
+            try {
+
+                System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(url);
+                //系统缓存
+                request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.CacheIfAvailable);
+
+                request.Headers.Add("X-Tinode-APIKey", CommunicationCore.client.ApiKey);
+                request.Headers.Add("X-Tinode-Auth", "Token " + CommunicationCore.client.Token);
+                System.Net.WebResponse response = await request.GetResponseAsync();
+                Stream stream = response.GetResponseStream();
+                // Create a .NET memory stream.
+                var memStream = new MemoryStream();
+                // Convert the stream to the memory stream, because a memory stream supports seeking.
+                await stream.CopyToAsync(memStream);
+                // Set the start position.
+                memStream.Position = 0;
+                var bitmap = new BitmapImage();
+                await bitmap.SetSourceAsync(memStream.AsRandomAccessStream());
+
+
+                return bitmap;
+
+            }
+            catch (Exception ex) {
+                Debug.WriteLine(ex.Message);
+                return null;
+
+            }
+            finally {
+                isDownloading = false;
+            }
+            
+        }
+
+
+
     }
 }

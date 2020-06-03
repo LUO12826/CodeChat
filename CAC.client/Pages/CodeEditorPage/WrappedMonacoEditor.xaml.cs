@@ -19,6 +19,7 @@ namespace CAC.client.CodeEditorPage
         public event PropertyChangedEventHandler PropertyChanged;
         public bool isEditorLoaded { get; private set; } = false;
         public event Action CodeEditorLoaded;
+        public event Action<string> SendCodeBack;
 
         private CodeEditSessionInfo _currentSession;
         public CodeEditSessionInfo CurrentSession {
@@ -36,6 +37,7 @@ namespace CAC.client.CodeEditorPage
         public WrappedMonacoEditor()
         {
             this.InitializeComponent();
+            
         }
 
         private void Editor_Loaded(object sender, RoutedEventArgs e)
@@ -55,7 +57,9 @@ namespace CAC.client.CodeEditorPage
                 return;
 
             int langIndex = GlobalFunctions.FindPosInLangList(CurrentSession.Language);
-            if(langIndex != 1) {
+            Debug.WriteLine("langIndex");
+            Debug.WriteLine(langIndex);
+            if(langIndex != -1) {
                 languageOptionBox.SelectedIndex = langIndex;
             }
             await editor.SwitchToSession(CurrentSession.GetHashCode().ToString(), CurrentSession.Language, CurrentSession.Code);
@@ -66,6 +70,25 @@ namespace CAC.client.CodeEditorPage
         {
             CurrentSession.Language = GlobalConfigs.HighlightLanguageListLower[languageOptionBox.SelectedIndex];
             editor.CodeLanguage = CurrentSession.Language;
+            editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
+        }
+
+
+        private void save_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            
+        }
+
+        private void sendBack_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+            editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
+            
+            SendCodeBack?.Invoke(editor.Text);
+        }
+
+        private void BtnRun_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+
         }
     }
 

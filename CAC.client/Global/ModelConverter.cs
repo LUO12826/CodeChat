@@ -24,7 +24,8 @@ namespace CAC.client
                 UserID = subscriber.UserId,
                 Base64Avatar = avatar,
                 Note = null,
-                IsOnline = subscriber.Online
+                IsOnline = subscriber.Online,
+                
             };
 
             return contactVM;
@@ -42,6 +43,7 @@ namespace CAC.client
                 TopicName = topic.Name,
                 Contact = contact,
                 LastActiveTime = GlobalFunctions.TimestampToDateTime(topic.LastUsed),
+                
             };
 
             return chatListItem;
@@ -71,11 +73,23 @@ namespace CAC.client
             if (msg.IsAttachment == true) {
 
                 var attach = ChatMessageParser.ParseGenericAttachment(msg);
+                
                 //通过消息解析器获取URL列表
                 List<string> urls = ChatMessageParser.ParseUrl(msg, CommunicationCore.client.ApiBaseUrl);
 
                 string url = urls.Count > 0 ? urls[0] : "";
                 string name = attach.Count > 0 ? attach[0].Name : "";
+                string mime = attach.Count > 0 ? attach[0].Mime : "";
+                Debug.WriteLine(mime);
+                if (GlobalFunctions.FindPosInImageMineList(GlobalConfigs.ImageMime, mime) != -1) {
+                    return new ImageMessageVM() {
+                        Contact = contact,
+                        ID = msg.Id,
+                        SendByMe = sendByMe,
+                        RawMessage = msg,
+                        ImageUri = url
+                    };
+                }
 
                 return new FileMessageVM() {
                     Contact = contact,
@@ -92,8 +106,6 @@ namespace CAC.client
             if (msg.IsPlainText == false) {
                 List<string> base64s = ChatMessageParser.ParseImageBase64(msg);
                 string base64 = base64s.Count > 0 ? base64s[0] : "";
-                Debug.WriteLine("load message image");
-                Debug.WriteLine(base64);
                 return new ImageMessageVM() {
                     Contact = contact,
                     ID = msg.Id,

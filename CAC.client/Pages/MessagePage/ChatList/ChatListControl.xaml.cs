@@ -10,6 +10,7 @@ using Windows.UI.Xaml.Controls;
 using System.Diagnostics;
 using System.Collections.ObjectModel;
 using Windows.Devices.SmartCards;
+using Windows.UI.Xaml.Controls.Primitives;
 
 namespace CAC.client.MessagePage
 {
@@ -43,6 +44,18 @@ namespace CAC.client.MessagePage
         private void ChatsList_ItemClick(object sender, ItemClickEventArgs e)
         {
             VM.DidSelectChat(e.ClickedItem as IChatListItem);
+        }
+
+        private void Grid_RightTapped(object sender, Windows.UI.Xaml.Input.RightTappedRoutedEventArgs e)
+        {
+            FlyoutBase.ShowAttachedFlyout(sender as FrameworkElement);
+        }
+
+        private void pinToTop_Click(object sender, RoutedEventArgs e)
+        {
+            var item = (sender as FrameworkElement).DataContext as IChatListItem;
+            VM.RequestPinToTop(item);
+            
         }
     }
 }

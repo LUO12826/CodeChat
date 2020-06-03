@@ -95,5 +95,18 @@ namespace CAC.client
                     return CodeType.NULL;
             }
         }
+
+        public static int FindPosInImageMineList(string[] list, string name)
+        {
+            if (list == null)
+                return -1;
+            for(int i = 0; i < list.Length; i++) {
+                if (list[i] == name) {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
     }
 }

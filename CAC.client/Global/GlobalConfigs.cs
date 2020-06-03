@@ -19,6 +19,9 @@ namespace CAC.client
 
         public static readonly string ApiKey = "AQEAAAABAAD_rAp4DJh05a1HAwFT3A6K";
 
+        public static string[] ImageMime =
+            { "image/gif",  "image/jpeg", "image/jpg", "image/png", "image/.jpg", "image/.jpeg", "image/.png", "image/.gif", "file/.jpg", "file/.jpeg", "file/.png" };
+
 
         public static string[] HighlightLanguageList = new string[] {
             "PlainText","C#","JavaScript","Python","XML","JSON","SQL","PHP","Ruby","C++","CSS","Java"

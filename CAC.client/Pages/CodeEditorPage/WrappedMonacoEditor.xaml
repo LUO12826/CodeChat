@@ -15,6 +15,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="50"/>
             <RowDefinition/>
+            <RowDefinition Height="16"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid Grid.Row="0">
@@ -33,16 +34,29 @@
                 <ComboBox x:Name="languageOptionBox" Grid.Row="1" HorizontalAlignment="Left" VerticalAlignment="Center" Width="120"
                           Background="Transparent" ItemsSource="{x:Bind LanguageOptions}" SelectionChanged="languageOptionBox_SelectionChanged"/>
                 <!--保存到本地按钮-->
-                <Button Style="{StaticResource transparentButtonStyle}" Margin="5 0 0 0" Width="30" Padding="0">
+                <Button x:Name="BtnRun" Style="{StaticResource transparentButtonStyle}" Tapped="BtnRun_Tapped"
+                        Margin="5 0 0 0" Width="30" Padding="0">
+                    <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="A"/>
+                </Button>
+                <!--保存到本地按钮-->
+                <Button x:Name="BtnSave" Style="{StaticResource transparentButtonStyle}" Tapped="save_Tapped"
+                        Margin="5 0 0 0" Width="30" Padding="0">
                     <FontIcon FontFamily="{StaticResource microsoft}" Glyph="&#xE74E;"/>
                 </Button>
                 <!--发送回原会话按钮-->
-                <Button Style="{StaticResource transparentButtonStyle}" Margin="0 0 5 0">
+                <Button x:Name="BtnSendBack" Style="{StaticResource transparentButtonStyle}" Margin="0 0 5 0" Tapped="sendBack_Tapped">
                     <FontIcon FontFamily="{StaticResource CAC-1}" Glyph="A" FontSize="18"/>
                 </Button>
 
             </StackPanel>
         </Grid>
-        <editor:CodeEditor Name="editor" Grid.Row="1" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Loaded="Editor_Loaded"/>
+
+        <editor:CodeEditor Name="editor" Grid.Row="1" 
+                           HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Loaded="Editor_Loaded" Margin="0" Padding="0"/>
+
+        <mtuc:GridSplitter Grid.Row="2" Height="16" ResizeDirection="Rows">
+        </mtuc:GridSplitter>
+        
+        <TextBlock x:Name="resultTextBlock" Height="300" Grid.Row="3"/>
     </Grid>
 </UserControl>

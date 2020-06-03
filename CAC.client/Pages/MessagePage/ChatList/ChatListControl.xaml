@@ -31,8 +31,15 @@
                 <DataTemplate x:Key="ChatListItemNormalTemplate" x:DataType="local:ChatListChatItemVM">
 
                     <Grid Margin="0 0 12 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                  Background="Transparent"
-                  PointerEntered="cellGrid_PointerEntered" PointerExited="cellGrid_PointerExited">
+                            Background="Transparent" RightTapped="Grid_RightTapped" IsRightTapEnabled="True"
+                            PointerEntered="cellGrid_PointerEntered" PointerExited="cellGrid_PointerExited">
+                        <FlyoutBase.AttachedFlyout>
+                            <MenuFlyout x:Name="flyout">
+                                <MenuFlyoutItem x:Name="pinToTop" Text="置顶" IsTapEnabled="True" Click="pinToTop_Click"/>
+                            </MenuFlyout>
+                        </FlyoutBase.AttachedFlyout>
+                        
+                        
                         <Grid.RowDefinitions>
                             <RowDefinition Height="38"/>
                             <RowDefinition Height="38"/>

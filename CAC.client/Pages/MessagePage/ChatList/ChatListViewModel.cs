@@ -30,6 +30,11 @@ namespace CAC.client.MessagePage
 
         }
 
+        public void RequestPinToTop(IChatListItem chatItem)
+        {
+
+        }
+
         public void ReloadChatList()
         {
             Debug.WriteLine("--------ReloadChatList");

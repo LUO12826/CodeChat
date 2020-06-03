@@ -97,6 +97,9 @@
             let newModel;
             if(!models.hasOwnProperty(userToken)) {
                 newModel = monaco.editor.createModel(Code, language);
+                newModel.onDidChangeContent((event) => {
+                Parent.setValue("Text", model.getValue());
+            });
                 models[userToken] = newModel;
 			}
             else {
@@ -105,8 +108,10 @@
             editor.setModel(newModel);
             Debug.log("set model");
             model = newModel;
+            Parent.setValue("Text", model.getValue());
             currentSession = userToken;
             restoreState();
+            editor.focus();  
 		}
 
         var saveState = function() {

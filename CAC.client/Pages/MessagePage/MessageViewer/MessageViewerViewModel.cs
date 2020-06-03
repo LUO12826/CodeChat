@@ -16,7 +16,7 @@ using CodeChatSDK.Models;
 using CodeChatSDK.Controllers;
 using CodeChatSDK.EventHandler;
 using Microsoft.Toolkit.Uwp.Helpers;
-
+using Windows.UI.WindowManagement;
 
 namespace CAC.client.MessagePage
 {
@@ -43,7 +43,7 @@ namespace CAC.client.MessagePage
 
         public DateTime LastOpenTime { get; set; }
 
-        public IncrementalCollection<MessageItemBaseVM> Messages;
+        public ObservableCollection<MessageItemBaseVM> Messages;
 
         public bool IsGroupChat {
             get => _IsGroupChat;
@@ -81,18 +81,7 @@ namespace CAC.client.MessagePage
         public MessageViewerViewModel()
         {
 
-            Messages = new IncrementalCollection<MessageItemBaseVM>(loadMoreItems);
-            for (int i = 0; i < 40; i++) {
-                Messages.Add(new TextMessageVM() {
-                    Contact = new ContactItemViewModel() {
-                        Base64Avatar = GlobalConfigs.testB64Avator,
-                        UserName = "aaa",
-                    },
-                    ID = i,
-                    Text = "这是测试消息。",
-                    SendByMe = i % 2 == 0 ? true : false
-                });
-            }
+            Messages = new ObservableCollection<MessageItemBaseVM>();
 
             MyContactInfo = new ContactItemViewModel() {
                 UserName = "self",
@@ -103,12 +92,7 @@ namespace CAC.client.MessagePage
 
         public MessageViewerViewModel(string topicName)
         {
-            this.topicName = topicName;
-            this.topic = CommunicationCore.accountController.GetTopicByName(topicName);
-            CommunicationCore.client.AddMessageEvent += Client_AddMessageEvent;
-
-
-            Messages = new IncrementalCollection<MessageItemBaseVM>(loadMoreItems);
+            Messages = new ObservableCollection<MessageItemBaseVM>();
 
             MyContactInfo = new ContactItemViewModel() {
                 UserName = CommunicationCore.account.Username,
@@ -117,25 +101,45 @@ namespace CAC.client.MessagePage
                 IsOnline = true,
             };
 
-            LoadHistoryMessages();
+            initViewer(topicName);
+            
         }
 
-        private void Client_AddMessageEvent(object sender, CodeChatSDK.EventHandler.AddMessageEventArgs args)
+        private async void initViewer(string topicName)
         {
 
+            await Task.Run(() => {
+                this.topicName = topicName;
+                this.topic = CommunicationCore.accountController.GetTopicByName(topicName);
+                CommunicationCore.client.AddMessageEvent += Client_AddMessageEvent;
+            });
+            await LoadHistoryMessages();
+        }
+
+        private async void Client_AddMessageEvent(object sender, CodeChatSDK.EventHandler.AddMessageEventArgs args)
+        {
+            Debug.WriteLine("Client_AddMessageEvent");
+            Debug.WriteLine("消息的topic是" + args.TopicName);
+            Debug.WriteLine("当前的topic是" + this.topicName);
             if (args.TopicName != this.topicName)
                 return;
-            var oldestSeq = Messages[0].RawMessage.SeqId;
-            var newestSeq = Messages[Messages.Count - 1].RawMessage.SeqId;
 
             var msg = ModelConverter.MessageToMessageVM(args.Message);
-            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+            await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+
+                var oldestSeq = Messages.Count > 0 ? Messages[0].RawMessage.SeqId : -1;
+
+                if (Messages.Count <= 0) {
+                    Messages.Add(msg);
+                    return;
+                }
                 if(msg.RawMessage.SeqId <= oldestSeq) {
                     Messages.Insert(0, msg);
                 }
                 else {
                     Messages.Add(msg);
                 }
+                Debug.WriteLine(Messages.Count + "========================");
             });
         }
 
@@ -151,12 +155,16 @@ namespace CAC.client.MessagePage
 
             topicController.LoadMessage();
             List<ChatMessage> ChatMessageList = topic.MessageList;
-            Debug.WriteLine("调用加载历史消息");
+            Debug.WriteLine("直接从topiccontroller加载了" + ChatMessageList.Count + "条消息");
+
             await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                 foreach (var message in ChatMessageList) {
-
                     var msg = ModelConverter.MessageToMessageVM(message);
                     Messages.Add(msg);
+
+                    if(msg is TextMessageVM tm) {
+                        Debug.WriteLine(tm.Text);
+                    }
                 }
             });
             
@@ -176,20 +184,21 @@ namespace CAC.client.MessagePage
         }
 
         //不使用
-        private async Task<Tuple<List<MessageItemBaseVM>, bool>> loadMoreItems(uint itemsNum)
-        {
-            var a = await Task.Run(async () => {
-                Thread.Sleep(2000);
-                var b = new List<MessageItemBaseVM>();
-                var exampleFile = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
-                var bb = await exampleFile.GetFolderAsync("Code");
-                var cc = await bb.GetFileAsync("example.java");
-                var text = await FileIO.ReadTextAsync(cc);
-                return b;
-            });
+        //private async Task<Tuple<List<MessageItemBaseVM>, bool>> loadMoreItems(uint itemsNum)
+        //{
+        //    var a = await Task.Run(async () => {
+        //        Thread.Sleep(2000);
+        //        var b = new List<MessageItemBaseVM>();
+        //        var exampleFile = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
+        //        var bb = await exampleFile.GetFolderAsync("Code");
+        //        var cc = await bb.GetFileAsync("example.java");
+        //        var text = await FileIO.ReadTextAsync(cc);
+        //        return b;
+        //    });
 
-            return new Tuple<List<MessageItemBaseVM>, bool>(new List<MessageItemBaseVM>(), false);
-        }
+        //    return new Tuple<List<MessageItemBaseVM>, bool>(new List<MessageItemBaseVM>(), false);
+        //}
+
 
         ~MessageViewerViewModel()
         {

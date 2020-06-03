@@ -20,6 +20,11 @@ namespace CAC.client.MessagePage
             base.OnNavigatedTo(e);
             MessagePageViewModel.OnNavigateTo();
         }
+
+        private void BtnSearchUserOnline_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        {
+
+        }
     }
 
 }

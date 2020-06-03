@@ -5,16 +5,28 @@ using Windows.UI.Xaml.Navigation;
 using System;
 using GalaSoft.MvvmLight.Messaging;
 using CAC.client.CodeEditorPage;
+using System.ComponentModel;
 
 namespace CAC.client
 {
 
-    sealed partial class MainPage : Page
+    sealed partial class MainPage : Page, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
         private CodeEditorPage.CodeEditorPage codeEditor => CodeEditorPage.CodeEditorPage.Default;
 
+        private string avatar = "";
+        public string Avatar {
+            get => avatar;
+            set {
+                avatar = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Avatar)));
+            }
+        }
 
-        private string avatar = "/Assets/640.jpeg";
+        private bool CodeEditorPageExpanded = false;
+
         private string currentPage;
 
         public MainPage()
@@ -26,12 +38,17 @@ namespace CAC.client
 
         private void RequestEditCode(CodeEditSessionInfo session)
         {
-            int AddWidth = 300;
-            if(GlobalFunctions.TryResizeWindow(AddWidth, 0)) {
-                Debug.WriteLine("resize ok");
+
+            if(!CodeEditorPageExpanded) {
+                int AddWidth = 300;
+                if (GlobalFunctions.TryResizeWindow(AddWidth, 0)) {
+                    Debug.WriteLine("resize ok");
+                }
+                MainGrid.Expan(AddWidth);
+                codeEditorFrame.Content = codeEditor;
+                CodeEditorPageExpanded = true;
             }
-            MainGrid.Expan(AddWidth);
-            codeEditorFrame.Content = codeEditor;
+            
             codeEditor.RequestOpenSession(session);
             
         }
@@ -39,8 +56,19 @@ namespace CAC.client
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            codeEditor.AllSessionClosed += CodeEditor_AllSessionClosed;
             naviFrame.Navigate(typeof(MessagePage.MessagePage), 0);
             currentPage = "chat";
+            Avatar = CommunicationCore.account.Avatar;
+        }
+
+        private void CodeEditor_AllSessionClosed()
+        {
+            if (CodeEditorPageExpanded) {
+
+                MainGrid.Collapse();
+                CodeEditorPageExpanded = false;
+            }
         }
 
         private void Navigator_OnNavigationChanged(object sender, object e)
