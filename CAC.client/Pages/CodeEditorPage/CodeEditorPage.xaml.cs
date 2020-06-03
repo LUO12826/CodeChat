@@ -56,13 +56,8 @@ namespace CAC.client.CodeEditorPage
             codeEditor = new WrappedMonacoEditor();
             editorPresenter.Content = codeEditor;
             codeEditor.CodeEditorLoaded += CodeEditor_CodeEditorLoaded;
-            codeEditor.SendCodeBack += CodeEditor_SendCodeBack;
         }
 
-        private void CodeEditor_SendCodeBack(string code)
-        {
-            
-        }
 
         private void CodeEditor_CodeEditorLoaded()
         {

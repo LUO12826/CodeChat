@@ -29,9 +29,9 @@
 
 
         <ScrollViewer x:Name="richTextHost" MaxHeight="400" MaxWidth="1000" MinWidth="200" Grid.Column="1">
-            <richText:CodeHighlightedTextBlock HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="0"
+            <richText:CodeHighlightedTextBlock  VerticalAlignment="Stretch" Margin="0"
                                         Code="{x:Bind Code, Mode=OneWay}" MaxWidth="1000"
-                                        HighlightLanguage="{x:Bind Language,Mode=OneWay, Converter={StaticResource StringToHightlightLanguage}}"/>
+                                        HighlightLanguage="{x:Bind CodeLanguage,Mode=OneWay, Converter={StaticResource StringToHightlightLanguage}}"/>
         </ScrollViewer>
 
         <StackPanel x:Name="functionBtnsLeft" Grid.RowSpan="2" Grid.Column="0">

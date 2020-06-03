@@ -26,6 +26,8 @@ namespace CAC.client.MessagePage
         private string _LatestMessage;
         private DateTime _LastActiveTime;
 
+        public long MaxMsgSeq { get; set; } = 0;
+
         public string TopicName {
             get => _TopicName;
             set {

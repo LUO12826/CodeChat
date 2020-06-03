@@ -26,7 +26,7 @@
             
             <Button x:Name="BtnDownload" Height="18" Width="18" Style="{StaticResource transparentButtonStyle}" 
                     Padding="0" Margin="0 0 0 0" Click="BtnDownload_Click" CornerRadius="10">
-                <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="A" FontSize="14" Foreground="{ThemeResource SystemControlPageBackgroundBaseMediumBrush}"/>
+                <FontIcon FontFamily="{StaticResource CAC-3}" Glyph="A" FontSize="14" Foreground="{ThemeResource SystemControlPageBackgroundBaseMediumBrush}"/>
             </Button>
             
         </StackPanel>

@@ -3,7 +3,6 @@ using CAC.client.ContactPage;
 using CAC.client.Common;
 using System.Diagnostics;
 using CAC.client.MessagePage;
-using Windows.ApplicationModel.Chat;
 using ChatMessage = CodeChatSDK.Models.ChatMessage;
 using CodeChatSDK.Utils;
 using System.Collections.Generic;
@@ -55,7 +54,6 @@ namespace CAC.client
             Debug.WriteLine("进行消息转换");
             var contact = CommunicationCore.GetContactByTopicName(msg.TopicName);
             bool sendByMe = !(msg.From == msg.TopicName);
-            Debug.WriteLine(msg.IsPlainText);
 
             //判断是否为代码消息
             if (msg.IsCode == true) {

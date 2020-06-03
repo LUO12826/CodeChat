@@ -8,6 +8,7 @@
     <FontFamily x:Key="IcoMoon">/Assets/fonts/IcoMoon-Free.ttf#IcoMoon-Free</FontFamily>
     <FontFamily x:Key="CAC-1">/Assets/fonts/CAC-1.ttf#CAC-1</FontFamily>
     <FontFamily x:Key="CAC-2">/Assets/fonts/CAC-2.ttf#CAC-2</FontFamily>
+    <FontFamily x:Key="CAC-3">/Assets/fonts/CAC-3.ttf#CAC-3</FontFamily>
 
     <FontIcon x:Key="CodeSymbol" FontFamily="{StaticResource CAC-1}" Glyph="E"/>
     <!--全局滚动条样式-->

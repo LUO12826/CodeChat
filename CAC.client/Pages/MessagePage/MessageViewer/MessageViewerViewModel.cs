@@ -116,7 +116,8 @@ namespace CAC.client.MessagePage
             await LoadHistoryMessages();
         }
 
-        private async void Client_AddMessageEvent(object sender, CodeChatSDK.EventHandler.AddMessageEventArgs args)
+
+        private void Client_AddMessageEvent(object sender, CodeChatSDK.EventHandler.AddMessageEventArgs args)
         {
             Debug.WriteLine("Client_AddMessageEvent");
             Debug.WriteLine("消息的topic是" + args.TopicName);
@@ -125,7 +126,7 @@ namespace CAC.client.MessagePage
                 return;
 
             var msg = ModelConverter.MessageToMessageVM(args.Message);
-            await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
 
                 var oldestSeq = Messages.Count > 0 ? Messages[0].RawMessage.SeqId : -1;
 

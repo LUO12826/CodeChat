@@ -11,6 +11,9 @@ namespace CAC.client.Converters
     {
         public object Convert(object value, Type targetType, object parameter, string language)
         {
+            if (value == null)
+                return HighlightLanguage.PlainText;
+
             string lang = ((string)value).ToLower();
             switch (lang) {
                 case "plaintext":

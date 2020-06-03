@@ -53,7 +53,10 @@ namespace CAC.client.MessagePage
         {
             Messenger.Default.Register<ChatListChatItemVM>(this, "RequestOpenChatToken", RequestOpenChat);
             Messenger.Default.Register<ChatListChatItemVM>(this, "RequestCloseChatToken", RequestCloseChat);
+            Messenger.Default.Register<CodeEditSessionInfo>(this, "RequestSendCodeBackToken", RequestSendCodeBack);
         }
+
+        
 
         //当缓存中有时，直接从缓存中取，否则新建
         public void RequestOpenChat(ChatListChatItemVM chatListItem)
@@ -68,6 +71,13 @@ namespace CAC.client.MessagePage
                 messageViewerCache.Add(chatListItem, viewerVM);
             }
 
+        }
+
+        private void RequestSendCodeBack(CodeEditSessionInfo obj)
+        {
+            var type = GlobalFunctions.StringToSDKcodeType(obj.Language);
+            ChatMessage message = ChatMessageBuilder.BuildCodeMessage(type, obj.Code);
+            CurrentViewer.VM.topicController.SendMessage(message);
         }
 
         public void RequestCloseChat(ChatListChatItemVM chatListItem)
@@ -130,6 +140,11 @@ namespace CAC.client.MessagePage
                     break;
             }
 
+        }
+
+        public void LoadMoreMessage()
+        {
+            CurrentViewer.VM.topicController.LoadMessage();
         }
     }
 }

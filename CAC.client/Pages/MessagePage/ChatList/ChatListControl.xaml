@@ -78,7 +78,7 @@
                            HorizontalAlignment="Left" VerticalAlignment="Bottom" 
                            FontSize="15px"
                            Foreground="{ThemeResource SystemControlPageTextBaseHighBrush}"/>
-                            <TextBlock Grid.Column="1" Text="{x:Bind LastActiveTime, Converter={StaticResource DateTimeToShortString}}" 
+                            <TextBlock Grid.Column="1" Text="{x:Bind LastActiveTime, Mode=OneWay, Converter={StaticResource DateTimeToShortString}}" 
                            Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}" FontSize="11"
                            HorizontalAlignment="Right" VerticalAlignment="Bottom"/>
                         </Grid>
@@ -91,7 +91,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Border Background="Orange" Width="15" Visibility="Collapsed"/>
-                            <TextBlock Grid.Column="1" Text="{x:Bind LatestMessage}" 
+                            <TextBlock Grid.Column="1" Text="{x:Bind LatestMessage, Mode=OneWay}" 
                                Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
                                FontSize="13px"
                                TextTrimming="WordEllipsis"

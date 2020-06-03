@@ -144,7 +144,7 @@
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         
                         <local:CodeMessageBubble Grid.Row="1" Grid.Column="1" RunResult="{x:Bind RunResult,Mode=TwoWay}" SendByMe="False"
-                                                 Code="{x:Bind Code,Mode=OneWay}" Language="{x:Bind Language, Mode=OneWay}"
+                                                 Code="{x:Bind Code,Mode=OneWay}" CodeLanguage="{x:Bind Language, Mode=OneWay,FallbackValue={x:Null}}"
                                                  DidTapEditButton="CodeMessageBubble_DidTapEditButton"/>
 
                     </Grid>
@@ -170,7 +170,7 @@
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         
                         <local:CodeMessageBubble Grid.Row="1" RunResult="{x:Bind RunResult,Mode=TwoWay}" SendByMe="True"
-                                                 Code="{x:Bind Code,Mode=OneWay}" Language="{x:Bind Language, Mode=OneWay}"
+                                                 Code="{x:Bind Code,Mode=OneWay}" CodeLanguage="{x:Bind Language, Mode=OneWay, FallbackValue={x:Null}}"
                                                  DidTapEditButton="CodeMessageBubble_DidTapEditButton"/>
                     </Grid>
                 </DataTemplate>

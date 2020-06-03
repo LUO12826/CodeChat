@@ -16,7 +16,7 @@ namespace CAC.client
 
         private CodeEditorPage.CodeEditorPage codeEditor => CodeEditorPage.CodeEditorPage.Default;
 
-        private string avatar = "";
+        private string avatar = GlobalConfigs.defaultAvatar;
         public string Avatar {
             get => avatar;
             set {

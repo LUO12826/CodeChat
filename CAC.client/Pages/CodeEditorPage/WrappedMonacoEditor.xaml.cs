@@ -7,6 +7,7 @@ using System.ComponentModel;
 using RichTextControls;
 using System.Diagnostics;
 using Monaco;
+using GalaSoft.MvvmLight.Messaging;
 
 namespace CAC.client.CodeEditorPage
 {
@@ -19,7 +20,7 @@ namespace CAC.client.CodeEditorPage
         public event PropertyChangedEventHandler PropertyChanged;
         public bool isEditorLoaded { get; private set; } = false;
         public event Action CodeEditorLoaded;
-        public event Action<string> SendCodeBack;
+        public event Action<string, string> SendCodeBack;
 
         private CodeEditSessionInfo _currentSession;
         public CodeEditSessionInfo CurrentSession {
@@ -82,8 +83,8 @@ namespace CAC.client.CodeEditorPage
         private void sendBack_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
-            
-            SendCodeBack?.Invoke(editor.Text);
+            CurrentSession.Code = editor.Text;
+            Messenger.Default.Send(CurrentSession, "RequestSendCodeBackToken");
         }
 
         private void BtnRun_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)

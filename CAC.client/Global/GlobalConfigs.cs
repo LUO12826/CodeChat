@@ -36,7 +36,7 @@ namespace CAC.client
             "plaintext","csharp","javascript","python","xml","json","sql","php","ruby","cplusplus","css","java"
         };
 
-        public static readonly ulong MaxUploadFileSize = 10 * 1024 * 1024;
+        public static readonly ulong MaxUploadFileSize = 8 * 1024 * 1024;
 
         public static Brush LeftBubbleBgColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243));
         public static Brush RightBubbleBgColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 219, 244, 253));

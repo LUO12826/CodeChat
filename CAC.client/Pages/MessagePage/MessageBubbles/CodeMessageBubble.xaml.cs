@@ -5,7 +5,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+using RichTextControls;
 
 
 namespace CAC.client.MessagePage
@@ -14,6 +14,9 @@ namespace CAC.client.MessagePage
     {
         public event EventHandler DidTapRunButton;
         public event EventHandler DidTapEditButton;
+
+
+        private HighlightLanguage defaultLanguage { get; set; } = HighlightLanguage.PlainText;
 
         public static readonly DependencyProperty CodeProperty =
             DependencyProperty.Register("Code", typeof(string), typeof(CodeMessageBubble), new PropertyMetadata(""));
@@ -27,7 +30,7 @@ namespace CAC.client.MessagePage
 
 
         public static readonly DependencyProperty CodeLanguageProperty =
-            DependencyProperty.Register("CodeLanguage", typeof(string), typeof(CodeMessageBubble), new PropertyMetadata(""));
+            DependencyProperty.Register("CodeLanguage", typeof(string), typeof(CodeMessageBubble), new PropertyMetadata("csharp"));
         /// <summary>
         /// 代码语言
         /// </summary>

@@ -203,7 +203,7 @@
                 <SymbolIcon Symbol="OpenFile"/>
             </Button>
 
-            <Button x:Name="sendCodeButton" Style="{StaticResource transparentButtonStyle}" 
+            <Button x:Name="sendCodeButton" Style="{StaticResource transparentButtonStyle}" AllowFocusOnInteraction="True"
                     VerticalAlignment="Stretch" Width="40">
                 <Button.Flyout>
                     <Flyout>

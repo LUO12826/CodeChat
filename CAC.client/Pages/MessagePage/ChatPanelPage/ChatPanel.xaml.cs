@@ -33,5 +33,10 @@ namespace CAC.client.MessagePage
         {
             VM.DidSendContent(e);
         }
+
+        private void BtnLoad_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            VM.LoadMoreMessage();
+        }
     }
 }
