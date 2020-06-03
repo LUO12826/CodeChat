@@ -131,7 +131,7 @@ namespace CodeChatSDK.Repository.Sqlite
         {
             return await db.Messages.
                             Where(m => m.TopicName == topic.Name).
-                            OrderByDescending(m => m.SeqId).
+                            OrderBy(m => m.SeqId).
                             Take(limit).
                             ToListAsync();
         }
