@@ -483,7 +483,7 @@ namespace CodeChatSDK.Controllers
             }
 
             //话题列表更新
-            instance.TopicList.Add(newTopic);
+            await AddTopic(newTopic);
 
             //数据库更新
             TopicController topicController = new TopicController(db);
