@@ -470,7 +470,17 @@ namespace CodeChatSDK.Controllers
                 return true;
             }
 
-            Topic newTopic = new Topic(subscriber.TopicName);
+            //获取已存在话题或创建话题
+            Topic newTopic = GetTopicByName(subscriber.TopicName);
+            if (newTopic == null)
+            {
+                newTopic = new Topic(subscriber.TopicName);
+            }
+
+            if(newTopic == null)
+            {
+                newTopic = new Topic(subscriber.TopicName);
+            }
 
             //话题列表更新
             instance.TopicList.Add(newTopic);

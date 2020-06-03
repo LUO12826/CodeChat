@@ -768,15 +768,11 @@ namespace CodeChatSDK
 
                                   if ((response.Pres.What == ServerPres.Types.What.On))
                                   {
-                                      ClientPost(Subscribe(new Topic(response.Pres.Topic)));
                                       SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = true });
-                                      
                                   }
                                   else if (response.Pres.What == ServerPres.Types.What.Off)
                                   {
-                                      ClientPost(Leave(new Topic(response.Pres.Topic)));
                                       SubscriberStateChangedEvent?.Invoke(this, new SubscriberStateChangedEventArgs() { Subscriber = new Subscriber() { TopicName = response.Pres.Src, UserId = response.Pres.Src }, IsOnline = false });
-                                      
                                   }
                                   else
                                   {
@@ -1183,13 +1179,13 @@ namespace CodeChatSDK
             return new ClientMsg() { Pub = pub };
         }
 
-        private ClientMsg Subscribe(Topic topic,int limit=24)
+        private ClientMsg Subscribe(Topic topic,int limit=0)
         {
             var id = GetNextId();
             AddCallback(id, new Callback(id, CallbackType.Sub, null, topic.Name));
 
             ClientSub sub = new ClientSub() { Id = id, Topic = topic.Name };
-            if (topic.Name != "me" && topic.Name != "fnd")
+            if (topic.Name != "me" && topic.Name != "fnd" && limit != 0)
             {
                 sub.GetQuery = new GetQuery() { Data = new GetOpts() { Limit = limit } };
             }

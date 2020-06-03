@@ -52,7 +52,7 @@ namespace CodeChatSDK.Repository.Sqlite
         {
             return await db.Messages.
                             OrderBy(m => m.TopicName).
-                            OrderByDescending(m=>m.SeqId).
+                            OrderBy(m=>m.SeqId).
                             ToListAsync();
         }
 
@@ -82,7 +82,7 @@ namespace CodeChatSDK.Repository.Sqlite
         {
             var query = db.Messages.
                             OrderBy(m => m.TopicName).
-                            OrderByDescending(m => m.SeqId).
+                            OrderBy(m => m.SeqId).
                             Where(m => m.Content.Contains(condition));
 
             pageCount = query.Count() % pageSize == 0 ? (query.Count() / pageSize) : (query.Count() / pageSize) + 1;
@@ -117,7 +117,7 @@ namespace CodeChatSDK.Repository.Sqlite
                             Where(m => m.TopicName == topic.Name &&
                             m.SeqId >= since &&
                             m.SeqId < before).
-                            OrderBy(m => m.SeqId).
+                            OrderByDescending(m => m.SeqId).
                             ToListAsync();
         }
 
@@ -131,7 +131,7 @@ namespace CodeChatSDK.Repository.Sqlite
         {
             return await db.Messages.
                             Where(m => m.TopicName == topic.Name).
-                            OrderBy(m => m.SeqId).
+                            OrderByDescending(m => m.SeqId).
                             Take(limit).
                             ToListAsync();
         }
