@@ -99,6 +99,14 @@ namespace CodeChatSDK
         public string ApiBaseUrl { get; private set; }
 
         /// <summary>
+        /// 上传下载文件令牌
+        /// </summary>
+        public string Token
+        {
+            get { return token; }
+        }
+
+        /// <summary>
         /// 登陆成功事件
         /// </summary>
         public event LoginSuccessEventHandler LoginSuccessEvent;
@@ -175,7 +183,7 @@ namespace CodeChatSDK
         private AsyncDuplexStreamingCall<ClientMsg, ServerMsg> stream;
         
         /// <summary>
-        /// 上传文件令牌
+        /// 上传下载文件令牌
         /// </summary>
         private string token;
 
