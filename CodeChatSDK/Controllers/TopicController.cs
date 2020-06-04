@@ -45,8 +45,10 @@ namespace CodeChatSDK.Controllers
         {
             instance = topic;
             MessageController messageController = new MessageController(db.Messages);
+            List<ChatMessage> messages = await messageController.GetMessages(instance,instance.Limit);
+            messages.ForEach(async m => await AddMessage(m));
+
             SubscriberController subscriberController = new SubscriberController(db.Subscribers);
-            instance.MessageList = await messageController.GetMessages(instance,instance.Limit);
             instance.SubsriberList = await subscriberController.GetSubscribers(instance);
         }
         
