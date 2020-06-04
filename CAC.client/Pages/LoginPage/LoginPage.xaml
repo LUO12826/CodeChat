@@ -534,7 +534,7 @@
                 <CheckBox x:Name="autoLoginCheckBox" Style="{StaticResource smallCheckBoxStyle}" Grid.Row="1" 
                           Content="自动登录" Height="10" MinWidth="0" HorizontalAlignment="Center"/>
 
-                <Button Grid.Column="1"  Content="忘记密码" HorizontalAlignment="Center"/>
+                <Button Grid.Column="1"  Content="忘记密码" HorizontalAlignment="Center" Visibility="Collapsed"/>
                 <Button Grid.Column="1" Grid.Row="1" Content="注册账号" HorizontalAlignment="Center"/>
             </Grid>
 

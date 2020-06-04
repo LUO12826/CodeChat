@@ -36,9 +36,6 @@ namespace CAC.client.LoginPage
         {
             this.InitializeComponent();
 
-            userNameBox.Text = "alice";
-            passwordBox.Password = "alice123";
-
             CommunicationCore.client.LoginSuccessEvent += LoginSucceed;
             CommunicationCore.client.LoginFailedEvent += LoginFailed;
         }

@@ -94,7 +94,7 @@
                             <TextBlock Grid.Column="1" Text="{x:Bind LatestMessage, Mode=OneWay}" 
                                Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"
                                FontSize="13px"
-                               TextTrimming="WordEllipsis"
+                               TextTrimming="Clip"
                                VerticalAlignment="Top"/>
                             <cc:UnreadBadge Grid.Column="2" UnreadCount="{x:Bind UnreadCount, Mode=OneWay, FallbackValue=0}"
                                     NotificationType="{x:Bind NotificationType, Mode=OneWay}"/>

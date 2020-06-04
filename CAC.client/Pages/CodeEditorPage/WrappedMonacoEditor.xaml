@@ -56,7 +56,10 @@
 
         <mtuc:GridSplitter Grid.Row="2" Height="16" ResizeDirection="Rows">
         </mtuc:GridSplitter>
+
+        <ScrollViewer  Grid.Row="3" MinHeight="150" VerticalAlignment="Stretch">
+            <TextBlock x:Name="resultTextBlock" VerticalAlignment="Stretch"/>
+        </ScrollViewer>
         
-        <TextBlock x:Name="resultTextBlock" Height="300" Grid.Row="3"/>
     </Grid>
 </UserControl>
