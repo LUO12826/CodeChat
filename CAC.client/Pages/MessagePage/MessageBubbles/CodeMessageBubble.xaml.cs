@@ -6,7 +6,9 @@ using Windows.UI.Xaml.Controls;
 
 using Windows.UI.Xaml.Media;
 using RichTextControls;
-
+using CAC.client.Common;
+using Microsoft.Toolkit.Uwp.Helpers;
+using System.Diagnostics;
 
 namespace CAC.client.MessagePage
 {
@@ -90,9 +92,47 @@ namespace CAC.client.MessagePage
             }
         }
 
-        private void BtnRun_Click(object sender, RoutedEventArgs e)
+        private async void BtnRun_Click(object sender, RoutedEventArgs e)
         {
-            DidTapRunButton?.Invoke(this, new EventArgs());
+
+            if(Code.IsNullOrEmpty()) {
+                return;
+            }
+
+            string lang = "";
+            switch (CodeLanguage) {
+                case "python":
+                    lang = "py";
+                    break;
+                case "cplusplus":
+                    lang = "cpp";
+                    break;
+                case "c":
+                    lang = "c";
+                    break;
+                case "java":
+                    lang = "java";
+                    break;
+                default:
+                    break;
+            }
+            
+            if(lang == "") {
+                await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    RunResult = "暂不支持此语言";
+                });
+            }
+            else {
+                await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    RunResult = "正在编译运行……";
+                });
+                string result = await CompileHelper.Compile(lang, Code, new Random().Next().ToString());
+
+                await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    RunResult = result;
+                });
+            }
+            
         }
 
         private void BtnEdit_Click(object sender, RoutedEventArgs e)

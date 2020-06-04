@@ -36,6 +36,10 @@ namespace CAC.client
             "plaintext","csharp","javascript","python","xml","json","sql","php","ruby","cplusplus","css","java"
         };
 
+        public static string[] HighlightLanguageListLower1 = new string[] {
+            "plaintext","csharp","javascript","python","xml","json","sql","php","ruby","cpp","css","java"
+        };
+
         public static readonly ulong MaxUploadFileSize = 8 * 1024 * 1024;
 
         public static Brush LeftBubbleBgColor = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 243, 243, 243));

@@ -133,6 +133,7 @@
     </Compile>
     <Compile Include="Global\AccountHelper.cs" />
     <Compile Include="Global\CommunicationCore.cs" />
+    <Compile Include="Global\CompileHelper.cs" />
     <Compile Include="Global\DatabaseHelper.cs" />
     <Compile Include="Global\GlobalRef.cs" />
     <Compile Include="Global\ModelConverter.cs" />

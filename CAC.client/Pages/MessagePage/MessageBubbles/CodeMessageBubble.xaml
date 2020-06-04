@@ -34,33 +34,33 @@
                                         HighlightLanguage="{x:Bind CodeLanguage,Mode=OneWay, Converter={StaticResource StringToHightlightLanguage}}"/>
         </ScrollViewer>
 
-        <StackPanel x:Name="functionBtnsLeft" Grid.RowSpan="2" Grid.Column="0">
+        <StackPanel x:Name="functionBtnsLeft" Grid.RowSpan="2" Grid.Column="0" Visibility="Collapsed">
             <Button x:Name="BtnRun" Height="25" Width="25" Style="{StaticResource transparentButtonStyle}" HorizontalAlignment="Center"
                     Padding="0" Click="BtnRun_Click">
                 <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="A" FontSize="14"/>
             </Button>
 
-            <Button x:Name="BtnEdit" Height="25" Width="25" Style="{StaticResource transparentButtonStyle}" 
+            <Button x:Name="BtnEdit" Height="25" Width="25" Style="{StaticResource transparentButtonStyle}" HorizontalAlignment="Center"
                     Padding="0" Click="BtnEdit_Click">
                 <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="B" FontSize="14"/>
             </Button>
 
         </StackPanel>
         
-        <StackPanel x:Name="functionBtnRight" Grid.RowSpan="2" Grid.Column="2">
-            <Button x:Name="BtnRun1" Height="25" Width="25" Style="{StaticResource transparentButtonStyle}" 
+        <StackPanel x:Name="functionBtnRight" Grid.RowSpan="2" Grid.Column="2" Visibility="Visible">
+            <Button x:Name="BtnRun1" Height="25" Width="25" Style="{StaticResource transparentButtonStyle}" HorizontalAlignment="Center"
                     Padding="0" Click="BtnRun_Click">
                 <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="A" FontSize="14"/>
             </Button>
 
-            <Button x:Name="BtnEdit1" Height="25" Width="25" Style="{StaticResource transparentButtonStyle}" 
+            <Button x:Name="BtnEdit1" Height="25" Width="25" Style="{StaticResource transparentButtonStyle}" HorizontalAlignment="Center"
                     Padding="0" Click="BtnEdit_Click">
                 <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="B" FontSize="14"/>
             </Button>
             
         </StackPanel>
 
-        <Grid Grid.Row="1" Visibility="{x:Bind RunResult,Mode=OneWay, Converter={StaticResource NullToVisibility}}">
+        <Grid Grid.Row="1" Grid.Column="1" Visibility="{x:Bind RunResult,Mode=OneWay, Converter={StaticResource NullToVisibility}}" MinHeight="50">
             <TextBlock Text="{x:Bind RunResult, Mode=OneWay}"/>
         </Grid>
     </Grid>

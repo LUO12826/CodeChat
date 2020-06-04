@@ -42,7 +42,7 @@ namespace CAC.client.MessagePage
                         latestMsg = t.Text;
                     }
                     else if (msg is CodeMessageVM c) {
-                        latestMsg = c.Code;
+                        latestMsg = "[代码]";
                     }
                     else if (msg is FileMessageVM f) {
                         latestMsg = f.FileName;
