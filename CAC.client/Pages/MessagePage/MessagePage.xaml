@@ -26,8 +26,10 @@
                             <ColumnDefinition Width="40"/>
                         </Grid.ColumnDefinitions>
 
-                        <AutoSuggestBox VerticalAlignment="Center" 
+                        <AutoSuggestBox x:Name="searchUserBox" VerticalAlignment="Center" 
                                         Margin="10 0 5 0"
+                                        TextChanged="searchUserBox_TextChanged"
+                                        SuggestionChosen="searchUserBox_SuggestionChosen"
                                         BorderBrush="{ThemeResource SystemControlPageBackgroundBaseLowBrush}"/>
                         
                         <Button Style="{StaticResource transparentButtonStyle}" Grid.Column="1">

@@ -42,7 +42,8 @@ namespace CAC.client
                 TopicName = topic.Name,
                 Contact = contact,
                 LastActiveTime = GlobalFunctions.TimestampToDateTime(topic.LastUsed),
-                
+                RawTopic = topic,
+                MaxMsgSeq = topic.MaxLocalSeqId
             };
 
             return chatListItem;

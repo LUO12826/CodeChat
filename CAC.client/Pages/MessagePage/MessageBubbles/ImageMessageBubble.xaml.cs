@@ -67,7 +67,10 @@ namespace CAC.client.MessagePage
         private static async void ImageUriChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if(d is ImageMessageBubble ib) {
-                ib.isLoading = true;
+                await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    ib.isLoading = true;
+                });
+                
                 if (!(e.NewValue as string).IsNullOrEmpty()) {
                     Debug.WriteLine(e.NewValue as string);
                     var bitmap = await ib.dowloadImage(e.NewValue as string);

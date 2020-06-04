@@ -37,30 +37,20 @@ namespace CAC.client.MessagePage
                 var chat = findChatlistItemByTopicName(args.TopicName);
 
                 if (chat != null && args.Message.SeqId > chat.MaxMsgSeq) {
-                    string latestMsg = "";
-                    if (msg is TextMessageVM t) {
-                        latestMsg = t.Text;
-                    }
-                    else if (msg is CodeMessageVM c) {
-                        latestMsg = "[代码]";
-                    }
-                    else if (msg is FileMessageVM f) {
-                        latestMsg = f.FileName;
-                    }
-                    else if (msg is ImageMessageVM i) {
-                        latestMsg = "[图片]";
-                    }
-                    chat.LatestMessage = latestMsg;
+                    
+                    chat.LatestMessage = GlobalFunctions.MessageToLatestString(msg);
                     chat.MaxMsgSeq = args.Message.SeqId;
+
+                    if (chat != selectedChat && !msg.SendByMe) {
+
+                        Items.Remove(chat);
+                        Items.Insert(0, chat);
+                        chat.LastActiveTime = DateTime.Now;
+                        chat.UnreadCount++;
+                    }
                 }
 
-                if (chat != null && chat != selectedChat && !msg.SendByMe) {
-
-                    Items.Remove(chat);
-                    Items.Insert(0, chat);
-                    chat.LastActiveTime = DateTime.Now;
-                    chat.UnreadCount++;
-                }
+                
             });
 
         }

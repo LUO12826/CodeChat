@@ -17,6 +17,7 @@ using CodeChatSDK.Controllers;
 using CodeChatSDK.EventHandler;
 using Microsoft.Toolkit.Uwp.Helpers;
 using Windows.UI.WindowManagement;
+using System.Linq;
 
 namespace CAC.client.MessagePage
 {
@@ -27,6 +28,8 @@ namespace CAC.client.MessagePage
 
         //指示此消息查看器查看的是哪个topic的消息。
         private string topicName;
+
+        private ChatListChatItemVM chatItem;
 
         public Topic topic;
 
@@ -90,9 +93,12 @@ namespace CAC.client.MessagePage
             
         }
 
-        public MessageViewerViewModel(string topicName)
+        public MessageViewerViewModel(ChatListChatItemVM chatItem)
         {
             Messages = new ObservableCollection<MessageItemBaseVM>();
+            this.chatItem = chatItem;
+            this.topicName = chatItem.TopicName;
+            this.topic = chatItem.RawTopic;
 
             MyContactInfo = new ContactItemViewModel() {
                 UserName = CommunicationCore.account.Username,
@@ -101,23 +107,17 @@ namespace CAC.client.MessagePage
                 IsOnline = true,
             };
 
+            CommunicationCore.client.AddMessageEvent += Client_AddMessageEvent;
             initViewer(topicName);
-            
         }
 
         private async void initViewer(string topicName)
         {
-
-            await Task.Run(() => {
-                this.topicName = topicName;
-                this.topic = CommunicationCore.accountController.GetTopicByName(topicName);
-                CommunicationCore.client.AddMessageEvent += Client_AddMessageEvent;
-            });
             await LoadHistoryMessages();
         }
 
 
-        private void Client_AddMessageEvent(object sender, CodeChatSDK.EventHandler.AddMessageEventArgs args)
+        private void Client_AddMessageEvent(object sender, AddMessageEventArgs args)
         {
             Debug.WriteLine("Client_AddMessageEvent");
             Debug.WriteLine("消息的topic是" + args.TopicName);
@@ -157,7 +157,8 @@ namespace CAC.client.MessagePage
             topicController.LoadMessage();
             List<ChatMessage> ChatMessageList = topic.MessageList;
             Debug.WriteLine("直接从topiccontroller加载了" + ChatMessageList.Count + "条消息");
-
+            if (ChatMessageList.Count == 0)
+                return;
             await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                 foreach (var message in ChatMessageList) {
                     var msg = ModelConverter.MessageToMessageVM(message);
@@ -167,6 +168,7 @@ namespace CAC.client.MessagePage
                         Debug.WriteLine(tm.Text);
                     }
                 }
+                chatItem.LatestMessage = GlobalFunctions.MessageToLatestString(Messages.Last());
             });
             
         }

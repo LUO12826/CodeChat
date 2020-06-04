@@ -66,7 +66,7 @@ namespace CAC.client.MessagePage
                 CurrentViewer = messageViewerCache[chatListItem];
             }
             else {
-                var viewerVM = new MessageViewer(chatListItem.TopicName);
+                var viewerVM = new MessageViewer(chatListItem);
                 CurrentViewer = viewerVM;
                 messageViewerCache.Add(chatListItem, viewerVM);
             }

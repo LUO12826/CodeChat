@@ -1,6 +1,9 @@
 ﻿using CAC.client.Common;
+using Microsoft.Toolkit.Uwp.Helpers;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -19,29 +22,79 @@ using Windows.UI.Xaml.Navigation;
 namespace CAC.client.SignupPage
 {
 
-    sealed partial class SignupPage : Page
+    sealed partial class SignupPage : Page, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public bool _SignupRunning = false;
+        public bool SignupRunning {
+            get => _SignupRunning;
+            set {
+                _SignupRunning = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SignupRunning)));
+            }
+        }
+
+        public bool _SignupFailed = false;
+        public bool SignupFailed {
+            get => _SignupFailed;
+            set {
+                _SignupFailed = value;
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(SignupFailed)));
+            }
+        }
+
         public SignupPage()
         {
             this.InitializeComponent();
+            CommunicationCore.client.RegisterSuccessEvent += Client_RegisterSuccessEvent;
+            CommunicationCore.client.RegisterFailedEvent += Client_RegisterFailedEvent;
         }
 
-        private void registerButton_Tapped(object sender, TappedRoutedEventArgs e)
+        
+
+        private void Client_RegisterFailedEvent(object sender, CodeChatSDK.EventHandler.RegisterFailedEventArgs args)
         {
+            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                pwdHint.Text = "注册失败，信息为：" + args.Exception.Message;
+                SignupFailed = true;
+                SignupRunning = false;
+            });
+        }
+
+        private void Client_RegisterSuccessEvent(object sender, CodeChatSDK.EventHandler.RegisterSuccessEventArgs args)
+        {
+            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                SignupRunning = false;
+                
+                notify.Show("注册成功", 1500);
+                GlobalRef.RootFrame.Navigate(typeof(LoginPage.LoginPage), 
+                    new Tuple<string, string>(userNameBox.Text, passwordBox.Password));
+
+            });
+
+            CommunicationCore.accountController.SendVerificationCode("123456");
+        }
+
+        private async void registerButton_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+
             var info = getInfo();
-            if(info ==null) {
+            if(info == null) {
                 pwdHint.Text = "信息不完整，请检查";
-                pwdHint.Visibility = Visibility.Visible;
+                SignupFailed = true;
+                return;
             }
 
             if(passwordBox.Password != ConfirmPasswordBox.Password) {
                 pwdHint.Text = "两次输入的密码不一致";
-                pwdHint.Visibility = Visibility.Visible;
+                SignupFailed = true;
                 return;
             }
-            pwdHint.Visibility = Visibility.Collapsed;
-            
 
+            SignupRunning = true;
+            SignupFailed = false;
+            await CommunicationCore.Register(info[0], info[1], info[2], info[3]);
         }
 
         private string[] getInfo()

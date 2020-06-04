@@ -10,6 +10,7 @@ using Monaco;
 using GalaSoft.MvvmLight.Messaging;
 using CAC.client.Common;
 using Microsoft.Toolkit.Uwp.Helpers;
+using System.Threading.Tasks;
 
 namespace CAC.client.CodeEditorPage
 {
@@ -24,6 +25,7 @@ namespace CAC.client.CodeEditorPage
         public event Action CodeEditorLoaded;
         public event Action<string, string> SendCodeBack;
 
+        private bool isSwitching = false;
         private CodeEditSessionInfo _currentSession;
         public CodeEditSessionInfo CurrentSession {
             get => _currentSession;
@@ -56,6 +58,7 @@ namespace CAC.client.CodeEditorPage
 
         private async void switchToCurrentSession()
         {
+            isSwitching = true;
             if (!isEditorLoaded || CurrentSession == null)
                 return;
 
@@ -65,12 +68,21 @@ namespace CAC.client.CodeEditorPage
             if(langIndex != -1) {
                 languageOptionBox.SelectedIndex = langIndex;
             }
-            await editor.SwitchToSession(CurrentSession.GetHashCode().ToString(), CurrentSession.Language, CurrentSession.Code);
-
+            else {
+                languageOptionBox.SelectedIndex = 0;
+            }
+            await editor.SwitchToSession(CurrentSession.GetHashCode().ToString(),
+                GlobalConfigs.HighlightLanguageListLower1[langIndex], 
+                CurrentSession.Code);
+            await Task.Delay(200);
+            isSwitching = false;
         }
 
         private void languageOptionBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if(isSwitching) {
+                return;
+            }
             CurrentSession.Language = GlobalConfigs.HighlightLanguageListLower[languageOptionBox.SelectedIndex];
             editor.CodeLanguage = GlobalConfigs.HighlightLanguageListLower1[languageOptionBox.SelectedIndex];
             editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);

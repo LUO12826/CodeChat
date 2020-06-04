@@ -3,6 +3,7 @@ using Windows.UI.Xaml.Controls;
 using CAC.client.Common;
 using CAC.client.ContactPage;
 using Windows.Storage.AccessCache;
+using CodeChatSDK.Models;
 
 namespace CAC.client.MessagePage
 {
@@ -27,6 +28,7 @@ namespace CAC.client.MessagePage
         private DateTime _LastActiveTime;
 
         public long MaxMsgSeq { get; set; } = 0;
+        public Topic RawTopic { get; set; }
 
         public string TopicName {
             get => _TopicName;

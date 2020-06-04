@@ -1,4 +1,5 @@
 ﻿
+using CAC.client.MessagePage;
 using CodeChatSDK.Models;
 using System;
 using Windows.UI.ViewManagement;
@@ -107,6 +108,24 @@ namespace CAC.client
             }
 
             return -1;
+        }
+
+        public static string MessageToLatestString(MessageItemBaseVM msg)
+        {
+            string latestMsg = "";
+            if (msg is TextMessageVM t) {
+                latestMsg = t.Text;
+            }
+            else if (msg is CodeMessageVM c) {
+                latestMsg = "[代码]";
+            }
+            else if (msg is FileMessageVM f) {
+                latestMsg = f.FileName;
+            }
+            else if (msg is ImageMessageVM i) {
+                latestMsg = "[图片]";
+            }
+            return latestMsg;
         }
     }
 }

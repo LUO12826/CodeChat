@@ -44,11 +44,11 @@ namespace CAC.client.MessagePage
             VM = new MessageViewerViewModel();
         }
 
-        public MessageViewer(string topicName)
+        public MessageViewer(ChatListChatItemVM chatItem)
         {
             this.InitializeComponent();
             this.MessageViewerList.DataContext = this;
-            VM = new MessageViewerViewModel(topicName);
+            VM = new MessageViewerViewModel(chatItem);
         }
 
         private void willChangeVM(ChatListBaseItemVM chat)
