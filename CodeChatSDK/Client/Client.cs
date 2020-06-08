@@ -9,6 +9,7 @@ using Newtonsoft.Json.Linq;
 using Pbx;
 using RestSharp;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -200,12 +201,12 @@ namespace CodeChatSDK
         /// <summary>
         /// 待发送消息列表
         /// </summary>
-        private Queue<ClientMsg> sendMessageQueue;
+        private ConcurrentQueue<ClientMsg> sendMessageQueue;
 
         /// <summary>
         /// 已完成列表
         /// </summary>
-        private Dictionary<string, Callback> onCompletion;
+        private ConcurrentDictionary<string, Callback> onCompletion;
 
         /// <summary>
         /// 构造函数
@@ -220,8 +221,8 @@ namespace CodeChatSDK
             ApiBaseUrl = "http://127.0.0.1:6060";
             ApiKey = "AQEAAAABAAD_rAp4DJh05a1HAwFT3A6K";
             cancellationTokenSource = new CancellationTokenSource();
-            sendMessageQueue = new Queue<ClientMsg>();
-            onCompletion = new Dictionary<string, Callback>();
+            sendMessageQueue = new ConcurrentQueue<ClientMsg>();
+            onCompletion = new ConcurrentDictionary<string, Callback>();
         }
 
         /// <summary>
@@ -300,7 +301,8 @@ namespace CodeChatSDK
                 onCompletion.Clear();
                 while (sendMessageQueue.Count > 0)
                 {
-                    sendMessageQueue.Dequeue();
+                    ClientMsg message = null;
+                    sendMessageQueue.TryDequeue(out message);
                 }
             }
             catch (Exception e)
@@ -716,17 +718,20 @@ namespace CodeChatSDK
                      if (sendMessageQueue.Count > 0)
                      {
                          //消息出队
-                         ClientMsg message = sendMessageQueue.Dequeue();
-                         try
+                         ClientMsg message = null;
+                         if(sendMessageQueue.TryDequeue(out message))
                          {
-                             //发送消息
-                             await stream.RequestStream.WriteAsync(message);
-                         }
-                         catch (Exception e)
-                         {
-                             //发送失败消息入队以便再次发送
-                             sendMessageQueue.Enqueue(message);
-                             Thread.Sleep(1000);
+                             try
+                             {
+                                 //发送消息
+                                 await stream.RequestStream.WriteAsync(message);
+                             }
+                             catch (Exception e)
+                             {
+                                 //发送失败消息入队以便再次发送
+                                 sendMessageQueue.Enqueue(message);
+                                 Thread.Sleep(1000);
+                             }
                          }
                      }
                      else
@@ -838,7 +843,7 @@ namespace CodeChatSDK
         /// <param name="bundle">回调</param>
         private void AddCallback(string id, Callback bundle)
         {
-            onCompletion.Add(id, bundle);
+            onCompletion.TryAdd(id, bundle);
         }
 
         /// <summary>
@@ -855,7 +860,8 @@ namespace CodeChatSDK
             {
                 var bundle = onCompletion[id];
                 var type = onCompletion[id].Type;
-                onCompletion.Remove(id);
+                Callback callback = null;
+                onCompletion.TryRemove(id,out callback);
 
                 if (code >= 200 && code <= 400)
                 {
