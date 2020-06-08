@@ -759,7 +759,8 @@ namespace CodeChatSDK.Controllers
             //移动话题位置
             await MoveTopic(currentTopic);
 
-            TopicController topicController = await GetTopicController(currentTopic);
+            TopicController topicController = new TopicController(db);
+            await topicController.SetTopic(currentTopic);
             //调用对应话题添加消息方法
             await topicController.AddMessage(args.Message);
         }
