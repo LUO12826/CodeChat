@@ -5,12 +5,17 @@
     xmlns:local="using:CAC.client.CustomControls"
     xmlns:mtuc="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:sdk="using:CodeChatSDK.Models"
+    xmlns:con="using:CAC.client.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     d:DesignHeight="300"
     d:DesignWidth="400">
 
+    <UserControl.Resources>
+        <con:BoolToVisibility x:Key="BoolToVisibility"/>
+    </UserControl.Resources>
+    
     <Grid Width="240">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -24,8 +29,12 @@
 
         <TextBox x:Name="SearchTextBox" PlaceholderText="请输入要查找的用户名" Height="36" Margin="5"/>
         <Button x:Name="BtnSearch" Content="查找" Grid.Column="1" Height="36" Margin="5" Tapped="BtnSearch_Tapped"/>
+
+        <ProgressRing Grid.Row="1" Grid.ColumnSpan="2" Width="40" Height="40" Visibility="Visible"
+                      IsActive="{x:Bind IsSearching, Mode=OneWay}"/>
+
         <Grid  Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="200">
-            <ListView ItemsSource="{x:Bind subscribers, Mode=OneWay}" SelectionMode="Single" IsItemClickEnabled="True">
+            <ListView ItemsSource="{x:Bind Subscribers, Mode=OneWay}" SelectionMode="Single" IsItemClickEnabled="True">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="sdk:Subscriber">
                         <Grid Margin="0 0 12 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"

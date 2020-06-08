@@ -12,6 +12,9 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using CAC.client;
 using Windows.UI.Xaml.Input;
+using System.Linq;
+using Windows.UI.Text;
+using Windows.Security.Credentials;
 
 namespace CAC.client.LoginPage
 {
@@ -74,13 +77,13 @@ namespace CAC.client.LoginPage
                 userNameBox.Text = info.Item1;
                 passwordBox.Password = info.Item2;
             }
-
+            loadAccountInfo();
         }
 
         protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
         {
             base.OnNavigatingFrom(e);
-
+            recordAccountInfo();
         }
 
 
@@ -99,6 +102,85 @@ namespace CAC.client.LoginPage
         private void BtnSignup_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             GlobalRef.RootFrame.Navigate(typeof(SignupPage.SignupPage), 0);
+        }
+
+        private void recordAccountInfo()
+        {
+            bool remember = false;
+            if(rememberPwdCheckBox.IsChecked.HasValue) {
+                remember = rememberPwdCheckBox.IsChecked.Value;
+            }
+            bool autoLogin = false;
+            if (autoLoginCheckBox.IsChecked.HasValue) {
+                autoLogin = autoLoginCheckBox.IsChecked.Value;
+            }
+
+            var newAccount = new AccountRecord() {
+                UserName = userNameBox.Text,
+                RememberPassword = remember,
+                KeepLogin = autoLogin,
+            };
+
+            var account = accounts.Where(x => x.UserName == userNameBox.Text).FirstOrDefault();
+            if(account == null) {
+                accounts.Add(newAccount);
+                if (newAccount.RememberPassword) {
+                    var vault = new PasswordVault();
+                    vault.Add(new PasswordCredential(Application.Current.ToString(), newAccount.UserName, passwordBox.Password));
+                }
+            }
+            else {
+                accounts.Remove(account);
+                accounts.Insert(0, newAccount);
+                if (!newAccount.RememberPassword) {
+                    var vault = new PasswordVault();
+                    var cred = vault.Retrieve(Application.Current.ToString(), newAccount.UserName);
+                    if(cred != null) {
+                        vault.Remove(cred);
+                    }
+                }
+                else {
+                    var vault = new PasswordVault();
+                    vault.Add(new PasswordCredential(Application.Current.ToString(), newAccount.UserName, passwordBox.Password));
+                }
+            }
+
+
+            AccountHelper.StorageAccountList(accounts);
+        }
+
+        private void loadAccountInfo()
+        {
+            DispatcherHelper.ExecuteOnUIThreadAsync(async () => {
+                accounts = await AccountHelper.GetAccountList();
+            });
+            
+        }
+
+        private void userNameBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if(args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) {
+                return;
+            }
+            userNameBox.ItemsSource = accounts.Where(x => x.UserName.Contains(userNameBox.Text)).ToList();
+        }
+
+        private void userNameBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            var user = args.SelectedItem as AccountRecord;
+            if (user == null)
+                return;
+
+            rememberPwdCheckBox.IsChecked = user.RememberPassword;
+            
+            if(user.RememberPassword) {
+                var vault = new PasswordVault();
+                var cred = vault.Retrieve(Application.Current.ToString(), user.UserName);
+                if(cred != null) {
+                    passwordBox.Password = cred.Password;
+                }
+                
+            }
         }
     }
 }

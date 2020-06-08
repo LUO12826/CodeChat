@@ -68,17 +68,21 @@ namespace CAC.client.MessagePage
         {
             if(d is ImageMessageBubble ib) {
                 await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
-                    ib.isLoading = true;
+                    ib.isLoading = false;
                 });
-                
+
                 if (!(e.NewValue as string).IsNullOrEmpty()) {
-                    Debug.WriteLine(e.NewValue as string);
+
                     var bitmap = await ib.dowloadImage(e.NewValue as string);
                     if(bitmap != null) {
                         await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
-                            ib.image.Source = bitmap;
+                            ib.image.Source = bitmap;  
                         });
-                        
+                    }
+                    else {
+                        await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                            ib.loadFailedBorder.Visibility = Visibility.Visible;
+                        });
                     }
                 }
             }
@@ -89,7 +93,9 @@ namespace CAC.client.MessagePage
 
             if (d is ImageMessageBubble ib) {
                 if (!(e.NewValue as string).IsNullOrEmpty() && ib.ImageUri.IsNullOrEmpty()) {
-                    ib.isLoading = true;
+                    DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                        ib.isLoading = true;
+                    });
                     //Bitmap image = Converter.ConvertBase64ToImage(e.NewValue as string);
                     ib.image.Source = e.NewValue as string;
                 }
@@ -99,24 +105,27 @@ namespace CAC.client.MessagePage
         public ImageMessageBubble()
         {
             this.InitializeComponent();
-            image.Loaded += Image_Loaded;
+            image.ImageExOpened += Image_ImageExOpened;
             image.ImageExFailed += Image_ImageExFailed;
+        }
+
+        private void Image_ImageExOpened(object sender, Microsoft.Toolkit.Uwp.UI.Controls.ImageExOpenedEventArgs e)
+        {
+
+            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                isLoading = false;
+            });
+
+            Debug.WriteLine("image loaded");
         }
 
         private void Image_ImageExFailed(object sender, Microsoft.Toolkit.Uwp.UI.Controls.ImageExFailedEventArgs e)
         {
-           
+            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                loadFailedBorder.Visibility = Visibility.Visible;
+            });
         }
 
-        private void Image_Loaded(object sender, RoutedEventArgs e)
-        {
-            if (!this.isLoading)
-                return;
-            this.isLoading = false;
-            progressRing.IsActive = false;
-            ProgressRingBorder.Visibility = Visibility.Collapsed;
-            image.Visibility = Visibility.Visible;
-        }
 
         //下载图片。
         private async Task<BitmapImage> dowloadImage(string url)
@@ -126,8 +135,9 @@ namespace CAC.client.MessagePage
                 return null;
 
             isDownloading = true;
-            try {
 
+
+            try {
                 System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(url);
                 //系统缓存
                 request.CachePolicy = new RequestCachePolicy(RequestCacheLevel.CacheIfAvailable);
@@ -143,11 +153,9 @@ namespace CAC.client.MessagePage
                 // Set the start position.
                 memStream.Position = 0;
                 var bitmap = new BitmapImage();
-                await bitmap.SetSourceAsync(memStream.AsRandomAccessStream());
-
+                bitmap.SetSource(memStream.AsRandomAccessStream());
 
                 return bitmap;
-
             }
             catch (Exception ex) {
                 Debug.WriteLine(ex.Message);
@@ -160,7 +168,12 @@ namespace CAC.client.MessagePage
             
         }
 
+        ~ImageMessageBubble()
+        {
+            image.ImageExOpened -= Image_ImageExOpened;
+            image.ImageExFailed -= Image_ImageExFailed;
+        }
 
-
+        
     }
 }

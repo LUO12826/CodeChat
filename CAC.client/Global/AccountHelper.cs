@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Windows.System;
 using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 using System.Collections.Generic;
+using Windows.ApplicationModel.VoiceCommands;
 
 namespace CAC.client
 {
@@ -23,10 +24,10 @@ namespace CAC.client
                 file = await folder.GetFileAsync(AccountListFileName);
             }
             catch {
-                file = await folder.CreateFileAsync(AccountListFileName);
+                return new List<AccountRecord>();
             }
 
-            return BinRead(file.Path) as List<AccountRecord>;
+            return BinRead(file.Path) != null ? (BinRead(file.Path) as List<AccountRecord>) : new List<AccountRecord>();
         }
 
         public static async void StorageAccountList(List<AccountRecord> account)
@@ -90,5 +91,10 @@ namespace CAC.client
         public string UserName;
         public bool KeepLogin;
         public bool RememberPassword;
+
+        public override string ToString()
+        {
+            return UserName;
+        }
     }
 }

@@ -11,16 +11,23 @@
     d:DesignHeight="300"
     d:DesignWidth="400">
     <UserControl.Resources>
-
+        <con:BoolToVisibility x:Key="BoolToVisibility"/>
+        <con:BoolToVisibilityInvert x:Key="BoolToVisibilityInvert"/>
     </UserControl.Resources>
 
     <Grid Background="{x:Bind BgColor, Mode=OneWay}" Padding="10" CornerRadius="4">
         <Border x:Name="ProgressRingBorder" MaxHeight="120" MaxWidth="140" Padding="30"
-                    Visibility="Visible" Background="Transparent" HorizontalAlignment="Stretch">
+                    Visibility="{x:Bind isLoading, Mode=OneWay, Converter={StaticResource BoolToVisibility}}" Background="Transparent" HorizontalAlignment="Stretch">
             <ProgressRing x:Name="progressRing" IsActive="True" Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
         </Border>
 
-        <mtuc:ImageEx x:Name="image" Visibility="Collapsed" MaxWidth="400" MaxHeight="400"/>
+        <Border x:Name="loadFailedBorder" MaxHeight="120" MaxWidth="140" Padding="30" Visibility="Collapsed"
+                    Background="Transparent" HorizontalAlignment="Stretch">
+            <Image Source="/Assets/icons/loadFailed.png" Width="40" Height="40"/>
+        </Border>
+        
+        <mtuc:ImageEx x:Name="image" Visibility="Visible" 
+                      MaxWidth="400" MaxHeight="400"/>
     </Grid>
 
 </UserControl>

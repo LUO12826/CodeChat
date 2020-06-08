@@ -63,8 +63,6 @@ namespace CAC.client.CodeEditorPage
                 return;
 
             int langIndex = GlobalFunctions.FindPosInLangList(CurrentSession.Language);
-            Debug.WriteLine("langIndex");
-            Debug.WriteLine(langIndex);
             if(langIndex != -1) {
                 languageOptionBox.SelectedIndex = langIndex;
             }

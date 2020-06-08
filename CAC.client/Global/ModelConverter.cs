@@ -61,6 +61,7 @@ namespace CAC.client
                 return new CodeMessageVM() {
                     Code = msg.Text,
                     Language = GlobalFunctions.SDKcodeTypeToString(msg.CodeType),
+                    RunResult = null,
                     ID = msg.Id,
                     Contact = contact,
                     SendByMe = sendByMe,

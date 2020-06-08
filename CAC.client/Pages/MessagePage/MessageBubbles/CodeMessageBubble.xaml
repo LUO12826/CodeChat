@@ -60,7 +60,7 @@
             
         </StackPanel>
 
-        <Grid Grid.Row="1" Grid.Column="1" Visibility="{x:Bind RunResult,Mode=OneWay, Converter={StaticResource NullToVisibility}}" MinHeight="50">
+        <Grid Grid.Row="1" Grid.Column="1" Visibility="{x:Bind RunResult,Mode=OneWay, Converter={StaticResource NullToVisibility}}">
             <TextBlock Text="{x:Bind RunResult, Mode=OneWay}"/>
         </Grid>
     </Grid>

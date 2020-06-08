@@ -87,10 +87,11 @@ namespace CAC.client.MessagePage
             Messages = new ObservableCollection<MessageItemBaseVM>();
 
             MyContactInfo = new ContactItemViewModel() {
-                UserName = "self",
-                Base64Avatar = GlobalConfigs.testB64Avator1
+                UserName = CommunicationCore.account.Username,
+                Base64Avatar = CommunicationCore.account.Avatar.IsNullOrEmpty() ? GlobalConfigs.defaultAvatar : CommunicationCore.account.Avatar,
+                UserID = CommunicationCore.account.UserId,
+                IsOnline = true,
             };
-            
         }
 
         public MessageViewerViewModel(ChatListChatItemVM chatItem)
@@ -119,9 +120,6 @@ namespace CAC.client.MessagePage
 
         private void Client_AddMessageEvent(object sender, AddMessageEventArgs args)
         {
-            Debug.WriteLine("Client_AddMessageEvent");
-            Debug.WriteLine("消息的topic是" + args.TopicName);
-            Debug.WriteLine("当前的topic是" + this.topicName);
             if (args.TopicName != this.topicName)
                 return;
 
@@ -140,7 +138,6 @@ namespace CAC.client.MessagePage
                 else {
                     Messages.Add(msg);
                 }
-                Debug.WriteLine(Messages.Count + "========================");
             });
         }
 
@@ -148,29 +145,27 @@ namespace CAC.client.MessagePage
         {
             if (topic == null)
                 return;
-            Messages.Clear();
 
+            Messages.Clear();
             if(topicController == null) {
                 topicController = await CommunicationCore.accountController.GetTopicController(topic);
             }
 
-            topicController.LoadMessage();
             List<ChatMessage> ChatMessageList = topic.MessageList;
             Debug.WriteLine("直接从topiccontroller加载了" + ChatMessageList.Count + "条消息");
-            if (ChatMessageList.Count == 0)
-                return;
-            await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
-                foreach (var message in ChatMessageList) {
-                    var msg = ModelConverter.MessageToMessageVM(message);
-                    Messages.Add(msg);
 
-                    if(msg is TextMessageVM tm) {
-                        Debug.WriteLine(tm.Text);
+
+            if (ChatMessageList.Count != 0) {
+                await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    foreach (var message in ChatMessageList) {
+                        var msg = ModelConverter.MessageToMessageVM(message);
+                        Messages.Add(msg);
                     }
-                }
-                chatItem.LatestMessage = GlobalFunctions.MessageToLatestString(Messages.Last());
-            });
-            
+                    chatItem.LatestMessage = GlobalFunctions.MessageToLatestString(Messages.Last());
+                });
+            }
+
+            topicController.LoadMessage();
         }
 
         public void RequestEditCode(CodeMessageVM codeMessage)

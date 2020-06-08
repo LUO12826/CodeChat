@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text;
@@ -52,11 +53,10 @@ namespace CAC.client
         public static ContactItemViewModel GetContactByTopicName(string topicName)
         {
             var subList = account.SubscriberList;
-            foreach(var sub in subList) {
 
-                if (sub.UserId == topicName) {
-                    return ModelConverter.SubscriberToContact(sub);
-                }
+            var sub = subList.Where(x => x.UserId == topicName).FirstOrDefault();
+            if(sub != null) {
+                return ModelConverter.SubscriberToContact(sub);
             }
             return null;
         }
