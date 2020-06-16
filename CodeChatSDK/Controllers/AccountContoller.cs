@@ -1,6 +1,7 @@
 ﻿using CodeChatSDK.EventHandler;
 using CodeChatSDK.Models;
 using CodeChatSDK.Repository;
+using CodeChatSDK.SDKClient;
 using Google.Protobuf;
 using System.Collections.Generic;
 using System.Linq;

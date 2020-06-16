@@ -8,7 +8,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using System.Threading.Tasks;
 using CAC.client.ContactPage;
-using CodeChatSDK;
+using CodeChatSDK.SDKClient;
 using CodeChatSDK.Controllers;
 using CodeChatSDK.Models;
 

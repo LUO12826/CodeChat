@@ -1,5 +1,6 @@
 ﻿using CodeChatSDK.Models;
 using CodeChatSDK.Repository;
+using CodeChatSDK.SDKClient;
 using CodeChatSDK.Utils;
 using System;
 using System.Collections.Generic;

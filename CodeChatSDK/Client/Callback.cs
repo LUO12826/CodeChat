@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.SDKClient
 {
     /// <summary>
     /// 回调

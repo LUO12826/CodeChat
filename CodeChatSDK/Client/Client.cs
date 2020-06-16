@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using Windows.Storage;
 using static Pbx.Node;
 
-namespace CodeChatSDK
+namespace CodeChatSDK.SDKClient
 {
     /// <summary>
     /// 客户端
