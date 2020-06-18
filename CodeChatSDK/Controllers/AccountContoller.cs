@@ -472,11 +472,14 @@ namespace CodeChatSDK.Controllers
         /// <returns>结果</returns>
         public async Task<bool> AddSubscriber(Subscriber subscriber,bool isTemporary=false)
         {
+            //判断是否为有效订阅者
             if (instance.SubscriberList.Contains(subscriber) || subscriber.TopicName == "fnd" || subscriber.TopicName == "me")
             {
+                //无效订阅者返回假
                 return false;
             }
 
+            //判断是否为临时查询
             if (isTemporary == true)
             {
                 if (searchSubscriberResult.Contains(subscriber))
@@ -527,6 +530,7 @@ namespace CodeChatSDK.Controllers
         /// <returns>结果</returns>
         public async Task<bool> RemoveSubscriber(Subscriber subscriber)
         {
+            //判断订阅者是否位于订阅者列表中
             if (!instance.SubscriberList.Contains(subscriber))
             {
                 return false;
@@ -584,6 +588,7 @@ namespace CodeChatSDK.Controllers
             await topicController.SetTopic(removedTopic);
             topicController.DeleteTopic();
 
+            //移除成功返回真
             return true;
         }
 

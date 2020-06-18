@@ -305,9 +305,9 @@ namespace CodeChatSDK.SDKClient
                     sendMessageQueue.TryDequeue(out message);
                 }
             }
-            catch (Exception e)
+            catch
             {
-
+                
             }
         }
 
@@ -523,7 +523,7 @@ namespace CodeChatSDK.SDKClient
                     return null;
                 }
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -616,7 +616,7 @@ namespace CodeChatSDK.SDKClient
                     return null;
                 }
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -726,7 +726,7 @@ namespace CodeChatSDK.SDKClient
                                  //发送消息
                                  await stream.RequestStream.WriteAsync(message);
                              }
-                             catch (Exception e)
+                             catch
                              {
                                  //发送失败消息入队以便再次发送
                                  sendMessageQueue.Enqueue(message);
