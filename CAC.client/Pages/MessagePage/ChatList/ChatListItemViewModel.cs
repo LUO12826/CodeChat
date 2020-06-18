@@ -21,7 +21,6 @@ namespace CAC.client.MessagePage
     class ChatListBaseItemVM : BaseViewModel, IChatListItem
     {
         private string _TopicName;
-        private string _ChatName;
         private int _UnreadCount;
         private bool _CanPinToTop;
         private string _LatestMessage;
@@ -38,13 +37,6 @@ namespace CAC.client.MessagePage
             }
         }
 
-        public string ChatName {
-            get => _ChatName;
-            set {
-                _ChatName = value;
-                RaisePropertyChanged(nameof(ChatName));
-            }
-        }
 
         public string LatestMessage {
             get => _LatestMessage;

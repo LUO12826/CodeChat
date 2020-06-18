@@ -111,5 +111,10 @@ namespace CAC.client.SignupPage
             }
             return info;
         }
+
+        private void btnReturn_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            GlobalRef.RootFrame.Navigate(typeof(LoginPage.LoginPage));
+        }
     }
 }

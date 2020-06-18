@@ -8,6 +8,8 @@ using CodeChatSDK.Models;
 using Windows.Graphics.Printing.Workflow;
 
 using System.Diagnostics;
+using Windows.UI.Core;
+using Microsoft.Toolkit.Uwp.Helpers;
 
 namespace CAC.client.ContactPage
 {
@@ -25,6 +27,29 @@ namespace CAC.client.ContactPage
                 IsExpanded = false,
                 Contacts = AllContact
             });
+            CommunicationCore.client.AddSubscriberEvent += Client_AddSubscriberEvent;
+            CommunicationCore.client.RemoveSubscriberEvent += Client_RemoveSubscriberEvent;
+        }
+
+        private void Client_RemoveSubscriberEvent(object sender, CodeChatSDK.EventHandler.RemoveSubscriberEventArgs args)
+        {
+            var contact = AllContact.Where(x => (x as ContactItemViewModel).UserID == args.Subscriber.UserId)
+                                    .FirstOrDefault();
+
+            if(contact != null) {
+                DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    AllContact.Remove(contact);
+                });
+            }
+        }
+
+        private void Client_AddSubscriberEvent(object sender, CodeChatSDK.EventHandler.AddSubscriberEventArgs args)
+        {
+            var contact = ModelConverter.SubscriberToContact(args.Subscriber);
+            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                AllContact.Add(contact);
+            });
+            
         }
 
         public void DidSelectContact(ContactBaseViewModel contactItem)

@@ -160,7 +160,7 @@ namespace CAC.client.CustomControls
 
         private async void showFileTooLarge()
         {
-            var msgDialog = new Windows.UI.Popups.MessageDialog("当前仅支持上传小于10MB的文件。") { Title = "文件过大" };
+            var msgDialog = new Windows.UI.Popups.MessageDialog("当前仅支持上传小于8MB的文件。") { Title = "文件过大" };
             msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定"));
             await msgDialog.ShowAsync();
         }

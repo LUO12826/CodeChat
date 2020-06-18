@@ -33,8 +33,9 @@
         <ProgressRing Grid.Row="1" Grid.ColumnSpan="2" Width="40" Height="40" Visibility="Visible"
                       IsActive="{x:Bind IsSearching, Mode=OneWay}"/>
 
-        <Grid  Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="200">
-            <ListView ItemsSource="{x:Bind Subscribers, Mode=OneWay}" SelectionMode="Single" IsItemClickEnabled="True">
+        <Grid Grid.Row="1" Grid.ColumnSpan="2" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Height="200">
+            <ListView x:Name="searchResultList" ItemsSource="{x:Bind Subscribers, Mode=OneWay}" 
+                      SelectionMode="None" IsItemClickEnabled="True" ItemClick="searchResultList_ItemClick">
                 <ListView.ItemTemplate>
                     <DataTemplate x:DataType="sdk:Subscriber">
                         <Grid Margin="0 0 12 0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"

@@ -15,6 +15,7 @@ using Windows.UI.Xaml.Input;
 using System.Linq;
 using Windows.UI.Text;
 using Windows.Security.Credentials;
+using CAC.client.Common;
 
 namespace CAC.client.LoginPage
 {
@@ -89,7 +90,7 @@ namespace CAC.client.LoginPage
 
         private async void loginButton_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
-            if (LoginRunning)
+            if (LoginRunning || userNameBox.Text.IsNullOrEmpty() || passwordBox.Password.IsNullOrEmpty())
                 return;
 
             await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
@@ -104,8 +105,13 @@ namespace CAC.client.LoginPage
             GlobalRef.RootFrame.Navigate(typeof(SignupPage.SignupPage), 0);
         }
 
+        //记录账号信息，即一个账号、这个账号是否记住密码和自动登录
         private void recordAccountInfo()
         {
+            if(userNameBox.Text.IsNullOrEmpty() || passwordBox.Password.IsNullOrEmpty()) {
+                return;
+            }
+
             bool remember = false;
             if(rememberPwdCheckBox.IsChecked.HasValue) {
                 remember = rememberPwdCheckBox.IsChecked.Value;
@@ -121,7 +127,9 @@ namespace CAC.client.LoginPage
                 KeepLogin = autoLogin,
             };
 
+            //先查找账号记录里有没有这个账号
             var account = accounts.Where(x => x.UserName == userNameBox.Text).FirstOrDefault();
+            //如果没有，直接加入账号列表
             if(account == null) {
                 accounts.Add(newAccount);
                 if (newAccount.RememberPassword) {
@@ -129,6 +137,7 @@ namespace CAC.client.LoginPage
                     vault.Add(new PasswordCredential(Application.Current.ToString(), newAccount.UserName, passwordBox.Password));
                 }
             }
+            //如果有，看它的“记住密码”状态有无更新
             else {
                 accounts.Remove(account);
                 accounts.Insert(0, newAccount);
@@ -141,6 +150,10 @@ namespace CAC.client.LoginPage
                 }
                 else {
                     var vault = new PasswordVault();
+                    var cred = vault.Retrieve(Application.Current.ToString(), newAccount.UserName);
+                    if (cred != null) {
+                        vault.Remove(cred);
+                    }
                     vault.Add(new PasswordCredential(Application.Current.ToString(), newAccount.UserName, passwordBox.Password));
                 }
             }

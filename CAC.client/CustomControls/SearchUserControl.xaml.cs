@@ -1,22 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 using CodeChatSDK.Models;
 using CAC.client.Common;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Helpers;
-using System.Diagnostics;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -24,6 +13,9 @@ namespace CAC.client.CustomControls
 {
     sealed partial class SearchUserControl : UserControl, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler PropertyChanged;
+
+
         public ObservableCollection<Subscriber> Subscribers { get; set; } = new ObservableCollection<Subscriber>();
         private bool isSearching { get; set; } = false;
 
@@ -40,7 +32,6 @@ namespace CAC.client.CustomControls
             this.InitializeComponent();
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
 
         private async void BtnSearch_Tapped(object sender, TappedRoutedEventArgs e)
         {
@@ -64,6 +55,30 @@ namespace CAC.client.CustomControls
                 }
             });
                 
+        }
+
+        private async void searchResultList_ItemClick(object sender, ItemClickEventArgs e)
+        {
+
+            var sub = e.ClickedItem as Subscriber;
+            string hint = "是否需要添加联系人" + sub.Username + "并发起会话?";
+            var msgDialog = new Windows.UI.Popups.MessageDialog(hint) { Title = "添加联系人" };
+            msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("是", (a) => {
+                addSubscriberOnline(sub);
+            }));
+            msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("否"));
+            await msgDialog.ShowAsync();
+        }
+
+        private async void addSubscriberOnline(Subscriber sub)
+        {
+            bool result = await CommunicationCore.accountController.AddSubscriber(sub);
+            if(result) {
+
+            }
+            else {
+
+            }
         }
     }
 }

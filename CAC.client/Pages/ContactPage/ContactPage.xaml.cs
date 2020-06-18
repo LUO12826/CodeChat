@@ -15,6 +15,7 @@ namespace CAC.client.ContactPage
         public ContactPage()
         {
             this.InitializeComponent();
+            NavigationCacheMode = NavigationCacheMode.Required;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)

@@ -252,6 +252,7 @@
     <Content Include="Assets\Code\example.js" />
     <Content Include="Assets\Code\example.sql" />
     <Content Include="Assets\icons\file.png" />
+    <Content Include="Assets\icons\icon_grey.png" />
     <Content Include="Assets\icons\loadFailed.png" />
     <Content Include="Assets\LargeTile.scale-100.png" />
     <Content Include="Assets\LargeTile.scale-125.png" />

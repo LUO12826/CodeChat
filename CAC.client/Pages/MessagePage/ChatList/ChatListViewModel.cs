@@ -4,11 +4,10 @@ using System.Collections.ObjectModel;
 using System;
 using System.Diagnostics;
 using GalaSoft.MvvmLight.Messaging;
-using Windows.ApplicationModel.VoiceCommands;
 using Microsoft.Toolkit.Uwp.Helpers;
 using CodeChatSDK.EventHandler;
 using System.Linq;
-using Windows.Devices.PointOfService;
+
 
 namespace CAC.client.MessagePage
 {
@@ -21,20 +20,33 @@ namespace CAC.client.MessagePage
         public ChatListViewModel()
         {
             CommunicationCore.client.AddMessageEvent += Client_AddMessageEvent;
-            CommunicationCore.client.AddTopicEvent += Client_AddTopicEvent;
+            CommunicationCore.client.RemoveTopicEvent += Client_RemoveTopicEvent;
+        }
+
+        private void Client_RemoveTopicEvent(object sender, RemoveTopicEventArgs args)
+        {
+            var item = findChatlistItemByTopicName(args.Topic.Name);
+            if (item != null) {
+                DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    Items.Remove(item);
+                });
+            }
         }
 
         private void Client_AddTopicEvent(object sender, AddTopicEventArgs args)
         {
-            //var chatlistItem = ModelConverter.TopicToChatListItem(args.Topic);
-            //Items.Insert(0, chatlistItem);
+            var chatlistItem = ModelConverter.TopicToChatListItem(args.Topic);
+            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                Items.Insert(0, chatlistItem);
+            });
         }
 
         private void Client_AddMessageEvent(object sender, AddMessageEventArgs args)
         {
+            var msg = ModelConverter.MessageToMessageVM(args.Message);
+            var chat = findChatlistItemByTopicName(args.TopicName);
+
             DispatcherHelper.ExecuteOnUIThreadAsync(() => {
-                var msg = ModelConverter.MessageToMessageVM(args.Message);
-                var chat = findChatlistItemByTopicName(args.TopicName);
 
                 if (chat != null && args.Message.SeqId > chat.MaxMsgSeq) {
                     
@@ -43,14 +55,15 @@ namespace CAC.client.MessagePage
 
                     if (chat != selectedChat && !msg.SendByMe) {
 
-                        Items.Remove(chat);
-                        Items.Insert(0, chat);
+                        if(Items.IndexOf(chat) != 0) {
+                            Items.Remove(chat);
+                            Items.Insert(0, chat);
+                        }
                         chat.LastActiveTime = DateTime.Now;
                         chat.UnreadCount++;
                     }
                 }
 
-                
             });
 
         }
@@ -77,24 +90,12 @@ namespace CAC.client.MessagePage
 
         private ChatListBaseItemVM findChatlistItemByTopicName(string topic)
         {
-            if(Items == null || Items.Count <= 0) {
-                return null;
-            }
-            
-            foreach(var item in Items) {
-                if(item is ChatListBaseItemVM baseVM) {
-                    if(baseVM.TopicName == topic) {
-                        return baseVM;
-                    }
-                }
-            }
-
-            return null;
+            var res = Items.Where(x => (x as ChatListBaseItemVM).RawTopic.Name == topic).FirstOrDefault();
+            return res == null ? null : res as ChatListBaseItemVM;
         }
 
         public void ReloadChatList()
         {
-            Debug.WriteLine("--------ReloadChatList");
             Items.Clear();
             var topics = CommunicationCore.account.TopicList;
 
@@ -108,7 +109,8 @@ namespace CAC.client.MessagePage
                     Items.Add(item);
                 }
             });
-            
+
+            CommunicationCore.client.AddTopicEvent += Client_AddTopicEvent;
         }
     }
 }

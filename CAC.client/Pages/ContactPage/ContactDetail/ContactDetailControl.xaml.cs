@@ -1,19 +1,10 @@
 ﻿using GalaSoft.MvvmLight.Messaging;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
+
 
 
 namespace CAC.client.ContactPage
@@ -73,6 +64,32 @@ namespace CAC.client.ContactPage
         private void RequestOpenContact(ContactBaseViewModel obj)
         {
             this.ContactItem = obj;
+        }
+
+        private async void btnDeleteContact_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            var msgDialog = new Windows.UI.Popups.MessageDialog("确定要删除联系人" + Contact.DisplayName + "吗?") 
+            { Title = "删除联系人" };
+            
+            msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定", (a) => {
+                deleteContact();
+            }));
+
+            msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("取消"));
+
+            await msgDialog.ShowAsync();
+        }
+
+        private async void deleteContact()
+        {
+            var subscriber = CommunicationCore.accountController.GetSubscriberByUserId(Contact.UserID);
+            bool result = await CommunicationCore.accountController.RemoveSubscriber(subscriber);
+            if(result) {
+
+            }
+            else {
+
+            }
         }
     }
 }

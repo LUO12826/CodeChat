@@ -514,13 +514,13 @@
     </Page.Resources>
 
     <Grid>
-        <StackPanel x:Name="loginPanel" Height="350" Width="400">
-
+        <StackPanel x:Name="loginPanel" Height="500" Width="400">
+            <Image Source="/Assets/icons/icon_grey.png" Width="120" Height="120" Margin="0 0 0 20"/>
             <AutoSuggestBox x:Name="userNameBox" TextChanged="userNameBox_TextChanged" SuggestionChosen="userNameBox_SuggestionChosen"
-                      Width="250" Padding="9" FontSize="16" Height="42"/>
+                      Width="250" Padding="9" FontSize="16" Height="42" VerticalContentAlignment="Center" PlaceholderText="用户名"/>
             <!--<TextBox x:Name="userNameBox" Style="{StaticResource userNameBoxStyle}" 
                       Width="250" Padding="9" FontSize="16"/>-->
-            <PasswordBox  x:Name="passwordBox" Margin="0 10 0 0" Width="250" Padding="9" FontSize="16"/>
+            <PasswordBox  x:Name="passwordBox" Margin="0 10 0 0" Width="250" Padding="9" FontSize="16" PlaceholderText="密码"/>
             <Grid Margin="0 10 0 0" Height="100" Width="250">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>

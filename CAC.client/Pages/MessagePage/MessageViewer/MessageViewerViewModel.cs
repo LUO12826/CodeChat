@@ -137,6 +137,7 @@ namespace CAC.client.MessagePage
                 }
                 else {
                     Messages.Add(msg);
+                    chatItem.LatestMessage = GlobalFunctions.MessageToLatestString(msg);
                 }
             });
         }
