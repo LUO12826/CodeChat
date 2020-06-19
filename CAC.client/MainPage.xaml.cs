@@ -6,6 +6,9 @@ using System;
 using GalaSoft.MvvmLight.Messaging;
 using CAC.client.CodeEditorPage;
 using System.ComponentModel;
+using System.Threading.Tasks;
+using Microsoft.Toolkit.Uwp.Helpers;
+using CAC.client.Common;
 
 namespace CAC.client
 {
@@ -34,6 +37,23 @@ namespace CAC.client
             this.InitializeComponent();
             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
             Messenger.Default.Register<CodeEditSessionInfo>(this, "RequestEditCodeToken", RequestEditCode);
+            GlobalRef.Navigator = Navigator;
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e)
+        {
+            base.OnNavigatedTo(e);
+            codeEditor.AllSessionClosed += CodeEditor_AllSessionClosed;
+            naviFrame.Navigate(typeof(MessagePage.MessagePage), 0);
+            currentPage = "chat";
+
+            Task.Run(async () => {
+                await Task.Delay(1000);
+                await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    Avatar = CommunicationCore.account.Avatar.IsNullOrEmpty() ? GlobalConfigs.defaultAvatar : CommunicationCore.account.Avatar;
+                });
+            });
+            
         }
 
         private void RequestEditCode(CodeEditSessionInfo session)
@@ -42,7 +62,7 @@ namespace CAC.client
             if(!CodeEditorPageExpanded) {
                 int AddWidth = 300;
                 if (GlobalFunctions.TryResizeWindow(AddWidth, 0)) {
-                    Debug.WriteLine("resize ok");
+
                 }
                 MainGrid.Expan(AddWidth);
                 codeEditorFrame.Content = codeEditor;
@@ -53,14 +73,7 @@ namespace CAC.client
             
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-            codeEditor.AllSessionClosed += CodeEditor_AllSessionClosed;
-            naviFrame.Navigate(typeof(MessagePage.MessagePage), 0);
-            currentPage = "chat";
-            Avatar = CommunicationCore.account.Avatar;
-        }
+
 
         private void CodeEditor_AllSessionClosed()
         {

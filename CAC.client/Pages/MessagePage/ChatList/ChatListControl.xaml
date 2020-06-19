@@ -22,6 +22,7 @@
         <ListView x:Name="ChatsList" SelectionMode="Single"
                   IsItemClickEnabled="True"
                   ItemClick="ChatsList_ItemClick"
+                  SelectedItem="{x:Bind VM.SelectedChat, Mode=OneWay}"
                   ItemTemplateSelector="{StaticResource ChatListDataTemplateSelector}"
                   Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
                   ItemsSource="{x:Bind VM.Items, Mode=OneWay}">

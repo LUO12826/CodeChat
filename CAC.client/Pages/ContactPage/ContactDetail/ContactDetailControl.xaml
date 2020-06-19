@@ -127,7 +127,7 @@
                           Width="90" Height="90"/>
             
             <StackPanel Grid.Row="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Button  HorizontalAlignment="Center" Content="发送消息" Width="100" Height="40"/>
+                <Button x:Name="btnSendMessage"  HorizontalAlignment="Center" Content="发送消息" Width="100" Height="40" Tapped="btnSendMessage_Tapped"/>
                 <Rectangle Width="20" Fill="Transparent"/>
                 <Button x:Name="btnDeleteContact" Style="{StaticResource btnDeleteContactStyle}"  HorizontalAlignment="Center" Width="100" Height="40"
                          Foreground="{ThemeResource ApplicationPageBackgroundThemeBrush}" Content="删除联系人" Tapped="btnDeleteContact_Tapped"/>

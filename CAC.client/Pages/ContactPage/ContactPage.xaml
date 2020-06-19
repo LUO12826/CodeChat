@@ -29,7 +29,10 @@
                                         Margin="10 0 5 0"
                                         TextChanged="searchUserBox_TextChanged"
                                         SuggestionChosen="searchUserBox_SuggestionChosen"
-                                        BorderBrush="{ThemeResource SystemControlPageBackgroundBaseLowBrush}"/>
+                                        BorderBrush="{ThemeResource SystemControlPageBackgroundBaseLowBrush}">
+                            
+                        </AutoSuggestBox>
+                            
 
                         <Button Style="{StaticResource transparentButtonStyle}" Grid.Column="1">
                             <Button.Flyout>
@@ -47,7 +50,7 @@
             </cc:ResizableMasterDetail.MasterContent>
 
             <cc:ResizableMasterDetail.DetailContent>
-                <local:ContactDetailControl x:Name="contactDetail"/>
+                <local:ContactDetailControl x:Name="contactDetail" DidDeleteContact="contactDetail_DidDeleteContact"/>
             </cc:ResizableMasterDetail.DetailContent>
         </cc:ResizableMasterDetail>
     </Grid>

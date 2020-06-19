@@ -21,4 +21,11 @@ namespace CAC.client
         code = 2,
         file = 3
     }
+
+    enum NaviItems
+    {
+        chat, 
+        contact,
+        settings
+    }
 }

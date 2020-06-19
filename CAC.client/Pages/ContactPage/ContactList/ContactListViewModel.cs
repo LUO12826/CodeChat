@@ -45,6 +45,8 @@ namespace CAC.client.ContactPage
 
         private void Client_AddSubscriberEvent(object sender, CodeChatSDK.EventHandler.AddSubscriberEventArgs args)
         {
+            if (args.isTemporary == true)
+                return;
             var contact = ModelConverter.SubscriberToContact(args.Subscriber);
             DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                 AllContact.Add(contact);
@@ -66,6 +68,12 @@ namespace CAC.client.ContactPage
                 var contact = ModelConverter.SubscriberToContact(sub);
                 AllContact.Add(contact);
             }
+        }
+
+        public void DeleteContact(ContactItemViewModel contact)
+        {
+            AllContact.Remove(contact);
+            Messenger.Default.Send(contact.UserID, "DeleteContactToken");
         }
     }
 }

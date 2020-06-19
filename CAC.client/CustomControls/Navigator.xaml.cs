@@ -2,18 +2,14 @@
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
+
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-
+using CAC.client;
 
 namespace CAC.client.CustomControls
 {
-    enum NaviItems
-    {
-        chat, contact, settings
-    }
+
 
     /// <summary>
     /// 最右侧导航栏。没做成一个通用性很强的组件。
@@ -72,20 +68,27 @@ namespace CAC.client.CustomControls
 
         public void SelectItem(NaviItems item)
         {
+            additionItemList.SelectedItem = null;
+            naviItemList.SelectedItem = null;
+
             switch (item) {
                 case NaviItems.chat:
                     naviItemList.SelectedItem = naviItem[0];
+                    OnNavigationChanged(this, naviItem[0].Tag);
                     break;
                 case NaviItems.contact:
                     naviItemList.SelectedItem = naviItem[1];
+                    OnNavigationChanged(this, naviItem[1].Tag);
                     break;
                 case NaviItems.settings:
                     additionItemList.SelectedItem = additionalItem[0];
+                    OnNavigationChanged(this, additionalItem[0].Tag);
                     break;
                 default:
                     break;
             }
         }
+
 
         private void naviItemList_ItemClick(object sender, ItemClickEventArgs e)
         {
@@ -125,6 +128,7 @@ namespace CAC.client.CustomControls
             }
         }
 
+        //清除选中标记。
         private void clearSelection()
         {
             foreach (var item in naviItem) {
@@ -167,6 +171,7 @@ namespace CAC.client.CustomControls
             }
         }
 
+        //界面根据此属性显示选中标记。
         public bool Selected {
             get => _Selected;
             set {

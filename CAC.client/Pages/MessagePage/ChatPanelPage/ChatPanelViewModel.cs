@@ -82,7 +82,12 @@ namespace CAC.client.MessagePage
 
         public void RequestCloseChat(ChatListChatItemVM chatListItem)
         {
-
+            if(ChatListItem == chatListItem) {
+                CurrentViewer = null;
+            }
+            if (messageViewerCache.ContainsKey(chatListItem)) {
+                messageViewerCache.Remove(chatListItem);
+            }
         }
 
         private async void sendFileHelper(StorageFile file)

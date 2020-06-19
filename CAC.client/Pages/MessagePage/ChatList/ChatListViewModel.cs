@@ -7,7 +7,8 @@ using GalaSoft.MvvmLight.Messaging;
 using Microsoft.Toolkit.Uwp.Helpers;
 using CodeChatSDK.EventHandler;
 using System.Linq;
-
+using CodeChatSDK.Models;
+using System.Threading.Tasks;
 
 namespace CAC.client.MessagePage
 {
@@ -15,12 +16,48 @@ namespace CAC.client.MessagePage
     {
         public ObservableCollection<IChatListItem> Items = new ObservableCollection<IChatListItem>();
 
-        private IChatListItem selectedChat;
+        private IChatListItem selectedChat = null;
+        public IChatListItem SelectedChat {
+            get => selectedChat;
+            set {
+                selectedChat = value;
+                RaisePropertyChanged(nameof(SelectedChat));
+            }
+        }
 
         public ChatListViewModel()
         {
             CommunicationCore.client.AddMessageEvent += Client_AddMessageEvent;
             CommunicationCore.client.RemoveTopicEvent += Client_RemoveTopicEvent;
+            Messenger.Default.Register<string>(this, "ProgrammlyOpenChatToken", ProgrammlyOpenChat);
+            Messenger.Default.Register<string>(this, "DeleteContactToken", didDeleteContact);
+        }
+
+        private void didDeleteContact(string userID)
+        {
+            var chatItem = Items.Where(x => (x as ChatListChatItemVM).TopicName == userID).FirstOrDefault();
+            if (chatItem == null) return;
+
+            RequestRemoveChat(chatItem);
+
+        }
+
+        /// <summary>
+        /// 程序内部调用的方式打开聊天会话
+        /// </summary>
+        /// <param name="topicName"></param>
+        private void ProgrammlyOpenChat(string topicName)
+        {
+            var chatItem = Items.Where(x => (x as ChatListChatItemVM).TopicName == topicName).FirstOrDefault();
+            if (chatItem == null) {
+                var topic = CommunicationCore.accountController.GetTopicByName(topicName);
+                var newChatItem = ModelConverter.TopicToChatListItem(topic);
+                Items.Insert(0, newChatItem);
+                DidSelectChat(newChatItem);
+                return;
+            }
+
+            DidSelectChat(chatItem);
         }
 
         private void Client_RemoveTopicEvent(object sender, RemoveTopicEventArgs args)
@@ -68,19 +105,33 @@ namespace CAC.client.MessagePage
 
         }
 
+        /// <summary>
+        /// 用户手动选择一个聊天会话时，将其打开。
+        /// </summary>
+        /// <param name="chatListItem"></param>
         public void DidSelectChat(IChatListItem chatListItem)
         {
             if(chatListItem is ChatListChatItemVM chatItem) {
-                selectedChat = chatItem;
                 chatItem.UnreadCount = 0;
-                Messenger.Default.Send(chatItem, "RequestOpenChatToken");
+                SelectedChat = chatItem;
+                Task.Run(async () => {
+                    await Task.Delay(20);
+                    await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                        Messenger.Default.Send(chatItem, "RequestOpenChatToken");
+                    });
+                });        
             }
-            
         }
+
 
         public void RequestRemoveChat(IChatListItem chatItem)
         {
-
+            if(Items.Contains(chatItem)) {
+                Messenger.Default.Send(chatItem, "RequestCloseChatToken");
+                SelectedChat = null;
+                Items.Remove(chatItem);
+            }
+            
         }
 
         public void RequestPinToTop(IChatListItem chatItem)
