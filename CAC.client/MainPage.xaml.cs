@@ -1,6 +1,5 @@
 ﻿using Windows.ApplicationModel.Core;
 using Windows.UI.Xaml.Controls;
-using System.Diagnostics;
 using Windows.UI.Xaml.Navigation;
 using System;
 using GalaSoft.MvvmLight.Messaging;
@@ -9,6 +8,10 @@ using System.ComponentModel;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Uwp.Helpers;
 using CAC.client.Common;
+using Windows.UI.Xaml;
+using Windows.UI.Core;
+using Windows.UI.ViewManagement;
+using Windows.UI;
 
 namespace CAC.client
 {
@@ -36,8 +39,12 @@ namespace CAC.client
         {
             this.InitializeComponent();
             CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
+            var tiWtleBar = ApplicationView.GetForCurrentView().TitleBar;
+            tiWtleBar.ButtonBackgroundColor = Color.FromArgb(0, 255, 255, 255);
+
             Messenger.Default.Register<CodeEditSessionInfo>(this, "RequestEditCodeToken", RequestEditCode);
             GlobalRef.Navigator = Navigator;
+            GlobalRef.MainPageNotification = notify;
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -68,11 +75,24 @@ namespace CAC.client
                 codeEditorFrame.Content = codeEditor;
                 CodeEditorPageExpanded = true;
             }
-            
+
             codeEditor.RequestOpenSession(session);
-            
         }
 
+        private async Task openEditorInNewWindow()
+        {
+            CoreApplicationView newView = CoreApplication.CreateNewView();
+            int newViewId = 0;
+            await newView.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => {
+                Frame frame = new Frame();
+                frame.Navigate(typeof(CodeEditorPage.CodeEditorPage));
+                Window.Current.Content = frame;
+                // You have to activate the window in order to show it later.
+                Window.Current.Activate();
+                newViewId = ApplicationView.GetForCurrentView().Id;
+            });
+            bool viewShown = await ApplicationViewSwitcher.TryShowAsStandaloneAsync(newViewId);
+        }
 
 
         private void CodeEditor_AllSessionClosed()

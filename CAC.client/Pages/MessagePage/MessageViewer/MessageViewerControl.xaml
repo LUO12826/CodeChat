@@ -195,7 +195,7 @@
                                    Visibility="{Binding ElementName=MessageViewerList, Path=DataContext.VM.IsGroupChat, Mode=OneWay}"
                                    Foreground="{ThemeResource SystemControlPageTextBaseMediumBrush}"/>
                         <local:FileMessageBubble Grid.Row="1" Grid.Column="1" FileName="{x:Bind FileName, Mode=OneWay}"
-                                                 Url="{x:Bind FileUri,Mode=OneWay}" State="{x:Bind DownloadState, Mode=OneWay}"/>
+                                                 Url="{x:Bind FileUri,Mode=OneWay}" State="{x:Bind DownloadState, Mode=TwoWay}"/>
 
                     </Grid>
                 </DataTemplate>

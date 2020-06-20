@@ -94,10 +94,9 @@ namespace CAC.client.MessagePage
             if (d is ImageMessageBubble ib) {
                 if (!(e.NewValue as string).IsNullOrEmpty() && ib.ImageUri.IsNullOrEmpty()) {
                     DispatcherHelper.ExecuteOnUIThreadAsync(() => {
-                        ib.isLoading = true;
+                        ib.image.Source = e.NewValue as string;
                     });
-                    //Bitmap image = Converter.ConvertBase64ToImage(e.NewValue as string);
-                    ib.image.Source = e.NewValue as string;
+                    
                 }
             }
         }
@@ -111,12 +110,9 @@ namespace CAC.client.MessagePage
 
         private void Image_ImageExOpened(object sender, Microsoft.Toolkit.Uwp.UI.Controls.ImageExOpenedEventArgs e)
         {
-
             DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                 isLoading = false;
             });
-
-            Debug.WriteLine("image loaded");
         }
 
         private void Image_ImageExFailed(object sender, Microsoft.Toolkit.Uwp.UI.Controls.ImageExFailedEventArgs e)

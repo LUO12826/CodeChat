@@ -18,7 +18,7 @@ namespace CAC.client.CodeEditorPage
     sealed partial class CodeEditorPage : Page
     {
         public event Action AllSessionClosed;
-
+        public static CodeEditorPage tempPage;
 
         private static CodeEditorPage _instance = null;
 
@@ -44,6 +44,7 @@ namespace CAC.client.CodeEditorPage
         public CodeEditorPage()
         {
             this.InitializeComponent();
+            tempPage = this;
         }
 
         //如果内部的代码编辑器没有初始化，初始化代码编辑器

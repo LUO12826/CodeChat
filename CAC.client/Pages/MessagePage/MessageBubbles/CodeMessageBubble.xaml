@@ -61,7 +61,7 @@
         </StackPanel>
 
         <Grid Grid.Row="1" Grid.Column="1" Visibility="{x:Bind RunResult,Mode=OneWay, Converter={StaticResource NullToVisibility}}">
-            <TextBlock Text="{x:Bind RunResult, Mode=OneWay}"/>
+            <TextBlock Text="{x:Bind RunResult, Mode=OneWay}" IsTextSelectionEnabled="True"/>
         </Grid>
     </Grid>
     

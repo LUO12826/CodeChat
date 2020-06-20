@@ -61,7 +61,7 @@ namespace CAC.client.CustomControls
         {
 
             var sub = e.ClickedItem as Subscriber;
-            string hint = "是否需要添加联系人" + sub.Username + "并发起会话?";
+            string hint = "是否需要添加联系人" + sub.Username + "?";
             var msgDialog = new Windows.UI.Popups.MessageDialog(hint) { Title = "添加联系人" };
             msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("是", (a) => {
                 addSubscriberOnline(sub);
@@ -74,10 +74,10 @@ namespace CAC.client.CustomControls
         {
             bool result = await CommunicationCore.accountController.AddSubscriber(sub);
             if(result) {
-
+                GlobalRef.MainPageNotification.Show("添加联系人成功", 2000);
             }
             else {
-
+                GlobalRef.MainPageNotification.Show("添加联系人失败，请稍后重试", 2000);
             }
         }
     }

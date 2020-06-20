@@ -8,11 +8,14 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    xmlns:primitiveContract7Present="using:Microsoft.UI.Xaml.Controls.Primitives?IsApiContractPresent(Windows.Foundation.UniversalApiContract,7)">
 
     <Grid>
 
-
+        <Rectangle Fill="{ThemeResource TabViewBackground}"
+                   Height="32" HorizontalAlignment="Stretch" VerticalAlignment="Top"/>
+        
         <controls:TabView x:Name="editorTabView" Margin="0 32 0 0" Height="39"
                           IsAddTabButtonVisible="True" SelectionChanged="editorTabView_SelectionChanged"
                           AddTabButtonClick="editorTabView_AddTabButtonClick"

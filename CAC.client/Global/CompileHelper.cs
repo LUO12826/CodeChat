@@ -1,5 +1,4 @@
 ﻿
-
 using CAC.client.Common;
 using System;
 using System.Diagnostics;
@@ -15,13 +14,12 @@ namespace CAC.client
     {
         private static string complieUrl = "http://39.98.65.135:8080/Test";
 
-
         public static string SerializeMessage(CompileInfo info)
         {
             DataContractJsonSerializer formatter = new DataContractJsonSerializer(typeof(CompileInfo));
             using (MemoryStream stream = new MemoryStream()) {
                 formatter.WriteObject(stream, info);
-                string result = System.Text.Encoding.UTF8.GetString(stream.ToArray());
+                string result = Encoding.UTF8.GetString(stream.ToArray());
                 return result;
             }
         }
@@ -33,14 +31,12 @@ namespace CAC.client
             req.Method = "POST";
             req.ContentType = "application/x-www-form-urlencoded";
 
-            #region 添加Post 参数
             byte[] data = Encoding.UTF8.GetBytes(content);
             req.ContentLength = data.Length;
             using (Stream reqStream = req.GetRequestStream()) {
                 reqStream.Write(data, 0, data.Length);
                 reqStream.Close();
             }
-            #endregion
 
             HttpWebResponse resp = (HttpWebResponse)req.GetResponse();
             Stream stream = resp.GetResponseStream();

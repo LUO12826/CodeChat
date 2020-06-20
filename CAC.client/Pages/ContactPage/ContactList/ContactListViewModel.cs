@@ -10,6 +10,7 @@ using Windows.Graphics.Printing.Workflow;
 using System.Diagnostics;
 using Windows.UI.Core;
 using Microsoft.Toolkit.Uwp.Helpers;
+using System.Threading.Tasks;
 
 namespace CAC.client.ContactPage
 {
@@ -43,15 +44,19 @@ namespace CAC.client.ContactPage
             }
         }
 
-        private void Client_AddSubscriberEvent(object sender, CodeChatSDK.EventHandler.AddSubscriberEventArgs args)
+        private async void Client_AddSubscriberEvent(object sender, CodeChatSDK.EventHandler.AddSubscriberEventArgs args)
         {
             if (args.isTemporary == true)
                 return;
             var contact = ModelConverter.SubscriberToContact(args.Subscriber);
-            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+            await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                 AllContact.Add(contact);
             });
-            
+
+            await Task.Delay(2000);
+            await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                ReloadContact();
+            });
         }
 
         public void DidSelectContact(ContactBaseViewModel contactItem)

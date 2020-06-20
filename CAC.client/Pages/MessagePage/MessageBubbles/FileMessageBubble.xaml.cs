@@ -8,6 +8,7 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Core;
 using Windows.Storage.Pickers;
+using Microsoft.Toolkit.Uwp.Helpers;
 
 namespace CAC.client.MessagePage
 {
@@ -31,7 +32,22 @@ namespace CAC.client.MessagePage
         }
 
         public static readonly DependencyProperty StateProperty =
-            DependencyProperty.Register("Url", typeof(int), typeof(FileMessageBubble), new PropertyMetadata(-1));
+            DependencyProperty.Register("Url", typeof(int), typeof(FileMessageBubble), new PropertyMetadata(-1, (d, arg) => { 
+                if(d is FileMessageBubble fm) {
+                    int state = (int)arg.NewValue;
+                    if(state == -1) {
+                        fm.downloadStateBlock.Visibility = Visibility.Collapsed;
+                    }
+                    else if(state == 0) {
+                        fm.downloadStateBlock.Visibility = Visibility.Visible;
+                        fm.downloadStateBlock.Text = "正在下载";
+                    }
+                    else if (state == 1) {
+                        fm.downloadStateBlock.Visibility = Visibility.Visible;
+                        fm.downloadStateBlock.Text = "下载完成";
+                    }
+                }
+            }));
 
         public int State {
             get { return (int)GetValue(StateProperty); }
@@ -76,20 +92,19 @@ namespace CAC.client.MessagePage
 
         void worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
- 
-         
         }
  
         void worker_DoWork(object sender, DoWorkEventArgs e)
-        {
-            
+        {    
         }
  
         public async void Invoke(Action action, CoreDispatcherPriority Priority = CoreDispatcherPriority.Normal)
         {
-            await Windows.ApplicationModel.Core.CoreApplication
-                .MainView.CoreWindow.Dispatcher.RunAsync(Priority, () => { action(); });
+            await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                State = 1;
+            });
         }
+
 
         private async void dowloadFile(StorageFolder folder, string fileName, string url)
         {
@@ -98,9 +113,10 @@ namespace CAC.client.MessagePage
                 return;
 
             isDownloading = true;
+            State = 0;
 
             try {
-                System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(url);
+                System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.WebRequest.Create(url);
                 request.Headers.Add("X-Tinode-APIKey", CommunicationCore.client.ApiKey);
                 request.Headers.Add("X-Tinode-Auth", "Token " + CommunicationCore.client.Token);
                 System.Net.WebResponse response = await request.GetResponseAsync();
@@ -108,7 +124,7 @@ namespace CAC.client.MessagePage
                 System.IO.Stream ns = response.GetResponseStream();
                 long totalSize = response.ContentLength;
                 double hasDownSize = 0;
-                byte[] nbytes = new byte[512];//521,2048 etc
+                byte[] nbytes = new byte[512];
                 int nReadSize = 0;
                 nReadSize = ns.Read(nbytes, 0, nbytes.Length);
 

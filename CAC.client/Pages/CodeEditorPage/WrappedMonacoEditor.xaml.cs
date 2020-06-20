@@ -11,6 +11,8 @@ using GalaSoft.MvvmLight.Messaging;
 using CAC.client.Common;
 using Microsoft.Toolkit.Uwp.Helpers;
 using System.Threading.Tasks;
+using Windows.Storage.Pickers;
+using Windows.Storage;
 
 namespace CAC.client.CodeEditorPage
 {
@@ -87,9 +89,51 @@ namespace CAC.client.CodeEditorPage
         }
 
 
-        private void save_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        private async void save_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
-            
+            editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
+            CurrentSession.Code = editor.Text;
+
+            string extension;
+            int langIndex = GlobalFunctions.FindPosInLangList(CurrentSession.Language);
+            if (langIndex != -1) {
+                extension = GlobalConfigs.HighlightLanguageExtension[langIndex];
+            }
+            else {
+                extension = GlobalConfigs.HighlightLanguageExtension[0];
+            }
+
+            var savePicker = new FileSavePicker();
+            savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
+            // Dropdown of file types the user can save the file as
+            savePicker.FileTypeChoices.Add(CurrentSession.Language, new List<string>() { extension });
+            // Default file name if the user does not type one in or select a file to replace
+            savePicker.SuggestedFileName = "code";
+
+            StorageFile file = await savePicker.PickSaveFileAsync();
+            writeCodeToFile(file);
+        }
+
+        private async void writeCodeToFile(StorageFile file)
+        {
+
+            if (file != null) {
+                // Prevent updates to the remote version of the file until
+                // we finish making changes and call CompleteUpdatesAsync.
+                CachedFileManager.DeferUpdates(file);
+                // write to file
+                await FileIO.WriteTextAsync(file, CurrentSession.Code);
+                // Let Windows know that we're finished changing the file so
+                // the other app can update the remote version of the file.
+                // Completing updates may require Windows to ask for user input.
+                Windows.Storage.Provider.FileUpdateStatus status = await CachedFileManager.CompleteUpdatesAsync(file);
+                if (status == Windows.Storage.Provider.FileUpdateStatus.Complete) {
+
+                }
+                else {
+
+                }
+            }
         }
 
         private void sendBack_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)

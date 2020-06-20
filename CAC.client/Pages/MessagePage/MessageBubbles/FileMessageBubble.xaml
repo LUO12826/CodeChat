@@ -23,11 +23,16 @@
             
             <TextBlock Text="{x:Bind FileName, Mode=OneWay}" TextWrapping="NoWrap"
                        HorizontalAlignment="Left" VerticalAlignment="Center" FontSize="16" Margin="0 12 0 0"/>
+
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="BtnDownload" Height="20" Width="20" Style="{StaticResource transparentButtonStyle}" 
+                    Padding="0" Margin="0 3 10 0" Click="BtnDownload_Click" CornerRadius="10">
+                    <FontIcon FontFamily="{StaticResource CAC-3}" Glyph="A" FontSize="16" Foreground="{ThemeResource SystemControlPageBackgroundBaseMediumBrush}"/>
+                </Button>
+                <TextBlock x:Name="downloadStateBlock" Text="正在下载" VerticalAlignment="Center" 
+                           Visibility="Collapsed" Foreground="{StaticResource SystemControlPageBackgroundBaseMediumBrush}"/>
+            </StackPanel>
             
-            <Button x:Name="BtnDownload" Height="18" Width="18" Style="{StaticResource transparentButtonStyle}" 
-                    Padding="0" Margin="0 0 0 0" Click="BtnDownload_Click" CornerRadius="10">
-                <FontIcon FontFamily="{StaticResource CAC-3}" Glyph="A" FontSize="14" Foreground="{ThemeResource SystemControlPageBackgroundBaseMediumBrush}"/>
-            </Button>
             
         </StackPanel>
 
