@@ -554,6 +554,8 @@ namespace CodeChatSDK.Controllers
             await topicController.SetTopic(removedTopic);
             topicController.DeleteTopic();
 
+            client.RemoveSubscriber(subscriber);
+
             return true;
         }
 
