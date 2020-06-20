@@ -141,20 +141,26 @@ namespace CAC.client.LoginPage
             else {
                 accounts.Remove(account);
                 accounts.Insert(0, newAccount);
-                if (!newAccount.RememberPassword) {
-                    var vault = new PasswordVault();
+                var vault = new PasswordVault();
+                if (!newAccount.RememberPassword && account.RememberPassword) {
                     var cred = vault.Retrieve(Application.Current.ToString(), newAccount.UserName);
-                    if(cred != null) {
+                    if (cred != null) {
                         vault.Remove(cred);
                     }
                 }
-                else {
-                    var vault = new PasswordVault();
+                else if (newAccount.RememberPassword && account.RememberPassword) {
                     var cred = vault.Retrieve(Application.Current.ToString(), newAccount.UserName);
                     if (cred != null) {
                         vault.Remove(cred);
                     }
                     vault.Add(new PasswordCredential(Application.Current.ToString(), newAccount.UserName, passwordBox.Password));
+                }
+                else if (newAccount.RememberPassword && !account.RememberPassword) {
+                    vault.Add(new PasswordCredential(Application.Current.ToString(), newAccount.UserName, passwordBox.Password));
+
+                }
+                else {
+
                 }
             }
 

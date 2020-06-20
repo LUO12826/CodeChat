@@ -65,7 +65,6 @@ namespace CAC.client.MessagePage
         public FileMessageBubble()
         {
             this.InitializeComponent();
-
         }
 
         private async void BtnDownload_Click(object sender, RoutedEventArgs e)
@@ -98,10 +97,12 @@ namespace CAC.client.MessagePage
         {    
         }
  
+        //文件下载完成时会调用此方法
         public async void Invoke(Action action, CoreDispatcherPriority Priority = CoreDispatcherPriority.Normal)
         {
             await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                 State = 1;
+                action();
             });
         }
 
@@ -147,18 +148,11 @@ namespace CAC.client.MessagePage
                         await dataWriter.FlushAsync();
                         await transaction.CommitAsync();
 
-                        this.Invoke(new Action(() => {
-                            
-
-                        }));
-                        // MessageBox.Show("下载完成");
-
+                        this.Invoke(new Action(() => {}));
                     }
                 }
-
             }
             catch (Exception ex) {
-                // fs.Close();
 
             }
             isDownloading = false;

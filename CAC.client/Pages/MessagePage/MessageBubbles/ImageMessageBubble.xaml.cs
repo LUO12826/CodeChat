@@ -1,25 +1,15 @@
 ﻿using CAC.client.Common;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.Storage.Streams;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
-using Windows.UI.Xaml.Navigation;
-using System.Net.Http;
 using Microsoft.Toolkit.Uwp.Helpers;
 using System.Net.Cache;
-using CodeChatSDK.Utils;
-using System.Drawing;
 using Brush = Windows.UI.Xaml.Media.Brush;
 
 namespace CAC.client.MessagePage
@@ -96,7 +86,6 @@ namespace CAC.client.MessagePage
                     DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                         ib.image.Source = e.NewValue as string;
                     });
-                    
                 }
             }
         }
@@ -169,7 +158,5 @@ namespace CAC.client.MessagePage
             image.ImageExOpened -= Image_ImageExOpened;
             image.ImageExFailed -= Image_ImageExFailed;
         }
-
-        
     }
 }
