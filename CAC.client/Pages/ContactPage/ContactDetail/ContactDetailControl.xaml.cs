@@ -97,11 +97,7 @@ namespace CAC.client.ContactPage
                 
             }
             else {
-                var msgDialog = new Windows.UI.Popups.
-                    MessageDialog("删除联系人" + Contact.DisplayName + "失败，请稍后再尝试。") { Title = "删除失败" };
-
-                msgDialog.Commands.Add(new Windows.UI.Popups.UICommand("确定"));
-                await msgDialog.ShowAsync();
+                GlobalRef.MainPageNotification.Show("删除联系人" + Contact.DisplayName + "失败，请稍后再尝试。", 2000);
             }
         }
 

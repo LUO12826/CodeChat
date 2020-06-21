@@ -28,6 +28,7 @@ namespace CAC.client.CodeEditorPage
         public event Action<string, string> SendCodeBack;
 
         private bool isSwitching = false;
+
         private CodeEditSessionInfo _currentSession;
         public CodeEditSessionInfo CurrentSession {
             get => _currentSession;
@@ -38,13 +39,13 @@ namespace CAC.client.CodeEditorPage
             }
         }
 
+        //下拉框语言选项
         private IEnumerable<string> LanguageOptions => GlobalConfigs.HighlightLanguageList;
 
 
         public WrappedMonacoEditor()
         {
             this.InitializeComponent();
-            
         }
 
         private void Editor_Loaded(object sender, RoutedEventArgs e)
@@ -78,13 +79,17 @@ namespace CAC.client.CodeEditorPage
             isSwitching = false;
         }
 
+        //当语言选项变化时
         private void languageOptionBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(isSwitching) {
                 return;
             }
+            //切换currentSession中的语言
             CurrentSession.Language = GlobalConfigs.HighlightLanguageListLower[languageOptionBox.SelectedIndex];
+            //切换代码编辑器中的语言
             editor.CodeLanguage = GlobalConfigs.HighlightLanguageListLower1[languageOptionBox.SelectedIndex];
+            //重新聚焦
             editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
         }
 
@@ -105,9 +110,7 @@ namespace CAC.client.CodeEditorPage
 
             var savePicker = new FileSavePicker();
             savePicker.SuggestedStartLocation = PickerLocationId.DocumentsLibrary;
-            // Dropdown of file types the user can save the file as
             savePicker.FileTypeChoices.Add(CurrentSession.Language, new List<string>() { extension });
-            // Default file name if the user does not type one in or select a file to replace
             savePicker.SuggestedFileName = "code";
 
             StorageFile file = await savePicker.PickSaveFileAsync();
@@ -128,13 +131,14 @@ namespace CAC.client.CodeEditorPage
                 // Completing updates may require Windows to ask for user input.
                 Windows.Storage.Provider.FileUpdateStatus status = await CachedFileManager.CompleteUpdatesAsync(file);
                 if (status == Windows.Storage.Provider.FileUpdateStatus.Complete) {
-
+                    GlobalRef.MainPageNotification.Show("保存成功", 1500);
                 }
                 else {
-
+                    GlobalRef.MainPageNotification.Show("保存失败，请稍后重试。", 1500);
                 }
             }
         }
+
 
         private void sendBack_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
@@ -181,8 +185,6 @@ namespace CAC.client.CodeEditorPage
                 });
                 string result = await CompileHelper.Compile(lang, Code, new Random().Next().ToString());
 
-                Debug.WriteLine(lang);
-                Debug.WriteLine(Code);
                 await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                     resultTextBlock.Text = result;
                 });

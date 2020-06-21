@@ -30,6 +30,7 @@ namespace CAC.client.MessagePage
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        #region 依赖属性
         public static readonly DependencyProperty BgColorProperty =
             DependencyProperty.Register("BgColor", typeof(Brush), typeof(ImageMessageBubble),
                 new PropertyMetadata(new SolidColorBrush(Windows.UI.Color.FromArgb(255, 255, 255, 255))));
@@ -54,6 +55,8 @@ namespace CAC.client.MessagePage
             set { SetValue(ImageBase64Property, value); }
         }
 
+        #endregion
+
         private static async void ImageUriChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if(d is ImageMessageBubble ib) {
@@ -69,6 +72,7 @@ namespace CAC.client.MessagePage
                             ib.image.Source = bitmap;  
                         });
                     }
+                    //图片加载失败，显示加载失败图
                     else {
                         await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                             ib.loadFailedBorder.Visibility = Visibility.Visible;
@@ -120,8 +124,6 @@ namespace CAC.client.MessagePage
                 return null;
 
             isDownloading = true;
-
-
             try {
                 System.Net.HttpWebRequest request = (System.Net.HttpWebRequest)System.Net.HttpWebRequest.Create(url);
                 //系统缓存
@@ -130,6 +132,8 @@ namespace CAC.client.MessagePage
                 request.Headers.Add("X-Tinode-APIKey", CommunicationCore.client.ApiKey);
                 request.Headers.Add("X-Tinode-Auth", "Token " + CommunicationCore.client.Token);
                 System.Net.WebResponse response = await request.GetResponseAsync();
+                
+                //这里存在一个将返回信息流转换为内存流的问题，参见msdn文档。
                 Stream stream = response.GetResponseStream();
                 // Create a .NET memory stream.
                 var memStream = new MemoryStream();

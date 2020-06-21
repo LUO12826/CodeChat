@@ -1,20 +1,24 @@
 ﻿using System;
-
 using Windows.Storage;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.IO;
 using System.Threading.Tasks;
-using Windows.System;
-using Microsoft.Toolkit.Uwp.UI.Controls.TextToolbarSymbols;
 using System.Collections.Generic;
-using Windows.ApplicationModel.VoiceCommands;
+using System.Linq;
 
 namespace CAC.client
 {
+    /// <summary>
+    /// 记录登录过的账号，以便在用户之后登录时给出提示。“自动登录”和“记住密码”功能也需要记录登录过的账号。
+    /// </summary>
     class AccountHelper
     {
         public static string AccountListFileName = "account.dat";
 
+        /// <summary>
+        /// 读取账号列表
+        /// </summary>
+        /// <returns></returns>
         public static async Task<List<AccountRecord>> GetAccountList()
         {
             
@@ -30,6 +34,9 @@ namespace CAC.client
             return BinRead(file.Path) != null ? (BinRead(file.Path) as List<AccountRecord>) : new List<AccountRecord>();
         }
 
+        /// <summary>
+        /// 存储账号列表
+        /// </summary>
         public static async void StorageAccountList(List<AccountRecord> account)
         {
             if (account == null)
@@ -46,6 +53,7 @@ namespace CAC.client
             BinFormat(file.Path, account);
         }
 
+        //序列化对象
         public static void BinFormat(string fileName, object obj)
         {
             var fs = new FileStream(fileName, FileMode.Create);
@@ -54,6 +62,7 @@ namespace CAC.client
             fs.Close();
         }
 
+        //反序列化对象
         public static object BinRead(string fileName)
         {
             var fs = new FileStream(fileName, FileMode.Open);
@@ -76,15 +85,13 @@ namespace CAC.client
         {
             if (records == null || records.Count <= 0)
                 return null;
-            foreach(var rec in records) {
-                if(rec.UserName == userName) {
-                    return rec;
-                }
-            }
-            return null;
+            return records.Where(x => x.UserName == userName).FirstOrDefault();
         }
     }
 
+    /// <summary>
+    /// 一条账号记录
+    /// </summary>
     [Serializable]
     class AccountRecord
     {

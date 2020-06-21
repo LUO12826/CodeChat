@@ -4,6 +4,9 @@ using Windows.UI.Xaml.Controls;
 
 namespace CAC.client
 {
+    /// <summary>
+    /// 全局引用。
+    /// </summary>
     class GlobalRef
     {
         public static Frame RootFrame;

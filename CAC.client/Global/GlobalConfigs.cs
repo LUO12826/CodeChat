@@ -5,6 +5,9 @@ using Windows.UI.Xaml.Media;
 
 namespace CAC.client
 {
+    /// <summary>
+    /// 全局配置。
+    /// </summary>
     class GlobalConfigs
     {
         /// <summary>

@@ -14,6 +14,9 @@ using CodeChatSDK.Models;
 
 namespace CAC.client
 {
+    /// <summary>
+    /// 存储使用SDK时必要的对象引用。实现与SDK的对接。
+    /// </summary>
     class CommunicationCore
     {
         public static Client client => Client.Instance;
@@ -22,7 +25,9 @@ namespace CAC.client
 
         public static Account account = AccountController.Instance;
 
-
+        /// <summary>
+        /// 配置客户端，一般在app启动时配置。
+        /// </summary>
         public static void ConfigClient()
         {
             client.ServerHost = GlobalConfigs.ServerHost;

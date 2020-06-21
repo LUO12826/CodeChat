@@ -47,6 +47,9 @@ namespace CAC.client
             return result;
         }
 
+        /// <summary>
+        /// 编译代码，返回结果字符串
+        /// </summary>
         public static async Task<string> Compile(string lang, string code, string id)
         {
             if(lang.IsNullOrEmpty() || code.IsNullOrEmpty() || id.IsNullOrEmpty()) {  

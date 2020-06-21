@@ -12,6 +12,9 @@ namespace CAC.client
 {
     class ModelConverter
     {
+        /// <summary>
+        /// 将SDK的subscriber类型转换为界面联系人列表中的项类型
+        /// </summary>
         public static ContactItemViewModel SubscriberToContact(Subscriber subscriber)
         {
             if (subscriber == null)
@@ -30,7 +33,9 @@ namespace CAC.client
             return contactVM;
         }
 
-
+        /// <summary>
+        /// 将SDK的topic类型转换为界面ChatList中的项类型
+        /// </summary>
         public static ChatListChatItemVM TopicToChatListItem(Topic topic)
         {
             if (topic == null)
@@ -49,6 +54,9 @@ namespace CAC.client
             return chatListItem;
         }
 
+        /// <summary>
+        /// 将SDK的消息类型转换为界面消息类型
+        /// </summary>
         public static MessageItemBaseVM MessageToMessageVM(ChatMessage msg)
         {
             if (msg == null) return null;
@@ -80,7 +88,8 @@ namespace CAC.client
                 string url = urls.Count > 0 ? urls[0] : "";
                 string name = attach.Count > 0 ? attach[0].Name : "";
                 string mime = attach.Count > 0 ? attach[0].Mime : "";
-                Debug.WriteLine(mime);
+                
+                //假如是以文件形式发送的图片
                 if (GlobalFunctions.FindPosInImageMineList(GlobalConfigs.ImageMime, mime) != -1) {
                     return new ImageMessageVM() {
                         Contact = contact,

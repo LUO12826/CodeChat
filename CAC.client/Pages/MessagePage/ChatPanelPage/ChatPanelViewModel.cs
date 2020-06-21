@@ -51,15 +51,13 @@ namespace CAC.client.MessagePage
 
         public ChatPanelViewModel()
         {
-            Messenger.Default.Register<ChatListChatItemVM>(this, "RequestOpenChatToken", RequestOpenChat);
             Messenger.Default.Register<ChatListChatItemVM>(this, "RequestCloseChatToken", RequestCloseChat);
+            Messenger.Default.Register<ChatListChatItemVM>(this, "RequestOpenChatToken", RequestOpenChat);
             Messenger.Default.Register<CodeEditSessionInfo>(this, "RequestSendCodeBackToken", RequestSendCodeBack);
         }
 
-        
-
         //当缓存中有时，直接从缓存中取，否则新建
-        public void RequestOpenChat(ChatListChatItemVM chatListItem)
+        private void RequestOpenChat(ChatListChatItemVM chatListItem)
         {
             ChatListItem = chatListItem;
             if (messageViewerCache.Keys.Contains(chatListItem)) {
@@ -80,10 +78,11 @@ namespace CAC.client.MessagePage
             CurrentViewer.VM.topicController.SendMessage(message);
         }
 
-        public void RequestCloseChat(ChatListChatItemVM chatListItem)
+        private void RequestCloseChat(ChatListChatItemVM chatListItem)
         {
-            if(ChatListItem == chatListItem) {
+            if (ChatListItem == chatListItem) {
                 CurrentViewer = null;
+                ChatListItem = null;
             }
             if (messageViewerCache.ContainsKey(chatListItem)) {
                 messageViewerCache.Remove(chatListItem);

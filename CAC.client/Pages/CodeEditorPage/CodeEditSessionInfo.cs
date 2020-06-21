@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 
 namespace CAC.client.CodeEditorPage
 {
-
+    /// <summary>
+    /// 代码编辑会话信息。
+    /// </summary>
     class CodeEditSessionInfo
     {
         public ContactItemViewModel Contact { get; set; }

@@ -7,10 +7,6 @@ namespace CAC.client.Common
     /// </summary>
     public class BaseViewModel : INotifyPropertyChanged
     {
-        /// <summary>
-        /// A global lock for property checks so prevent locking on different instances of expressions.
-        /// Considering how fast this check will always be it isn't an issue to globally lock all callers.
-        /// </summary>
         protected object PropertyValueCheckLock = new object();
 
         public event PropertyChangedEventHandler PropertyChanged = (sender, e) => { };

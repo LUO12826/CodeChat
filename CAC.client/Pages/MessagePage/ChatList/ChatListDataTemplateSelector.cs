@@ -1,7 +1,5 @@
 ﻿using Microsoft.Toolkit.Uwp.UI.Extensions;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 

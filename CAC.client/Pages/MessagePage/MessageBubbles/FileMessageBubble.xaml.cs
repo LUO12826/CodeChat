@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using System.ComponentModel;
 using Windows.Storage;
 using Windows.Storage.Streams;
@@ -45,6 +44,10 @@ namespace CAC.client.MessagePage
                     else if (state == 1) {
                         fm.downloadStateBlock.Visibility = Visibility.Visible;
                         fm.downloadStateBlock.Text = "下载完成";
+                    }
+                    else if (state == 2) {
+                        fm.downloadStateBlock.Visibility = Visibility.Visible;
+                        fm.downloadStateBlock.Text = "下载失败";
                     }
                 }
             }));
@@ -98,15 +101,17 @@ namespace CAC.client.MessagePage
         }
  
         //文件下载完成时会调用此方法
-        public async void Invoke(Action action, CoreDispatcherPriority Priority = CoreDispatcherPriority.Normal)
+        public void Invoke(Action action, CoreDispatcherPriority Priority = CoreDispatcherPriority.Normal)
         {
-            await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
-                State = 1;
-                action();
-            });
+            action();
         }
 
-
+        /// <summary>
+        /// 可报告进度的下载方法。
+        /// </summary>
+        /// <param name="folder"></param>
+        /// <param name="fileName"></param>
+        /// <param name="url"></param>
         private async void dowloadFile(StorageFolder folder, string fileName, string url)
         {
 
@@ -139,21 +144,25 @@ namespace CAC.client.MessagePage
 
                             nReadSize = ns.Read(nbytes, 0, 512);
                             hasDownSize += nReadSize;
-                            this.Invoke(new Action(() => {
-                            }));
-
+                            
                         }
 
                         transaction.Stream.Size = await dataWriter.StoreAsync();
                         await dataWriter.FlushAsync();
                         await transaction.CommitAsync();
 
-                        this.Invoke(new Action(() => {}));
+                        this.Invoke(() => {
+                            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                                State = 1;
+                            });
+                        });
                     }
                 }
             }
-            catch (Exception ex) {
-
+            catch {
+                await DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+                    State = 2;
+                });
             }
             isDownloading = false;
         }

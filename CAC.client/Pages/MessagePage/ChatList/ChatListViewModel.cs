@@ -45,7 +45,6 @@ namespace CAC.client.MessagePage
         /// <summary>
         /// 程序内部调用的方式打开聊天会话
         /// </summary>
-        /// <param name="topicName"></param>
         private void ProgrammlyOpenChat(string topicName)
         {
             var chatItem = Items.Where(x => (x as ChatListChatItemVM).TopicName == topicName).FirstOrDefault();
@@ -108,7 +107,6 @@ namespace CAC.client.MessagePage
         /// <summary>
         /// 用户手动选择一个聊天会话时，将其打开。
         /// </summary>
-        /// <param name="chatListItem"></param>
         public void DidSelectChat(IChatListItem chatListItem)
         {
             if(chatListItem is ChatListChatItemVM chatItem) {
@@ -126,12 +124,17 @@ namespace CAC.client.MessagePage
 
         public void RequestRemoveChat(IChatListItem chatItem)
         {
-            if(Items.Contains(chatItem)) {
-                Messenger.Default.Send(chatItem, "RequestCloseChatToken");
-                SelectedChat = null;
-                Items.Remove(chatItem);
+            //bool result = await CommunicationCore.accountController.RemoveTopic((chatItem as ChatListChatItemVM).RawTopic);
+            if(true) {
+                if (Items.Contains(chatItem)) {
+                    SelectedChat = null;
+                    Items.Remove(chatItem);
+                    Messenger.Default.Send(chatItem as ChatListChatItemVM, "RequestCloseChatToken");
+                }
             }
-            
+            else {
+
+            }
         }
 
         public void RequestPinToTop(IChatListItem chatItem)
@@ -152,7 +155,6 @@ namespace CAC.client.MessagePage
 
             DispatcherHelper.ExecuteOnUIThreadAsync(() => {
                 foreach (var topic in topics) {
-                    Debug.WriteLine(topic.Name);
                     if (topic.IsArchived || !topic.IsVisible)
                         continue;
 

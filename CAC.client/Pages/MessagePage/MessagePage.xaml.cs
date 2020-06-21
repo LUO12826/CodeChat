@@ -29,11 +29,6 @@ namespace CAC.client.MessagePage
             MessagePageViewModel.OnNavigateTo();
         }
 
-        private void BtnSearchUserOnline_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
-        {
-
-        }
-
         private async void searchUserBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
             if (isSearching && !(args.Reason == AutoSuggestionBoxTextChangeReason.UserInput))

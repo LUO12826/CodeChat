@@ -19,7 +19,7 @@ namespace CAC.client.MessagePage
         public static async void OnNavigateTo()
         {
             if(!initialized) {
-                await Task.Delay(1000);
+                await Task.Delay(1500);
                 ChatListViewModel.ReloadChatList();
                 initialized = true;
             }

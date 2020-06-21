@@ -8,6 +8,9 @@ using Windows.Storage;
 
 namespace CAC.client
 {
+    /// <summary>
+    /// 辅助SDK建立数据库。
+    /// </summary>
     class DatabaseHelper
     {
         public static async Task<SqliteAccountRepository> GetAccountRepoForUser(string userName)

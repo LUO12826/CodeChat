@@ -3,20 +3,15 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.IO;
-using System.Threading;
 using System.Threading.Tasks;
-using Windows.Storage;
 using Windows.UI.Xaml.Media;
 using CAC.client.ContactPage;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Messaging;
 using CAC.client.CodeEditorPage;
 using CodeChatSDK.Models;
 using CodeChatSDK.Controllers;
 using CodeChatSDK.EventHandler;
 using Microsoft.Toolkit.Uwp.Helpers;
-using Windows.UI.WindowManagement;
 using System.Linq;
 
 namespace CAC.client.MessagePage
@@ -41,9 +36,6 @@ namespace CAC.client.MessagePage
 
         public bool RequireCache { get; set; } = false;
 
-        //记录scrollViewer的垂直滚动位置，现在用不到了。
-        //public double VerticalScrollOffset { get; set; } = -1.0;
-
         public DateTime LastOpenTime { get; set; }
 
         public ObservableCollection<MessageItemBaseVM> Messages;
@@ -55,6 +47,7 @@ namespace CAC.client.MessagePage
                 RaisePropertyChanged(nameof(IsGroupChat));
             }
         }
+
         public Brush RightBubbleBgColor {
             get => _RightBubbleBgColor;
             set {
@@ -122,14 +115,14 @@ namespace CAC.client.MessagePage
         {
             if (args.TopicName != this.topicName)
                 return;
-
             var msg = ModelConverter.MessageToMessageVM(args.Message);
-            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
+            var oldestSeq = Messages.Count > 0 ? Messages[0].RawMessage.SeqId : -1;
 
-                var oldestSeq = Messages.Count > 0 ? Messages[0].RawMessage.SeqId : -1;
+            DispatcherHelper.ExecuteOnUIThreadAsync(() => {
 
                 if (Messages.Count <= 0) {
                     Messages.Add(msg);
+                    chatItem.LatestMessage = GlobalFunctions.MessageToLatestString(msg);
                     return;
                 }
                 if(msg.RawMessage.SeqId <= oldestSeq) {
@@ -166,6 +159,7 @@ namespace CAC.client.MessagePage
                 });
             }
 
+            await Task.Delay(100);
             topicController.LoadMessage();
         }
 
@@ -182,21 +176,6 @@ namespace CAC.client.MessagePage
             Messenger.Default.Send(newSession, "RequestEditCodeToken");
         }
 
-        //不使用
-        //private async Task<Tuple<List<MessageItemBaseVM>, bool>> loadMoreItems(uint itemsNum)
-        //{
-        //    var a = await Task.Run(async () => {
-        //        Thread.Sleep(2000);
-        //        var b = new List<MessageItemBaseVM>();
-        //        var exampleFile = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Assets");
-        //        var bb = await exampleFile.GetFolderAsync("Code");
-        //        var cc = await bb.GetFileAsync("example.java");
-        //        var text = await FileIO.ReadTextAsync(cc);
-        //        return b;
-        //    });
-
-        //    return new Tuple<List<MessageItemBaseVM>, bool>(new List<MessageItemBaseVM>(), false);
-        //}
 
 
         ~MessageViewerViewModel()

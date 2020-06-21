@@ -18,7 +18,6 @@ namespace CAC.client.CodeEditorPage
     sealed partial class CodeEditorPage : Page
     {
         public event Action AllSessionClosed;
-        public static CodeEditorPage tempPage;
 
         private static CodeEditorPage _instance = null;
 
@@ -31,20 +30,20 @@ namespace CAC.client.CodeEditorPage
             }
         }
 
-
         private WrappedMonacoEditor codeEditor;
 
         private bool innerEditorLoaded = false;
 
+        //由于MonacoEditor的加载需要一段时间，在此期间请求打开的session将被加入打开队列中。
         private Queue<CodeEditSessionInfo> waitingSessions = new Queue<CodeEditSessionInfo>();
 
+        //用一个字典存放打开的session和tab。
         private Dictionary<CodeEditSessionInfo, muxc.TabViewItem> openedSessions 
             = new Dictionary<CodeEditSessionInfo, muxc.TabViewItem>();
 
         public CodeEditorPage()
         {
             this.InitializeComponent();
-            tempPage = this;
         }
 
         //如果内部的代码编辑器没有初始化，初始化代码编辑器
@@ -158,6 +157,7 @@ namespace CAC.client.CodeEditorPage
             count++;
         }
 
+        //创建一个新tab。
         private muxc.TabViewItem createTabViewItem(CodeEditSessionInfo session)
         {
             var newTab = new muxc.TabViewItem() {

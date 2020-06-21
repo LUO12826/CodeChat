@@ -7,6 +7,9 @@ using Windows.UI.Xaml;
 
 namespace CAC.client
 {
+    /// <summary>
+    /// 全局方法。
+    /// </summary>
     class GlobalFunctions
     {
         /// <summary>
@@ -19,7 +22,9 @@ namespace CAC.client
             return ApplicationView.GetForCurrentView().TryResizeView(new Windows.Foundation.Size(width + widthIncrement, height + heightIncrement));
         }
 
-
+        /// <summary>
+        /// 找到一种语言在语言列表中的位置。
+        /// </summary>
         public static int FindPosInLangList(string lang)
         {
             var list = GlobalConfigs.HighlightLanguageListLower;
@@ -97,6 +102,9 @@ namespace CAC.client
             }
         }
 
+        /// <summary>
+        /// 在一个字符串数组中找
+        /// </summary>
         public static int FindPosInImageMineList(string[] list, string name)
         {
             if (list == null)
@@ -106,7 +114,6 @@ namespace CAC.client
                     return i;
                 }
             }
-
             return -1;
         }
 
