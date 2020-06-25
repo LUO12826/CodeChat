@@ -10,6 +10,9 @@ using System.Collections.Generic;
 
 namespace CAC.client
 {
+    /// <summary>
+    /// 将数据转换为ViewModel。
+    /// </summary>
     class ModelConverter
     {
         /// <summary>
@@ -60,7 +63,6 @@ namespace CAC.client
         public static MessageItemBaseVM MessageToMessageVM(ChatMessage msg)
         {
             if (msg == null) return null;
-            Debug.WriteLine("进行消息转换");
             var contact = CommunicationCore.GetContactByTopicName(msg.TopicName);
             bool sendByMe = !(msg.From == msg.TopicName);
 
@@ -90,7 +92,7 @@ namespace CAC.client
                 string mime = attach.Count > 0 ? attach[0].Mime : "";
                 
                 //假如是以文件形式发送的图片
-                if (GlobalFunctions.FindPosInImageMineList(GlobalConfigs.ImageMime, mime) != -1) {
+                if (GlobalFunctions.FindPosInImageMineList(GlobalConfigs.ImageMime, mime.ToLower()) != -1) {
                     return new ImageMessageVM() {
                         Contact = contact,
                         ID = msg.Id,

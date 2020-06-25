@@ -22,8 +22,11 @@ namespace CAC.client
 
         public static readonly string ApiKey = "AQEAAAABAAD_rAp4DJh05a1HAwFT3A6K";
 
+        //看起来消息中的mine类型不总是很规范的，只好增加一些不规范的写法以便识别出图片。
         public static string[] ImageMime =
-            { "image/gif",  "image/jpeg", "image/jpg", "image/png", "image/.jpg", "image/.jpeg", "image/.png", "image/.gif", "file/.jpg", "file/.jpeg", "file/.png" };
+            { "image/gif",  "image/jpeg", "image/jpg", "image/png", 
+            "image/.jpg", "image/.jpeg", "image/.png", "image/.gif",
+            "file/.jpg", "file/.jpeg", "file/.png"};
 
 
         public static string[] HighlightLanguageList = new string[] {
