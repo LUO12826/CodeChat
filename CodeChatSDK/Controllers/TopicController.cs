@@ -136,6 +136,12 @@ namespace CodeChatSDK.Controllers
         /// <returns>结果</returns>
         public async Task<bool> AddMessage(ChatMessage message)
         {
+            //判断消息是否已存在
+            //if (instance.MessageList.Contains(message))
+            //{
+                //已存在则添加失败返回假
+             //   return false;
+            //}
 
             int newSeqId = message.SeqId;
             int oldSeqId = instance.MessageList.Count == 0 ? instance.MinLocalSeqId : instance.MessageList[0].SeqId;
