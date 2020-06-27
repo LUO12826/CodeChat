@@ -94,7 +94,7 @@ namespace CAC.client.CodeEditorPage
         }
 
 
-        private async void save_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        private async void BtnSave_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
             CurrentSession.Code = editor.Text;
@@ -121,14 +121,10 @@ namespace CAC.client.CodeEditorPage
         {
 
             if (file != null) {
-                // Prevent updates to the remote version of the file until
-                // we finish making changes and call CompleteUpdatesAsync.
                 CachedFileManager.DeferUpdates(file);
-                // write to file
+                
                 await FileIO.WriteTextAsync(file, CurrentSession.Code);
-                // Let Windows know that we're finished changing the file so
-                // the other app can update the remote version of the file.
-                // Completing updates may require Windows to ask for user input.
+
                 Windows.Storage.Provider.FileUpdateStatus status = await CachedFileManager.CompleteUpdatesAsync(file);
                 if (status == Windows.Storage.Provider.FileUpdateStatus.Complete) {
                     GlobalRef.MainPageNotification.Show("保存成功", 1500);
@@ -140,7 +136,7 @@ namespace CAC.client.CodeEditorPage
         }
 
 
-        private void sendBack_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
+        private void BtnSendBack_Tapped(object sender, Windows.UI.Xaml.Input.TappedRoutedEventArgs e)
         {
             editor.Focus(Windows.UI.Xaml.FocusState.Keyboard);
             CurrentSession.Code = editor.Text;

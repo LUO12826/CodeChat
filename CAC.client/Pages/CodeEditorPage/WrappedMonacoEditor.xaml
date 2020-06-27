@@ -39,13 +39,13 @@
                     <FontIcon FontFamily="{StaticResource CAC-2}" Glyph="A"/>
                 </Button>
                 <!--保存到本地按钮-->
-                <Button x:Name="BtnSave" Style="{StaticResource transparentButtonStyle}" Tapped="save_Tapped"
+                <Button x:Name="BtnSave" Style="{StaticResource transparentButtonStyle}" Tapped="BtnSave_Tapped"
                         Margin="5 0 0 0" Width="30" Height="30" Padding="0">
                     <FontIcon FontFamily="{StaticResource microsoft}" Glyph="&#xE74E;"/>
                 </Button>
                 <!--发送回原会话按钮-->
                 <Button x:Name="BtnSendBack" Style="{StaticResource transparentButtonStyle}" Height="30"
-                        Margin="0 0 5 0" Tapped="sendBack_Tapped">
+                        Margin="0 0 5 0" Tapped="BtnSendBack_Tapped">
                     <FontIcon FontFamily="{StaticResource CAC-1}" Glyph="A" FontSize="18"/>
                 </Button>
 

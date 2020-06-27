@@ -92,9 +92,12 @@
         });
 
         var SwitchToSession = function(userToken, language, Code) {
+			//如果要切换的session就是当前的session，不用切换
             if(currentSession === userToken) return;
+			//下面的方法用于保存一些状态
             saveState();
             let newModel;
+			//如果models字典中还没有这个model，新建一个
             if(!models.hasOwnProperty(userToken)) {
                 newModel = monaco.editor.createModel(Code, language);
                 newModel.onDidChangeContent((event) => {
@@ -102,14 +105,17 @@
             });
                 models[userToken] = newModel;
 			}
+			//否则直接取出
             else {
                 newModel = models[userToken];
 			}
+			//为Monaco Editor切换model
             editor.setModel(newModel);
-            Debug.log("set model");
+            
             model = newModel;
-            Parent.setValue("Text", model.getValue());
             currentSession = userToken;
+			Parent.setValue("Text", model.getValue());
+			//恢复状态
             restoreState();
             editor.focus();  
 		}
